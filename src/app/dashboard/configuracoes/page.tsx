@@ -37,8 +37,9 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
       const { data: userData } = await supabase.from('users')
-        .select('barbershop_id, barbershops(*)').eq('id', user!.id).single()
+        .select('barbershop_id, barbershops(*)').eq('id', user.id).single()
       const shop = (userData as any)?.barbershops
       if (shop) {
         setBarbershopId(shop.id)

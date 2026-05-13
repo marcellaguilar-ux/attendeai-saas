@@ -1,14 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createHmac } from 'crypto'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+function verifyWebhookSignature(payload: string, signature: string | null): boolean {
+  const secret = process.env.INFINITEPAY_WEBHOOK_SECRET
+  if (!secret || !signature) return false
+  const expected = createHmac('sha256', secret).update(payload).digest('hex')
+  return expected === signature
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    const rawBody = await req.text()
+
+    // Verify webhook signature from payment provider
+    const signature = req.headers.get('x-webhook-signature') || req.headers.get('x-infinitepay-signature')
+    if (!verifyWebhookSignature(rawBody, signature)) {
+      return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
+    }
+
+    const body = JSON.parse(rawBody)
     const { order_nsu, transaction_nsu, capture_method, paid_amount } = body
 
     if (!order_nsu) return NextResponse.json({ error: 'order_nsu ausente' }, { status: 400 })

@@ -30,8 +30,8 @@ Execute o script abaixo no terminal (substitua os valores):
 node -e "
 const { createClient } = require('@supabase/supabase-js')
 const supabase = createClient(
-  'https://xikrkmemzxpblhkzkxvc.supabase.co',
-  'REDACTED_USE_ENV_VAR'
+  process.env.SUPABASE_URL,       // use env var — NEVER hardcode
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 async function main() {
   const NOME_RESPONSAVEL = 'João Silva'
@@ -96,8 +96,8 @@ Anote o **Barbershop ID** gerado — será usado nos próximos passos.
 Conecte ao servidor via SSH:
 
 ```bash
-ssh -p 22022 root@REDACTED_VPS_IP
-# senha: REDACTED
+ssh -p 22022 root@<VPS_IP>
+# senha armazenada no gerenciador de senhas da equipe
 ```
 
 ### 3.1 Criar pasta do novo cliente
@@ -156,7 +156,7 @@ O QR code será salvo em `/opt/whatsapp-agent-CLIENTE/whatsapp-qr.png`. Baixe e 
 
 ```bash
 # Para baixar o QR no seu Mac:
-scp -P 22022 root@REDACTED_VPS_IP:/opt/whatsapp-agent-CLIENTE/whatsapp-qr.png ~/Desktop/qr-CLIENTE.png
+scp -P <SSH_PORT> root@<VPS_IP>:/opt/whatsapp-agent-CLIENTE/whatsapp-qr.png ~/Desktop/qr-CLIENTE.png
 ```
 
 ---
@@ -169,8 +169,8 @@ Após o cliente escanear o QR e o agente conectar, o Supabase é atualizado auto
 node -e "
 const { createClient } = require('@supabase/supabase-js')
 const supabase = createClient(
-  'https://xikrkmemzxpblhkzkxvc.supabase.co',
-  'REDACTED_USE_ENV_VAR'
+  process.env.SUPABASE_URL,       // use env var — NEVER hardcode
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 supabase.from('whatsapp_instances').insert({
   barbershop_id: 'BARBERSHOP_ID_DO_PASSO_1',
@@ -219,9 +219,9 @@ Oriente o cliente a:
 | Recurso | Valor |
 |---|---|
 | Dashboard | https://barbearia-saas-eight.vercel.app |
-| VPS IP | REDACTED_VPS_IP |
-| VPS SSH porta | 22022 |
-| VPS usuário | root |
+| VPS IP | (ver gerenciador de senhas) |
+| VPS SSH porta | (ver gerenciador de senhas) |
+| VPS usuário | (ver gerenciador de senhas) |
 | Supabase projeto | xikrkmemzxpblhkzkxvc.supabase.co |
 | Service Account email | barbearia-monteiro@barbearia-monteiro-493422.iam.gserviceaccount.com |
 | Credenciais Google (VPS) | /opt/whatsapp-agent/google-credentials.json |

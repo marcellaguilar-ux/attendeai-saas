@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { rateLimit } from '@/lib/rate-limit'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,7 +8,38 @@ const supabaseAdmin = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (rateLimit(`cadastro:${ip}`, { max: 5, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Muitas tentativas. Aguarde um momento.' }, { status: 429 })
+  }
+
   const { nome, email, password, barbearia, telefone } = await req.json()
+
+  // Input validation
+  if (!nome || !email || !password || !barbearia) {
+    return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 })
+  }
+
+  if (typeof nome !== 'string' || nome.length > 200) {
+    return NextResponse.json({ error: 'Nome inválido' }, { status: 400 })
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (typeof email !== 'string' || !emailRegex.test(email) || email.length > 254) {
+    return NextResponse.json({ error: 'Email inválido' }, { status: 400 })
+  }
+
+  if (typeof password !== 'string' || password.length < 8) {
+    return NextResponse.json({ error: 'Senha deve ter no mínimo 8 caracteres' }, { status: 400 })
+  }
+
+  if (typeof barbearia !== 'string' || barbearia.length > 200) {
+    return NextResponse.json({ error: 'Nome da barbearia inválido' }, { status: 400 })
+  }
+
+  if (telefone && (typeof telefone !== 'string' || telefone.length > 30)) {
+    return NextResponse.json({ error: 'Telefone inválido' }, { status: 400 })
+  }
 
   // 1. Criar usuário no Auth
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -17,7 +49,7 @@ export async function POST(req: NextRequest) {
   })
 
   if (authError || !authData.user) {
-    return NextResponse.json({ error: authError?.message || 'Erro ao criar conta' }, { status: 400 })
+    return NextResponse.json({ error: 'Erro ao criar conta' }, { status: 400 })
   }
 
   // 2. Criar barbearia

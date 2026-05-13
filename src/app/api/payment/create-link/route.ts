@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 const PLANS: Record<string, { price: number; name: string }> = {
   starter:  { price: 19700, name: 'AttendeAI Starter' },
@@ -7,7 +9,30 @@ const PLANS: Record<string, { price: number; name: string }> = {
 }
 
 export async function POST(req: NextRequest) {
+  // Verify the user is authenticated and owns the barbershop
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll(cookiesToSet) {
+          try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {}
+        },
+      },
+    }
+  )
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+
   const { plano, barbershop_id, customer } = await req.json()
+
+  // Verify user owns this barbershop
+  const { data: userData } = await supabase.from('users').select('barbershop_id').eq('id', user.id).single()
+  if (!userData || userData.barbershop_id !== barbershop_id) {
+    return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+  }
 
   const plan = PLANS[plano]
   if (!plan) return NextResponse.json({ error: 'Plano inválido' }, { status: 400 })
@@ -40,13 +65,13 @@ export async function POST(req: NextRequest) {
   const data = await res.json()
 
   if (!res.ok) {
-    return NextResponse.json({ error: 'Erro ao criar link de pagamento', detail: data }, { status: 502 })
+    return NextResponse.json({ error: 'Erro ao criar link de pagamento' }, { status: 502 })
   }
 
   // InfinitePay may return the link under different field names
   const url = data.url || data.link || data.checkout_url || data.payment_url
   if (!url) {
-    return NextResponse.json({ error: 'Link não retornado', detail: data }, { status: 502 })
+    return NextResponse.json({ error: 'Link não retornado' }, { status: 502 })
   }
 
   return NextResponse.json({ url })
