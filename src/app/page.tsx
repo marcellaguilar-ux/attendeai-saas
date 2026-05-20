@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
+import { t, type Locale } from '@/lib/i18n'
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Instrument+Serif&display=swap');
@@ -437,6 +438,32 @@ nav {
 }
 .theme-toggle:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface-2); }
 .theme-toggle svg { width: 15px; height: 15px; }
+
+/* Language selector */
+.lang-selector {
+  display: flex;
+  gap: 1px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 2px;
+}
+.lang-btn {
+  padding: 5px 10px;
+  border-radius: 100px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all .2s;
+}
+.lang-btn:hover { color: var(--text); }
+.lang-btn.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+[data-theme="light"] .lang-btn.active { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
 
 /* ═══════════════════════════ BUTTONS ═══════════════════════════ */
 .btn {
@@ -1474,118 +1501,42 @@ footer {
 
 type UCKey = 'salao' | 'clinica' | 'oficina' | 'estudio' | 'restaurante'
 
-interface UCMessage {
-  who: string
-  text: string
-}
-
-interface UCData {
-  title: string
-  desc: string
-  points: string[]
-  preview: UCMessage[]
-}
-
-const UC_DATA: Record<UCKey, UCData> = {
-  salao: {
-    title: 'Salão de beleza',
-    desc: 'Clientes agendando corte, coloração e outros serviços — muitas vezes à noite, quando você já fechou. A IA atende, consulta sua agenda no Google Calendar, sugere horários e confirma o agendamento.',
-    points: [
-      'Agendamento 24h sem perder um cliente',
-      'Consulta disponibilidade no Google Calendar em tempo real',
-      'Confirmação do horário diretamente pelo WhatsApp',
-      'IA treinada com os serviços e horários do seu salão'
-    ],
-    preview: [
-      { who: 'bot', text: 'Olá! Bem-vinda ao Salão Luxe ✨' },
-      { who: 'user', text: 'Posso marcar uma mechas sábado?' },
-      { who: 'bot', text: 'Temos 10h e 15h disponíveis. Qual prefere?' },
-      { who: 'user', text: '15h' },
-      { who: 'confirm', text: 'Confirmado — mechas, sábado 15h.' }
-    ]
-  },
-  clinica: {
-    title: 'Clínica médica',
-    desc: 'Pacientes com dúvidas sobre disponibilidade e horários. A IA responde 24/7, agenda consultas no Google Calendar e confirma o atendimento pelo WhatsApp.',
-    points: [
-      'Agendamento de consultas 24h pelo WhatsApp',
-      'Consulta de disponibilidade em tempo real',
-      'Confirmação do agendamento no Google Calendar',
-      'IA treinada com as informações do seu consultório'
-    ],
-    preview: [
-      { who: 'bot', text: 'Olá! Clínica SorrisoBem. Como posso ajudar?' },
-      { who: 'user', text: 'Quero marcar uma consulta' },
-      { who: 'bot', text: 'Temos terça às 09:30 e quinta às 14h. Qual prefere?' },
-      { who: 'user', text: 'Terça' },
-      { who: 'confirm', text: 'Agendado — terça 09:30. Até lá!' }
-    ]
-  },
-  oficina: {
-    title: 'Oficina mecânica',
-    desc: 'Clientes que querem agendar inspeção ou revisão pelo WhatsApp. A IA coleta informações básicas, verifica disponibilidade no calendário e confirma o horário.',
-    points: [
-      'Agendamento de inspeções e revisões 24h',
-      'Coleta informações básicas do veículo e serviço',
-      'Consulta disponibilidade no Google Calendar',
-      'Confirmação automática pelo WhatsApp'
-    ],
-    preview: [
-      { who: 'user', text: 'Meu carro tá fazendo um barulho estranho' },
-      { who: 'bot', text: 'Entendi. Qual o modelo e ano?' },
-      { who: 'user', text: 'Civic 2018' },
-      { who: 'bot', text: 'Temos horário amanhã 14h para inspeção. Confirmo?' },
-      { who: 'confirm', text: 'Inspeção Civic 2018 · amanhã 14h.' }
-    ]
-  },
-  estudio: {
-    title: 'Estúdio & academia',
-    desc: 'Alunos consultando horários e querendo agendar aulas experimentais. A IA responde na hora, verifica disponibilidade e confirma o agendamento pelo WhatsApp.',
-    points: [
-      'Agendamento de aulas e experimentais 24h',
-      'Consulta de horários disponíveis por modalidade',
-      'Confirmação direta no Google Calendar',
-      'IA treinada com a grade e serviços da sua academia'
-    ],
-    preview: [
-      { who: 'user', text: 'Tem yoga à noite?' },
-      { who: 'bot', text: 'Sim! Segunda, quarta e sexta às 19h.' },
-      { who: 'user', text: 'Posso fazer uma aula experimental?' },
-      { who: 'bot', text: 'Claro, posso marcar pra segunda 19h?' },
-      { who: 'confirm', text: 'Aula experimental agendada. Até segunda!' }
-    ]
-  },
-  restaurante: {
-    title: 'Restaurante',
-    desc: 'Clientes querendo fazer reservas pelo WhatsApp, a qualquer hora. A IA atende, verifica disponibilidade e confirma a reserva no Google Calendar.',
-    points: [
-      'Reservas 24h sem depender de ligação',
-      'Verificação de disponibilidade em tempo real',
-      'Confirmação automática pelo WhatsApp',
-      'IA treinada com horários e informações do restaurante'
-    ],
-    preview: [
-      { who: 'user', text: 'Mesa pra 4 sábado 20h?' },
-      { who: 'bot', text: 'Temos disponibilidade. Confirmo a reserva?' },
-      { who: 'user', text: 'Sim!' },
-      { who: 'bot', text: 'Perfeito. Alguma restrição alimentar?' },
-      { who: 'confirm', text: 'Reserva 4 pessoas · sábado 20h.' }
-    ]
-  }
-}
-
 const WAVE_HEIGHTS = [35, 68, 42, 75, 55, 80, 38, 65, 48, 72, 40, 85, 52, 70, 45, 60, 77, 35, 90, 43, 65, 50, 78, 38, 62, 85, 44, 70, 55, 80, 37, 67, 48, 75, 42, 88, 52, 64, 38, 73]
 
-function UCPanel({ activeKey }: { activeKey: UCKey }) {
-  const d = UC_DATA[activeKey]
+const FEAT_ICONS = [
+  <svg key={0} viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  <svg key={1} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  <svg key={2} viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  <svg key={3} viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M7 16l4-4 4 4 5-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  <svg key={4} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M8 14h4M8 18h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  <svg key={5} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+]
+
+const STEP_ICONS = [
+  <svg key={0} viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>,
+  <svg key={1} viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 016 6c0 2-1 3-2 4v3a2 2 0 01-2 2h-4a2 2 0 01-2-2v-3c-1-1-2-2-2-4a6 6 0 016-6zM10 21h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  <svg key={2} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  <svg key={3} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+]
+
+const UC_TAB_ICONS = [
+  <svg key={0} viewBox="0 0 24 24" fill="none"><path d="M8 4l-2 8m12-8l2 8M6 12a6 6 0 0012 0M12 12v8M9 20h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  <svg key={1} viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  <svg key={2} viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5 5L3 18l3 3 6.7-6.7a4 4 0 005-5l-2.3 2.3-2.4-.7-.7-2.4 2.4-2.3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  <svg key={3} viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5"/></svg>,
+  <svg key={4} viewBox="0 0 24 24" fill="none"><path d="M5 3v18M5 3h3a4 4 0 010 8H5M19 3v18M19 3v6a3 3 0 003 3v9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+]
+
+function UCPanel({ activeKey, i }: { activeKey: UCKey; i: ReturnType<typeof t> }) {
+  const d = i.useCases[activeKey]
   return (
     <>
       <div className="uc-content">
         <h3>{d.title}</h3>
         <p>{d.desc}</p>
         <ul className="uc-list">
-          {d.points.map((p, i) => (
-            <li key={i}>
+          {d.points.map((p, idx) => (
+            <li key={idx}>
               <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               {p}
             </li>
@@ -1593,16 +1544,16 @@ function UCPanel({ activeKey }: { activeKey: UCKey }) {
         </ul>
       </div>
       <div className="uc-preview">
-        {d.preview.map((m, i) => {
+        {d.preview.map((m, idx) => {
           if (m.who === 'confirm') {
             return (
-              <div key={i} className="bubble confirm">
+              <div key={idx} className="bubble confirm">
                 <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 <div>{m.text}</div>
               </div>
             )
           }
-          return <div key={i} className={`bubble ${m.who}`}>{m.text}</div>
+          return <div key={idx} className={`bubble ${m.who}`}>{m.text}</div>
         })}
         <div className="typing"><i></i><i></i><i></i></div>
       </div>
@@ -1612,6 +1563,7 @@ function UCPanel({ activeKey }: { activeKey: UCKey }) {
 
 export default function LandingPage() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [locale, setLocale] = useState<Locale>('pt')
   const [activeUC, setActiveUC] = useState<UCKey>('salao')
   const [billingMode, setBillingMode] = useState<'m' | 'a'>('m')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -1621,23 +1573,29 @@ export default function LandingPage() {
     if (saved) setTheme(saved)
   }, [])
 
+  useEffect(() => {
+    const saved = localStorage.getItem('locale') as Locale | null
+    if (saved) setLocale(saved)
+  }, [])
+
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
     localStorage.setItem('theme', next)
   }
 
-  const prices: Record<string, { m: string; a: string }> = {
-    starter: { m: '197', a: '158' },
-    pro: { m: '397', a: '318' },
-    business: { m: '697', a: '558' },
+  function changeLocale(l: Locale) {
+    setLocale(l)
+    localStorage.setItem('locale', l)
   }
 
-  const periodText = billingMode === 'a' ? 'por mês · faturado anualmente' : 'por mês · faturado mensalmente'
+  const i = t(locale)
+
+  const periodText = billingMode === 'a' ? i.pricing.periodAnnual : i.pricing.periodMonthly
 
   const waveformBars = useMemo(() => {
-    return WAVE_HEIGHTS.map((h, i) => (
-      <i key={i} style={{ animationDelay: `${i * 0.05}s`, height: `${h}%` }} />
+    return WAVE_HEIGHTS.map((h, idx) => (
+      <i key={idx} style={{ animationDelay: `${idx * 0.05}s`, height: `${h}%` }} />
     ))
   }, [])
 
@@ -1656,24 +1614,7 @@ export default function LandingPage() {
     setOpenFaq(openFaq === index ? null : index)
   }
 
-  const faqItems = [
-    {
-      q: 'Preciso saber programar para configurar?',
-      a: 'Não. Você nos conta sobre seu negócio — serviços, horários, preços — e nossa equipe configura o agente para você. No plano Business, a ativação acontece em até 24h.'
-    },
-    {
-      q: 'Como funciona a integração com o WhatsApp?',
-      a: 'Conectamos ao seu número de WhatsApp via conexão direta. Seu número não muda, os clientes continuam falando normalmente — mas agora quem responde é a IA.'
-    },
-    {
-      q: 'A IA responde em português do Brasil com qualidade?',
-      a: 'Sim. Usamos modelos avançados de linguagem em pt-BR, com respostas naturais e contextuais. O agente é treinado com as informações do seu negócio para atender com o seu tom.'
-    },
-    {
-      q: 'Posso cancelar quando quiser?',
-      a: 'Sim, sem multas ou fidelidade mínima. Cancele a qualquer momento entrando em contato com nossa equipe.'
-    }
-  ]
+  const UC_KEYS: UCKey[] = ['salao', 'clinica', 'oficina', 'estudio', 'restaurante']
 
   return (
     <>
@@ -1687,13 +1628,20 @@ export default function LandingPage() {
             attende<span style={{ color: 'var(--muted)', fontWeight: 400 }}>.ai</span>
           </a>
           <ul className="nav-links">
-            <li><a href="#como-funciona">Como funciona</a></li>
-            <li><a href="#casos">Casos de uso</a></li>
-            <li><a href="#recursos">Recursos</a></li>
-            <li><a href="#precos">Preços</a></li>
-            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#como-funciona">{i.nav.howItWorks}</a></li>
+            <li><a href="#casos">{i.nav.useCases}</a></li>
+            <li><a href="#recursos">{i.nav.features}</a></li>
+            <li><a href="#precos">{i.nav.pricing}</a></li>
+            <li><a href="#faq">{i.nav.faq}</a></li>
           </ul>
           <div className="nav-right">
+            <div className="lang-selector">
+              {(['pt','en','es'] as Locale[]).map(l => (
+                <button key={l} className={`lang-btn${locale === l ? ' active' : ''}`} onClick={() => changeLocale(l)}>
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Alternar tema">
               {theme === 'dark' ? (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -1701,9 +1649,9 @@ export default function LandingPage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
               )}
             </button>
-            <a href="/login" className="nav-login-link">Entrar</a>
+            <a href="/login" className="nav-login-link">{i.nav.login}</a>
             <a href="/cadastro" className="nav-cta">
-              Criar conta
+              {i.nav.signup}
               <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
           </div>
@@ -1717,38 +1665,38 @@ export default function LandingPage() {
             <div className="hero-content">
               <div className="hero-pill">
                 <span className="tag"><span className="dot" style={{ display: 'inline-block', marginRight: '4px' }}></span>live</span>
-                IA em produção 24/7 no WhatsApp
+                {i.hero.pill}
               </div>
 
               <h1 className="hero-title">
-                Seu negócio<br />
-                nunca <em>para de</em><br />
-                atender clientes.
+                {i.hero.title1}<br />
+                {i.hero.title2} <em>{i.hero.titleEm}</em><br />
+                {i.hero.title3}
               </h1>
 
               <p className="hero-sub">
-                Um agente de IA que atende clientes pelo WhatsApp, agenda no Google Calendar, responde dúvidas e cuida dos clientes — enquanto você cuida do que importa.
+                {i.hero.sub}
               </p>
 
               <div className="hero-actions">
                 <a href="#como-funciona" className="btn btn-ghost">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M5 3v10l8-5-8-5z" fill="currentColor"/></svg>
-                  Ver demonstração
+                  {i.hero.cta}
                 </a>
               </div>
 
               <div className="hero-trust">
                 <div className="trust-item">
                   <div className="k"><span className="accent">24</span>/7</div>
-                  <div className="v">disponibilidade</div>
+                  <div className="v">{i.hero.trustAvailability}</div>
                 </div>
                 <div className="trust-item">
                   <div className="k"><span className="accent">98</span>%</div>
-                  <div className="v">taxa de resposta</div>
+                  <div className="v">{i.hero.trustResponseRate}</div>
                 </div>
                 <div className="trust-item">
                   <div className="k">R$<span className="accent">0</span></div>
-                  <div className="v">custo por mensagem perdida</div>
+                  <div className="v">{i.hero.trustCostPerMissed}</div>
                 </div>
               </div>
             </div>
@@ -1763,20 +1711,20 @@ export default function LandingPage() {
                         <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><path d="M12 2v4M8 18v3M16 18v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       </div>
                       <div>
-                        <div className="panel-title">Salão da Ana</div>
-                        <div className="panel-sub">whatsapp · attendeai</div>
+                        <div className="panel-title">{i.heroConversation.brandName}</div>
+                        <div className="panel-sub">{i.heroConversation.subtitle}</div>
                       </div>
                     </div>
-                    <div className="panel-status"><span className="dot"></span>online</div>
+                    <div className="panel-status"><span className="dot"></span>{i.heroConversation.online}</div>
                   </div>
                   <div className="panel-body">
-                    <div className="bubble bot">Olá! Bem-vinda ao Salão da Ana. Como posso ajudar hoje?</div>
-                    <div className="bubble user">Quero agendar um corte pra sexta</div>
-                    <div className="bubble bot">Perfeito! Temos horários às 10h, 14h e 16h na sexta. Qual prefere?</div>
-                    <div className="bubble user">14h tá ótimo!</div>
+                    <div className="bubble bot">{i.heroConversation.bot1}</div>
+                    <div className="bubble user">{i.heroConversation.user1}</div>
+                    <div className="bubble bot">{i.heroConversation.bot2}</div>
+                    <div className="bubble user">{i.heroConversation.user2}</div>
                     <div className="bubble confirm">
                       <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      <div>Agendado — sexta, 14h. Te envio um lembrete na véspera.</div>
+                      <div>{i.heroConversation.confirm}</div>
                     </div>
                     <div className="typing"><i></i><i></i><i></i></div>
                   </div>
@@ -1788,30 +1736,30 @@ export default function LandingPage() {
               <div className="variant v-dashboard">
                 <div className="dash-top">
                   <div className="dash-dots"><i></i><i></i><i></i></div>
-                  <div className="dash-url">app.attende.ai / inbox</div>
+                  <div className="dash-url">{i.heroDashboard.inboxUrl}</div>
                 </div>
                 <div className="dash-body">
                   <div className="dash-stats">
                     <div className="dash-stat">
-                      <div className="l">Atendimentos</div>
+                      <div className="l">{i.heroDashboard.attendances}</div>
                       <div className="n">247</div>
-                      <div className="d">↗ 32% esta semana</div>
+                      <div className="d">{i.heroDashboard.attendancesChange}</div>
                     </div>
                     <div className="dash-stat">
-                      <div className="l">Agendados</div>
+                      <div className="l">{i.heroDashboard.scheduled}</div>
                       <div className="n">89</div>
-                      <div className="d">↗ 18%</div>
+                      <div className="d">{i.heroDashboard.scheduledChange}</div>
                     </div>
                     <div className="dash-stat">
-                      <div className="l">Tempo médio</div>
+                      <div className="l">{i.heroDashboard.avgTime}</div>
                       <div className="n">1.4m</div>
-                      <div className="d down">↘ 45%</div>
+                      <div className="d down">{i.heroDashboard.avgTimeChange}</div>
                     </div>
                   </div>
                   <div className="dash-chart">
                     <div className="dash-chart-hd">
-                      <span className="l">Conversas por dia</span>
-                      <span className="v">últimos 7 dias</span>
+                      <span className="l">{i.heroDashboard.chartTitle}</span>
+                      <span className="v">{i.heroDashboard.chartSub}</span>
                     </div>
                     <svg viewBox="0 0 300 60" preserveAspectRatio="none">
                       <defs>
@@ -1827,17 +1775,17 @@ export default function LandingPage() {
                   <div className="dash-list">
                     <div className="dash-row">
                       <div className="ch"><svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" strokeWidth="1.5"/></svg></div>
-                      <div className="m"><div className="t">Maria Silva confirmou agendamento</div><div className="s">corte · sexta 14:00</div></div>
+                      <div className="m"><div className="t">{i.heroDashboard.event1Title}</div><div className="s">{i.heroDashboard.event1Sub}</div></div>
                       <div className="tm">2min</div>
                     </div>
                     <div className="dash-row">
                       <div className="ch"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/></svg></div>
-                      <div className="m"><div className="t">Chamada atendida · 2m 18s</div><div className="s">+55 11 9···· · belo horizonte</div></div>
+                      <div className="m"><div className="t">{i.heroDashboard.event2Title}</div><div className="s">{i.heroDashboard.event2Sub}</div></div>
                       <div className="tm">5min</div>
                     </div>
                     <div className="dash-row">
                       <div className="ch"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
-                      <div className="m"><div className="t">3 agendamentos criados</div><div className="s">google calendar · sincronizado</div></div>
+                      <div className="m"><div className="t">{i.heroDashboard.event3Title}</div><div className="s">{i.heroDashboard.event3Sub}</div></div>
                       <div className="tm">12min</div>
                     </div>
                   </div>
@@ -1855,18 +1803,18 @@ export default function LandingPage() {
                     <div className="phone-head">
                       <div className="av">A</div>
                       <div className="ti">
-                        <div className="n">Salão da Ana</div>
-                        <div className="s"><i></i> IA ativa · respondendo</div>
+                        <div className="n">{i.heroPhone.brandName}</div>
+                        <div className="s"><i></i> {i.heroPhone.status}</div>
                       </div>
                     </div>
                     <div className="phone-body">
-                      <div className="bubble bot">Olá! Como posso ajudar?</div>
-                      <div className="bubble user">Agendar corte sexta</div>
-                      <div className="bubble bot">10h, 14h ou 16h?</div>
-                      <div className="bubble user">14h</div>
+                      <div className="bubble bot">{i.heroPhone.bot1}</div>
+                      <div className="bubble user">{i.heroPhone.user1}</div>
+                      <div className="bubble bot">{i.heroPhone.bot2}</div>
+                      <div className="bubble user">{i.heroPhone.user2}</div>
                       <div className="bubble confirm">
                         <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        <div>Agendado!</div>
+                        <div>{i.heroPhone.confirm}</div>
                       </div>
                       <div className="typing"><i></i><i></i><i></i></div>
                     </div>
@@ -1880,7 +1828,7 @@ export default function LandingPage() {
         {/* LOGOS */}
         <div className="logos-section">
           <div className="wrap">
-            <div className="logos-label">Integrado com as ferramentas que você já usa</div>
+            <div className="logos-label">{i.logos.heading}</div>
             <div className="logos-row">
               <div className="logo-item"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> Google Calendar</div>
               <div className="logo-item"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3.5-7.1L21 3v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> WhatsApp Business</div>
@@ -1892,36 +1840,20 @@ export default function LandingPage() {
         <section className="how" id="como-funciona">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">Como funciona</div>
-              <h2 className="section-title">Do contato ao agendamento em segundos.</h2>
-              <p className="section-sub">Seu agente responde, entende e agenda — sem precisar de nenhuma ação sua.</p>
+              <div className="eyebrow">{i.howItWorks.eyebrow}</div>
+              <h2 className="section-title">{i.howItWorks.title}</h2>
+              <p className="section-sub">{i.howItWorks.sub}</p>
             </div>
 
             <div className="steps fade-up">
-              <div className="step">
-                <div className="step-num">01 / contato</div>
-                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg></div>
-                <h3>Cliente entra em contato</h3>
-                <p>Pelo WhatsApp, o agente atende imediatamente, a qualquer hora do dia ou da noite.</p>
-              </div>
-              <div className="step">
-                <div className="step-num">02 / compreensão</div>
-                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 016 6c0 2-1 3-2 4v3a2 2 0 01-2 2h-4a2 2 0 01-2-2v-3c-1-1-2-2-2-4a6 6 0 016-6zM10 21h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
-                <h3>IA entende e responde</h3>
-                <p>O agente entende a intenção com linguagem natural, responde dúvidas e coleta as informações necessárias.</p>
-              </div>
-              <div className="step">
-                <div className="step-num">03 / agendamento</div>
-                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Agenda automaticamente</h3>
-                <p>Consulta o Google Calendar em tempo real e confirma o horário diretamente com o cliente.</p>
-              </div>
-              <div className="step">
-                <div className="step-num">04 / confirmado</div>
-                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Agendamento salvo</h3>
-                <p>O agendamento é registrado no Google Calendar e no painel. Você acompanha tudo em um só lugar, sem precisar fazer nada.</p>
-              </div>
+              {i.howItWorks.steps.map((step, idx) => (
+                <div className="step" key={idx}>
+                  <div className="step-num">{step.num} / {step.label}</div>
+                  <div className="step-ico">{STEP_ICONS[idx]}</div>
+                  <h3>{step.title}</h3>
+                  <p>{step.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -1930,30 +1862,26 @@ export default function LandingPage() {
         <section className="usecases" id="casos">
           <div className="wrap">
             <div className="section-head fade-up">
-              <div className="eyebrow">Casos de uso</div>
-              <h2 className="section-title">Feito para o ritmo do seu negócio.</h2>
-              <p className="section-sub">Veja como a AttendeAI se adapta à rotina de diferentes segmentos — do salão de beleza à clínica médica.</p>
+              <div className="eyebrow">{i.useCases.eyebrow}</div>
+              <h2 className="section-title">{i.useCases.title}</h2>
+              <p className="section-sub">{i.useCases.sub}</p>
             </div>
 
             <div className="uc-tabs fade-up" id="ucTabs">
-              {(['salao', 'clinica', 'oficina', 'estudio', 'restaurante'] as UCKey[]).map((key) => (
+              {UC_KEYS.map((key, index) => (
                 <button
                   key={key}
                   className={`uc-tab${activeUC === key ? ' active' : ''}`}
                   onClick={() => setActiveUC(key)}
                 >
-                  {key === 'salao' && <svg viewBox="0 0 24 24" fill="none"><path d="M8 4l-2 8m12-8l2 8M6 12a6 6 0 0012 0M12 12v8M9 20h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  {key === 'clinica' && <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-                  {key === 'oficina' && <svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5 5L3 18l3 3 6.7-6.7a4 4 0 005-5l-2.3 2.3-2.4-.7-.7-2.4 2.4-2.3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>}
-                  {key === 'estudio' && <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5"/></svg>}
-                  {key === 'restaurante' && <svg viewBox="0 0 24 24" fill="none"><path d="M5 3v18M5 3h3a4 4 0 010 8H5M19 3v18M19 3v6a3 3 0 003 3v9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  {key === 'salao' ? 'Salão de beleza' : key === 'clinica' ? 'Clínica médica' : key === 'oficina' ? 'Oficina' : key === 'estudio' ? 'Estúdio / Academia' : 'Restaurante'}
+                  {UC_TAB_ICONS[index]}
+                  {i.useCases.tabs[index]}
                 </button>
               ))}
             </div>
 
             <div className="uc-panel fade-up" id="ucPanel">
-              <UCPanel activeKey={activeUC} />
+              <UCPanel activeKey={activeUC} i={i} />
             </div>
           </div>
         </section>
@@ -1962,42 +1890,19 @@ export default function LandingPage() {
         <section id="recursos">
           <div className="wrap">
             <div className="section-head fade-up">
-              <div className="eyebrow">Recursos</div>
-              <h2 className="section-title">Tudo que um atendente profissional faz — e mais.</h2>
-              <p className="section-sub">Sem folgas, sem hora extra, sem atestado. O melhor atendente do seu negócio custa menos que um almoço por dia.</p>
+              <div className="eyebrow">{i.features.eyebrow}</div>
+              <h2 className="section-title">{i.features.title}</h2>
+              <p className="section-sub">{i.features.sub}</p>
             </div>
 
             <div className="features-grid fade-up">
-              <div className="feat-card">
-                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
-                <h3>WhatsApp inteligente</h3>
-                <p>Responde mensagens com entendimento contextual, envia confirmações e conduz a conversa até o agendamento — de forma natural e automática.</p>
-              </div>
-              <div className="feat-card">
-                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
-                <h3>Agendamento em tempo real</h3>
-                <p>Consulta disponibilidade, cria eventos, envia convites e dispara lembretes — tudo integrado direto ao seu Google Calendar.</p>
-              </div>
-              <div className="feat-card">
-                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
-                <h3>Personalização total</h3>
-                <p>Configure serviços, preços e horários de atendimento de forma simples. O agente aprende sobre seu negócio e atende com o tom certo.</p>
-              </div>
-              <div className="feat-card">
-                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M7 16l4-4 4 4 5-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Painel de gestão</h3>
-                <p>Agendamentos organizados num painel limpo. Visualize próximas visitas, histórico e status da conexão WhatsApp em um só lugar.</p>
-              </div>
-              <div className="feat-card">
-                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M8 14h4M8 18h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
-                <h3>Histórico de agendamentos</h3>
-                <p>Todos os agendamentos registrados e acessíveis no painel. Veja data, serviço e cliente — sem depender de cadernos ou planilhas.</p>
-              </div>
-              <div className="feat-card">
-                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Disponível 24/7</h3>
-                <p>O agente nunca para. Atende clientes de madrugada, fins de semana e feriados sem custo adicional — e sem você precisar fazer nada.</p>
-              </div>
+              {i.features.cards.map((card, idx) => (
+                <div className="feat-card" key={idx}>
+                  <div className="feat-ico">{FEAT_ICONS[idx]}</div>
+                  <h3>{card.title}</h3>
+                  <p>{card.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -2006,79 +1911,39 @@ export default function LandingPage() {
         <section className="pricing how" id="precos">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">Planos e preços</div>
-              <h2 className="section-title">Comece hoje. Cancele quando quiser.</h2>
-              <p className="section-sub">Sem taxa de adesão, sem fidelidade. Só resultados.</p>
+              <div className="eyebrow">{i.pricing.eyebrow}</div>
+              <h2 className="section-title">{i.pricing.title}</h2>
+              <p className="section-sub">{i.pricing.sub}</p>
             </div>
 
 
             <div className="plans fade-up">
-              {/* STARTER */}
-              <div className="plan">
-                <div className="plan-name">Starter</div>
-                <div className="plan-price">
-                  <span className="plan-currency">R$</span>
-                  <span className="plan-amount">197</span>
+              {i.pricing.plans.map((plan, idx) => (
+                <div className={`plan${plan.popular ? ' featured' : ''}`} key={idx}>
+                  {plan.popular && <div className="plan-badge">{i.pricing.badge}</div>}
+                  <div className="plan-name">{plan.name}</div>
+                  <div className="plan-price">
+                    <span className="plan-amount">{billingMode === 'a' ? plan.priceAnnual : plan.price}</span>
+                  </div>
+                  <div className="plan-period">{periodText}</div>
+                  <p className="plan-desc">{plan.desc}</p>
+                  <ul className="plan-feats">
+                    {plan.features.map((feat, fi) => (
+                      <li key={fi}>
+                        <svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={`/cadastro?plano=${['starter','pro','business'][idx]}`} className={`btn-plan ${plan.popular ? 'filled' : 'outline'}`}>
+                    {plan.cta} <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
                 </div>
-                <div className="plan-period">por mês · faturado mensalmente</div>
-                <p className="plan-desc">Ideal para barbearias que querem automatizar o agendamento pelo WhatsApp.</p>
-                <ul className="plan-feats">
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agente IA no WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agendamento no Google Calendar</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Verificação de disponibilidade em tempo real</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Confirmação automática pelo WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>1 número de WhatsApp</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Painel de gestão</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Onboarding dedicado</span></li>
-                </ul>
-                <a href="/cadastro?plano=starter" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-              </div>
-
-              {/* PRO */}
-              <div className="plan featured">
-                <div className="plan-badge">Mais popular</div>
-                <div className="plan-name">Pro</div>
-                <div className="plan-price">
-                  <span className="plan-currency">R$</span>
-                  <span className="plan-amount">397</span>
-                </div>
-                <div className="plan-period">por mês · faturado mensalmente</div>
-                <p className="plan-desc">Para barbearias que querem automação completa com visibilidade total do negócio.</p>
-                <ul className="plan-feats">
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Starter</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Painel de gestão completo</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Histórico de agendamentos</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Status da conexão WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configurações da barbearia</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte por e-mail</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Onboarding dedicado</span></li>
-                </ul>
-                <a href="/cadastro?plano=pro" className="btn-plan filled">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-              </div>
-
-              {/* BUSINESS */}
-              <div className="plan">
-                <div className="plan-name">Business</div>
-                <div className="plan-price">
-                  <span className="plan-currency">R$</span>
-                  <span className="plan-amount">697</span>
-                </div>
-                <div className="plan-period">por mês · faturado mensalmente</div>
-                <p className="plan-desc">Para quem quer começar sem complicação — a gente configura tudo para você.</p>
-                <ul className="plan-feats">
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Pro</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Onboarding dedicado</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configuração completa do agente</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte prioritário via WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Ativação em até 24h</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Treinamento do agente personalizado</span></li>
-                </ul>
-                <a href="/cadastro?plano=business" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-              </div>
+              ))}
             </div>
 
             <div className="pricing-foot">
-              <span><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2"/></svg> Pagamento 100% seguro</span>
+              <span><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2"/></svg> {i.pricing.footer}</span>
             </div>
           </div>
         </section>
@@ -2087,12 +1952,12 @@ export default function LandingPage() {
         <section className="how" id="faq">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">Perguntas frequentes</div>
-              <h2 className="section-title">Ainda tem dúvidas?</h2>
+              <div className="eyebrow">{i.faq.eyebrow}</div>
+              <h2 className="section-title">{i.faq.title}</h2>
             </div>
 
             <div className="faq-wrap">
-              {faqItems.map((item, index) => (
+              {i.faq.items.map((item, index) => (
                 <div key={index} className="faq-item fade-up" data-open={openFaq === index ? "true" : undefined}>
                   <button type="button" className="faq-q" onClick={(e) => { e.preventDefault(); toggleFaq(index) }}>
                     {item.q}
@@ -2110,11 +1975,11 @@ export default function LandingPage() {
         {/* CTA FINAL */}
         <div className="cta-final">
           <div className="wrap cta-final-inner fade-up">
-            <div className="eyebrow" style={{ justifyContent: 'center', display: 'inline-flex' }}>Comece agora</div>
-            <h2>Seu próximo cliente está <em>tentando</em> te contatar agora.</h2>
-            <p>Enquanto você dorme, descansa ou está ocupado, a AttendeAI garante que nenhum cliente fique sem resposta.</p>
+            <div className="eyebrow" style={{ justifyContent: 'center', display: 'inline-flex' }}>{i.ctaFinal.eyebrow}</div>
+            <h2>{i.ctaFinal.titleStart} <em>{i.ctaFinal.titleEm}</em> {i.ctaFinal.titleEnd}</h2>
+            <p>{i.ctaFinal.sub}</p>
             <div className="actions">
-              <a href="https://wa.me/5534999819748" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> Falar com um humano</a>
+              <a href="https://wa.me/5534999819748" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> {i.ctaFinal.cta}</a>
             </div>
           </div>
         </div>
@@ -2128,19 +1993,19 @@ export default function LandingPage() {
                 attende<span style={{ color: 'var(--muted)', fontWeight: 400 }}>.ai</span>
               </div>
               <div className="footer-links">
-                <a href="#">Termos</a>
-                <a href="#">Privacidade</a>
-                <a href="#">Suporte</a>
-                <a href="#">Blog</a>
-                <a href="#">Fale conosco</a>
+                <a href="#">{i.footer.terms}</a>
+                <a href="#">{i.footer.privacy}</a>
+                <a href="#">{i.footer.support}</a>
+                <a href="#">{i.footer.blog}</a>
+                <a href="#">{i.footer.contact}</a>
                 <a href="https://www.instagram.com/attendeai.ia" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style={{ display: 'inline-flex', alignItems: 'center' }}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </a>
               </div>
             </div>
             <div className="wrap footer-copy">
-              <span>© 2026 AttendeAI</span>
-              <span>feito no brasil 🇧🇷</span>
+              <span>{i.footer.copyright}</span>
+              <span>{i.footer.madeIn}</span>
             </div>
           </div>
         </footer>
