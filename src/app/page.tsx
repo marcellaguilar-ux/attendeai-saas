@@ -1760,7 +1760,6 @@ export default function LandingPage() {
             <li><a href="#casos">Casos de uso</a></li>
             <li><a href="#recursos">Recursos</a></li>
             <li><a href="#precos">Preços</a></li>
-            <li><a href="#faq">FAQ</a></li>
           </ul>
           <div className="nav-right">
             <a href="/login" className="nav-login-link">Entrar</a>
