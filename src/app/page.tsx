@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
-import { t, type Locale } from '@/lib/i18n'
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Instrument+Serif&display=swap');
@@ -40,220 +39,19 @@ const CSS = `
 }
 
 [data-theme="light"] {
-  /* ── Base palette ── */
-  --bg: #ffffff;
-  --bg-elev: #fafafa;
+  --bg: #fafaf9;
+  --bg-elev: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f5f5f3;
-  --border: #e6e6e2;
-  --border-strong: #d0d0ca;
-  /* ── Text hierarchy — key to good light mode ── */
-  --text: #111318;
-  --text-2: #3c4249;
-  --muted: #6b7580;
-  /* ── Accent tuned for light: slightly deeper for WCAG AA ── */
-  --accent: #00b67a;
-  --accent-ink: #fff;
-  --accent-soft: rgba(0, 182, 122, 0.08);
-  --accent-line: rgba(0, 182, 122, 0.25);
-  --danger: #e5484d;
-  --info: #3b82f6;
+  --surface-2: #f4f4f2;
+  --border: #e8e8e5;
+  --border-strong: #d4d4d0;
+  --text: #0a0d10;
+  --text-2: #3d4549;
+  --muted: #737d84;
+  --accent-soft: rgba(0, 180, 125, 0.08);
+  --accent-line: rgba(0, 180, 125, 0.28);
   color-scheme: light;
-  /* ── Override inherited body values ── */
-  background: #ffffff;
-  color: #111318;
 }
-
-/* ═══════════════ LIGHT MODE OVERRIDES ═══════════════ */
-
-/* ── Remove grain — it muddies light backgrounds ── */
-[data-theme="light"] body::before { display: none; }
-
-/* ── Hero ── */
-[data-theme="light"] .hero-bg {
-  background:
-    radial-gradient(ellipse 55% 55% at 65% 30%, rgba(0,182,122,.05) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 50% at 25% 85%, rgba(59,130,246,.03) 0%, transparent 65%) !important;
-}
-[data-theme="light"] .hero-grid {
-  opacity: .12;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-}
-[data-theme="light"] h1.hero-title { color: #111318; }
-[data-theme="light"] h1.hero-title em { color: #00a06c; }
-[data-theme="light"] .hero-sub { color: #3c4249; }
-[data-theme="light"] .hero-pill { background: #f5f5f3; border-color: #e6e6e2; color: #3c4249; }
-[data-theme="light"] .hero-pill .tag { background: rgba(0,182,122,.08); color: #00865c; border-color: rgba(0,182,122,.2); }
-[data-theme="light"] .hero-pill .dot { background: #00b67a; box-shadow: 0 0 0 3px rgba(0,182,122,.15); }
-[data-theme="light"] .trust-item .k { color: #111318; }
-[data-theme="light"] .trust-item .v { color: #6b7580; }
-
-/* ── Nav: frosted glass ── */
-[data-theme="light"] nav {
-  background: rgba(255,255,255,.82);
-  border-color: rgba(0,0,0,.06);
-  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
-}
-[data-theme="light"] .nav-links a { color: #3c4249; }
-[data-theme="light"] .nav-links a:hover { color: #111318; background: #f5f5f3; }
-[data-theme="light"] .nav-login-link { color: #3c4249; }
-[data-theme="light"] .nav-login-link:hover { color: #111318; }
-[data-theme="light"] .nav-cta { background: #00b67a; color: #fff; }
-[data-theme="light"] .logo { color: #111318; }
-
-/* ── Panels (hero conversation) ── */
-[data-theme="light"] .panel {
-  background: #ffffff;
-  border-color: #e6e6e2;
-  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 32px -8px rgba(0,0,0,.08);
-}
-[data-theme="light"] .panel-head { border-bottom-color: #eeeeea; }
-[data-theme="light"] .panel-title { color: #111318; }
-[data-theme="light"] .panel-sub { color: #6b7580; }
-[data-theme="light"] .panel-status { color: #00865c; }
-[data-theme="light"] .panel-status .dot { background: #00b67a; box-shadow: 0 0 0 3px rgba(0,182,122,.15); }
-[data-theme="light"] .panel-avatar { background: rgba(0,182,122,.08); border-color: rgba(0,182,122,.2); color: #00865c; }
-
-/* ── Bubbles ── */
-[data-theme="light"] .bubble.bot {
-  background: #f0faf5;
-  border-color: #d0eddf;
-  color: #111318;
-}
-[data-theme="light"] .bubble.user {
-  background: #f5f5f3;
-  border-color: #e6e6e2;
-  color: #111318;
-}
-[data-theme="light"] .bubble.confirm {
-  background: #e8f8f0;
-  border-color: #c0e8d4;
-  color: #111318;
-}
-[data-theme="light"] .bubble.confirm div { color: #111318; }
-[data-theme="light"] .bubble.confirm svg { color: #00865c; }
-
-/* ── Typing dots ── */
-[data-theme="light"] .typing {
-  background: #f0faf5;
-  border-color: #d0eddf;
-}
-[data-theme="light"] .typing i { background: #00b67a; }
-
-/* ── Dashboard visual ── */
-[data-theme="light"] .v-dashboard {
-  border-color: #e6e6e2;
-  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 16px 48px -16px rgba(0,0,0,.08);
-}
-[data-theme="light"] .dash-top { border-bottom-color: #eeeeea; }
-[data-theme="light"] .dash-dots i { background: #d0d0ca; }
-[data-theme="light"] .dash-url { background: #f5f5f3; color: #6b7580; }
-[data-theme="light"] .dash-stat { background: #fafafa; border-color: #e6e6e2; }
-[data-theme="light"] .dash-stat .n { color: #111318; }
-[data-theme="light"] .dash-chart { background: #fafafa; border-color: #e6e6e2; }
-[data-theme="light"] .dash-row { background: #fafafa; border-color: #e6e6e2; }
-
-/* ── Phone ── */
-[data-theme="light"] .phone {
-  background: #e8e8e4;
-  border-color: #d0d0ca;
-  box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 24px 56px -16px rgba(0,0,0,.1);
-}
-[data-theme="light"] .phone::before { background: #c0c0ba; }
-[data-theme="light"] .phone-screen { background: #ffffff; }
-[data-theme="light"] .phone-head { border-bottom-color: #eeeeea; }
-[data-theme="light"] .phone-head .av { background: #00b67a; color: #fff; }
-[data-theme="light"] .phone-head .ti .n { color: #111318; }
-[data-theme="light"] .phone-head .ti .s { color: #00865c; }
-[data-theme="light"] .phone-body .bubble { font-size: 12px; }
-
-/* ── Call panel ── */
-[data-theme="light"] .call-panel { background: #fff; border-color: #e6e6e2; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-[data-theme="light"] .call-ico { background: rgba(59,130,246,.06); border-color: rgba(59,130,246,.15); color: #3b82f6; }
-
-/* ── Logos section ── */
-[data-theme="light"] .logos-section { border-color: #eeeeea; }
-[data-theme="light"] .logo-item { color: #6b7580; }
-[data-theme="light"] .logo-item:hover { color: #111318; }
-
-/* ── How it works (steps) ── */
-[data-theme="light"] .how { background: #fafafa; border-color: #eeeeea; }
-[data-theme="light"] .steps { background: #fff; border-color: #e6e6e2; }
-[data-theme="light"] .step { border-right-color: #eeeeea; }
-[data-theme="light"] .step:hover { background: #fafafa; }
-
-/* ── Feature cards ── */
-[data-theme="light"] .features-grid { background: #e6e6e2; border-color: #e6e6e2; }
-[data-theme="light"] .feat-card { background: #ffffff; }
-[data-theme="light"] .feat-card:hover { background: #fafafa; }
-
-/* ── Use cases ── */
-[data-theme="light"] .usecases { background: #fafafa; border-color: #eeeeea; }
-[data-theme="light"] .uc-tabs { background: #fff; border-color: #e6e6e2; }
-[data-theme="light"] .uc-tab { color: #6b7580; }
-[data-theme="light"] .uc-tab:hover { color: #111318; }
-[data-theme="light"] .uc-tab.active { background: #f5f5f3; color: #111318; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-[data-theme="light"] .uc-panel { background: #fff; border-color: #e6e6e2; }
-[data-theme="light"] .uc-preview { background: #fafafa; border-color: #e6e6e2; }
-
-/* ── Pricing ── */
-[data-theme="light"] .billing-toggle { background: #f5f5f3; border-color: #e6e6e2; }
-[data-theme="light"] .billing-toggle button { color: #6b7580; }
-[data-theme="light"] .billing-toggle button.active { background: #fff; color: #111318; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-[data-theme="light"] .plan { background: #fff; border-color: #e6e6e2; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-[data-theme="light"] .plan:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); }
-[data-theme="light"] .plan.featured {
-  background: linear-gradient(180deg, rgba(0,182,122,.03) 0%, #fff 40%);
-  border-color: rgba(0,182,122,.35);
-  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 12px 40px -12px rgba(0,182,122,.1);
-}
-[data-theme="light"] .plan-amount { color: #111318; }
-[data-theme="light"] .btn-plan.outline { border-color: #d0d0ca; color: #111318; }
-[data-theme="light"] .btn-plan.outline:hover { background: #f5f5f3; border-color: #6b7580; }
-[data-theme="light"] .btn-plan.filled { background: #00b67a; color: #fff; border-color: #00b67a; }
-
-/* ── Testimonials ── */
-[data-theme="light"] .testi { background: #fff; border-color: #e6e6e2; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
-[data-theme="light"] .testi:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); border-color: #d0d0ca; }
-[data-theme="light"] .testi-text { color: #3c4249; }
-[data-theme="light"] .testi-author { border-top-color: #eeeeea; }
-
-/* ── FAQ ── */
-[data-theme="light"] .faq-item { border-bottom-color: #eeeeea; }
-[data-theme="light"] .faq-q { color: #111318; }
-[data-theme="light"] .faq-q:hover { color: #00865c; }
-[data-theme="light"] .faq-arrow { border-color: #e6e6e2; color: #6b7580; }
-[data-theme="light"] .faq-a { color: #3c4249; }
-
-/* ── CTA buttons ── */
-[data-theme="light"] .btn-primary {
-  background: #00b67a; color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 4px 12px -4px rgba(0,182,122,.25);
-}
-[data-theme="light"] .btn-ghost {
-  background: #fff;
-  border-color: #d0d0ca;
-  color: #111318;
-}
-[data-theme="light"] .btn-ghost:hover { background: #f5f5f3; border-color: #6b7580; }
-
-/* ── CTA final section ── */
-[data-theme="light"] .cta-final::before {
-  background: radial-gradient(ellipse 60% 60% at 50% 100%, rgba(0,182,122,.04) 0%, transparent 70%);
-}
-
-/* ── Footer / section titles ── */
-[data-theme="light"] .section-title { color: #111318; }
-[data-theme="light"] .section-sub { color: #3c4249; }
-[data-theme="light"] .eyebrow { color: #6b7580; }
-
-/* ── Selection ── */
-[data-theme="light"] ::selection { background: #00b67a; color: #fff; }
-
-/* ── Waveform ── */
-[data-theme="light"] .waveform i { background: #00b67a; opacity: .5; }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
@@ -280,7 +78,7 @@ body::before {
   opacity: .35;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-/* light grain handled above */
+[data-theme="light"] body::before { opacity: .6; filter: invert(1); }
 
 /* ═══════════════════════════ LAYOUT ═══════════════════════════ */
 .wrap { max-width: var(--container); margin: 0 auto; padding: 0 32px; }
@@ -423,47 +221,6 @@ nav {
   .nav-links { display: none; }
   nav { padding: 8px 8px 8px 16px; }
 }
-
-/* Theme toggle */
-.theme-toggle {
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-2);
-  display: grid; place-items: center;
-  cursor: pointer;
-  transition: all .2s;
-  flex-shrink: 0;
-}
-.theme-toggle:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface-2); }
-.theme-toggle svg { width: 15px; height: 15px; }
-
-/* Language selector */
-.lang-selector {
-  display: flex;
-  gap: 1px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  padding: 2px;
-}
-.lang-btn {
-  padding: 5px 10px;
-  border-radius: 100px;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 11px;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  cursor: pointer;
-  letter-spacing: 0.03em;
-  transition: all .2s;
-}
-.lang-btn:hover { color: var(--text); }
-.lang-btn.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.15); }
-[data-theme="light"] .lang-btn.active { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
 
 /* ═══════════════════════════ BUTTONS ═══════════════════════════ */
 .btn {
@@ -1373,6 +1130,143 @@ h1.hero-title em {
 .testi-name { font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em; }
 .testi-role { font-size: 11.5px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
 
+/* ═══════════════════════════ DEMO ═══════════════════════════ */
+.demo-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.demo-phone {
+  width: 360px;
+  height: 680px;
+  background: #0b141a;
+  border-radius: 36px;
+  border: 2px solid var(--border-strong);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+.demo-chat-header {
+  background: #1f2c34;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #2a3942;
+  min-height: 58px;
+}
+.demo-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #008f6f);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.demo-header-name { color: #e9edef; font-size: 15px; font-weight: 500; }
+.demo-header-status { color: #8696a0; font-size: 11px; }
+.demo-header-status.online { color: var(--accent); }
+.demo-chat-body {
+  flex: 1; overflow-y: auto; padding: 12px 16px;
+  background: #0b141a; display: flex; flex-direction: column; gap: 4px;
+  scroll-behavior: smooth;
+}
+.demo-msg {
+  max-width: 82%; padding: 8px 12px; border-radius: 8px;
+  font-size: 13.5px; line-height: 1.4; word-wrap: break-word;
+  animation: demoFadeIn 0.3s ease;
+}
+@keyframes demoFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.demo-msg.received { background: #1f2c34; color: #e9edef; align-self: flex-start; border-top-left-radius: 0; }
+.demo-msg.sent { background: #005c4b; color: #e9edef; align-self: flex-end; border-top-right-radius: 0; }
+.demo-msg .dm-time { font-size: 10px; color: #8696a0; float: right; margin-left: 8px; margin-top: 4px; }
+.demo-msg.sent .dm-time { color: #7fb8a8; }
+.demo-msg .dm-check { color: #53bdeb; margin-left: 2px; }
+.demo-typing {
+  align-self: flex-start; background: #1f2c34; border-radius: 8px;
+  border-top-left-radius: 0; padding: 12px 16px; display: none; gap: 4px; align-items: center;
+}
+.demo-typing.visible { display: flex; }
+.demo-typing-dot {
+  width: 6px; height: 6px; background: #8696a0; border-radius: 50%;
+  animation: demoTyping 1.4s ease-in-out infinite;
+}
+.demo-typing-dot:nth-child(2) { animation-delay: .2s; }
+.demo-typing-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes demoTyping {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+.demo-input-bar {
+  background: #1f2c34; padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+  border-top: 1px solid #2a3942;
+}
+.demo-input-bar input {
+  flex: 1; background: #2a3942; border: none; border-radius: 20px;
+  padding: 8px 14px; color: #e9edef; font-size: 13px; outline: none;
+}
+.demo-input-bar input::placeholder { color: #8696a0; }
+.demo-progress {
+  position: absolute; bottom: 0; left: 0; height: 3px;
+  background: var(--accent); transition: width 0.4s ease; z-index: 2;
+}
+.demo-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 3; cursor: pointer; transition: opacity 0.4s;
+}
+.demo-overlay.hidden { opacity: 0; pointer-events: none; }
+.demo-overlay-title { font-size: 16px; color: var(--text); font-weight: 600; margin-bottom: 6px; }
+.demo-overlay-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.demo-play-btn {
+  width: 56px; height: 56px; border-radius: 50%; background: var(--accent);
+  border: none; color: var(--accent-ink); font-size: 22px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,229,160,0.3); transition: transform .2s;
+}
+.demo-play-btn:hover { transform: scale(1.1); }
+.demo-overlay-hint { font-size: 11px; color: var(--muted); margin-top: 14px; }
+.demo-date { text-align: center; margin: 8px 0; }
+.demo-date span { background: #182229; color: #8696a0; font-size: 11px; padding: 3px 10px; border-radius: 6px; }
+
+.demo-side {
+  max-width: 380px; flex: 1; min-width: 260px;
+  display: flex; flex-direction: column; gap: 20px; padding-top: 20px;
+}
+.demo-step-card {
+  background: var(--surface); border-radius: var(--r-md);
+  padding: 24px; border-left: 3px solid var(--accent);
+  min-height: 100px; transition: opacity 0.3s;
+}
+.demo-step-card .ds-title { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 6px; }
+.demo-step-card .ds-desc { font-size: 14px; color: var(--text-2); line-height: 1.5; }
+.demo-nav-hint { font-size: 12px; color: var(--muted); text-align: center; }
+.demo-nav-hint kbd {
+  background: var(--surface-2); padding: 2px 6px; border-radius: 4px;
+  font-size: 11px; color: var(--text-2); font-family: var(--font-mono);
+}
+.demo-restart-btn {
+  background: transparent; border: 1px solid var(--border-strong); color: var(--text-2);
+  padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;
+  font-family: var(--font-mono); transition: all .2s; align-self: center;
+}
+.demo-restart-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 800px) {
+  .demo-container { flex-direction: column; align-items: center; }
+  .demo-phone { width: 340px; height: 620px; }
+  .demo-side { max-width: 360px; padding-top: 24px; }
+}
+@media (max-width: 400px) {
+  .demo-phone { width: 300px; height: 560px; }
+}
+
 /* ═══════════════════════════ FAQ ═══════════════════════════ */
 .faq-wrap { max-width: 720px; margin: 0 auto; }
 .faq-item {
@@ -1501,42 +1395,118 @@ footer {
 
 type UCKey = 'salao' | 'clinica' | 'oficina' | 'estudio' | 'restaurante'
 
+interface UCMessage {
+  who: string
+  text: string
+}
+
+interface UCData {
+  title: string
+  desc: string
+  points: string[]
+  preview: UCMessage[]
+}
+
+const UC_DATA: Record<UCKey, UCData> = {
+  salao: {
+    title: 'Salão de beleza',
+    desc: 'Clientes agendando corte, coloração e outros serviços — muitas vezes à noite, quando você já fechou. A IA atende, consulta sua agenda no Google Calendar, sugere horários e confirma o agendamento.',
+    points: [
+      'Agendamento 24h sem perder um cliente',
+      'Consulta disponibilidade no Google Calendar em tempo real',
+      'Confirmação do horário diretamente pelo WhatsApp',
+      'IA treinada com os serviços e horários do seu salão'
+    ],
+    preview: [
+      { who: 'bot', text: 'Olá! Bem-vinda ao Salão Luxe ✨' },
+      { who: 'user', text: 'Posso marcar uma mechas sábado?' },
+      { who: 'bot', text: 'Temos 10h e 15h disponíveis. Qual prefere?' },
+      { who: 'user', text: '15h' },
+      { who: 'confirm', text: 'Confirmado — mechas, sábado 15h.' }
+    ]
+  },
+  clinica: {
+    title: 'Clínica médica',
+    desc: 'Pacientes com dúvidas sobre disponibilidade e horários. A IA responde 24/7, agenda consultas no Google Calendar e confirma o atendimento pelo WhatsApp.',
+    points: [
+      'Agendamento de consultas 24h pelo WhatsApp',
+      'Consulta de disponibilidade em tempo real',
+      'Confirmação do agendamento no Google Calendar',
+      'IA treinada com as informações do seu consultório'
+    ],
+    preview: [
+      { who: 'bot', text: 'Olá! Clínica SorrisoBem. Como posso ajudar?' },
+      { who: 'user', text: 'Quero marcar uma consulta' },
+      { who: 'bot', text: 'Temos terça às 09:30 e quinta às 14h. Qual prefere?' },
+      { who: 'user', text: 'Terça' },
+      { who: 'confirm', text: 'Agendado — terça 09:30. Até lá!' }
+    ]
+  },
+  oficina: {
+    title: 'Oficina mecânica',
+    desc: 'Clientes que querem agendar inspeção ou revisão pelo WhatsApp. A IA coleta informações básicas, verifica disponibilidade no calendário e confirma o horário.',
+    points: [
+      'Agendamento de inspeções e revisões 24h',
+      'Coleta informações básicas do veículo e serviço',
+      'Consulta disponibilidade no Google Calendar',
+      'Confirmação automática pelo WhatsApp'
+    ],
+    preview: [
+      { who: 'user', text: 'Meu carro tá fazendo um barulho estranho' },
+      { who: 'bot', text: 'Entendi. Qual o modelo e ano?' },
+      { who: 'user', text: 'Civic 2018' },
+      { who: 'bot', text: 'Temos horário amanhã 14h para inspeção. Confirmo?' },
+      { who: 'confirm', text: 'Inspeção Civic 2018 · amanhã 14h.' }
+    ]
+  },
+  estudio: {
+    title: 'Estúdio & academia',
+    desc: 'Alunos consultando horários e querendo agendar aulas experimentais. A IA responde na hora, verifica disponibilidade e confirma o agendamento pelo WhatsApp.',
+    points: [
+      'Agendamento de aulas e experimentais 24h',
+      'Consulta de horários disponíveis por modalidade',
+      'Confirmação direta no Google Calendar',
+      'IA treinada com a grade e serviços da sua academia'
+    ],
+    preview: [
+      { who: 'user', text: 'Tem yoga à noite?' },
+      { who: 'bot', text: 'Sim! Segunda, quarta e sexta às 19h.' },
+      { who: 'user', text: 'Posso fazer uma aula experimental?' },
+      { who: 'bot', text: 'Claro, posso marcar pra segunda 19h?' },
+      { who: 'confirm', text: 'Aula experimental agendada. Até segunda!' }
+    ]
+  },
+  restaurante: {
+    title: 'Restaurante',
+    desc: 'Clientes querendo fazer reservas pelo WhatsApp, a qualquer hora. A IA atende, verifica disponibilidade e confirma a reserva no Google Calendar.',
+    points: [
+      'Reservas 24h sem depender de ligação',
+      'Verificação de disponibilidade em tempo real',
+      'Confirmação automática pelo WhatsApp',
+      'IA treinada com horários e informações do restaurante'
+    ],
+    preview: [
+      { who: 'user', text: 'Mesa pra 4 sábado 20h?' },
+      { who: 'bot', text: 'Temos disponibilidade. Confirmo a reserva?' },
+      { who: 'user', text: 'Sim!' },
+      { who: 'bot', text: 'Perfeito. Alguma restrição alimentar?' },
+      { who: 'confirm', text: 'Reserva 4 pessoas · sábado 20h.' }
+    ]
+  }
+}
+
 const WAVE_HEIGHTS = [35, 68, 42, 75, 55, 80, 38, 65, 48, 72, 40, 85, 52, 70, 45, 60, 77, 35, 90, 43, 65, 50, 78, 38, 62, 85, 44, 70, 55, 80, 37, 67, 48, 75, 42, 88, 52, 64, 38, 73]
 
-const FEAT_ICONS = [
-  <svg key={0} viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
-  <svg key={1} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  <svg key={2} viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
-  <svg key={3} viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M7 16l4-4 4 4 5-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-  <svg key={4} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M8 14h4M8 18h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  <svg key={5} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-]
-
-const STEP_ICONS = [
-  <svg key={0} viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>,
-  <svg key={1} viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 016 6c0 2-1 3-2 4v3a2 2 0 01-2 2h-4a2 2 0 01-2-2v-3c-1-1-2-2-2-4a6 6 0 016-6zM10 21h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  <svg key={2} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-  <svg key={3} viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-]
-
-const UC_TAB_ICONS = [
-  <svg key={0} viewBox="0 0 24 24" fill="none"><path d="M8 4l-2 8m12-8l2 8M6 12a6 6 0 0012 0M12 12v8M9 20h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-  <svg key={1} viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  <svg key={2} viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5 5L3 18l3 3 6.7-6.7a4 4 0 005-5l-2.3 2.3-2.4-.7-.7-2.4 2.4-2.3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
-  <svg key={3} viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5"/></svg>,
-  <svg key={4} viewBox="0 0 24 24" fill="none"><path d="M5 3v18M5 3h3a4 4 0 010 8H5M19 3v18M19 3v6a3 3 0 003 3v9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-]
-
-function UCPanel({ activeKey, i }: { activeKey: UCKey; i: ReturnType<typeof t> }) {
-  const d = i.useCases[activeKey]
+function UCPanel({ activeKey }: { activeKey: UCKey }) {
+  const d = UC_DATA[activeKey]
   return (
     <>
       <div className="uc-content">
         <h3>{d.title}</h3>
         <p>{d.desc}</p>
         <ul className="uc-list">
-          {d.points.map((p, idx) => (
-            <li key={idx}>
+          {d.points.map((p, i) => (
+            <li key={i}>
               <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               {p}
             </li>
@@ -1544,16 +1514,16 @@ function UCPanel({ activeKey, i }: { activeKey: UCKey; i: ReturnType<typeof t> }
         </ul>
       </div>
       <div className="uc-preview">
-        {d.preview.map((m, idx) => {
+        {d.preview.map((m, i) => {
           if (m.who === 'confirm') {
             return (
-              <div key={idx} className="bubble confirm">
+              <div key={i} className="bubble confirm">
                 <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 <div>{m.text}</div>
               </div>
             )
           }
-          return <div key={idx} className={`bubble ${m.who}`}>{m.text}</div>
+          return <div key={i} className={`bubble ${m.who}`}>{m.text}</div>
         })}
         <div className="typing"><i></i><i></i><i></i></div>
       </div>
@@ -1562,40 +1532,21 @@ function UCPanel({ activeKey, i }: { activeKey: UCKey; i: ReturnType<typeof t> }
 }
 
 export default function LandingPage() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const [locale, setLocale] = useState<Locale>('pt')
   const [activeUC, setActiveUC] = useState<UCKey>('salao')
   const [billingMode, setBillingMode] = useState<'m' | 'a'>('m')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-  useEffect(() => {
-    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
-    if (saved) setTheme(saved)
-  }, [])
-
-  useEffect(() => {
-    const saved = localStorage.getItem('locale') as Locale | null
-    if (saved) setLocale(saved)
-  }, [])
-
-  function toggleTheme() {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    localStorage.setItem('theme', next)
+  const prices: Record<string, { m: string; a: string }> = {
+    starter: { m: '197', a: '158' },
+    pro: { m: '397', a: '318' },
+    business: { m: '697', a: '558' },
   }
 
-  function changeLocale(l: Locale) {
-    setLocale(l)
-    localStorage.setItem('locale', l)
-  }
-
-  const i = t(locale)
-
-  const periodText = billingMode === 'a' ? i.pricing.periodAnnual : i.pricing.periodMonthly
+  const periodText = billingMode === 'a' ? 'por mês · faturado anualmente' : 'por mês · faturado mensalmente'
 
   const waveformBars = useMemo(() => {
-    return WAVE_HEIGHTS.map((h, idx) => (
-      <i key={idx} style={{ animationDelay: `${idx * 0.05}s`, height: `${h}%` }} />
+    return WAVE_HEIGHTS.map((h, i) => (
+      <i key={i} style={{ animationDelay: `${i * 0.05}s`, height: `${h}%` }} />
     ))
   }, [])
 
@@ -1610,16 +1561,192 @@ export default function LandingPage() {
     return () => io.disconnect()
   }, [])
 
+  // Demo WhatsApp interativa
+  useEffect(() => {
+    const demoConv = [
+      { type: 'sent', text: 'Oi, boa tarde! Queria agendar um horário', step: { title: '1. Cliente inicia contato', desc: 'O cliente envia uma mensagem pelo WhatsApp. A IA responde instantaneamente, 24h por dia.' } },
+      { type: 'received', text: 'Oi! Boa tarde! Bem-vindo à Barbearia Monteiro! Eu sou a Bia, assistente virtual. Vou te ajudar a agendar seu horário. Qual serviço você gostaria?\n\nCorte de cabelo\nBarba\nCorte + Barba\nSobrancelha', delay: 1800, step: { title: '2. Saudação + Menu de serviços', desc: 'A IA cumprimenta o cliente pelo nome do negócio e apresenta os serviços disponíveis automaticamente.' } },
+      { type: 'sent', text: 'Corte + Barba', step: { title: '3. Cliente escolhe o serviço', desc: 'Interação natural por texto, sem menus complicados. O cliente digita normalmente.' } },
+      { type: 'received', text: 'Ótima escolha! Corte + Barba leva em média 50 minutos. Para quando você gostaria de agendar?\n\nHorários disponíveis para amanhã (quarta):\n\n09:00\n10:00\n11:00\n14:00\n15:00\n16:00', delay: 2000, step: { title: '4. Consulta de agenda em tempo real', desc: 'A IA consulta o Google Calendar do barbeiro e mostra apenas horários realmente livres. Sem conflitos!' } },
+      { type: 'sent', text: '15:00', step: { title: '5. Cliente escolhe horário', desc: 'Processo simples e rápido. O cliente não precisa ligar nem esperar resposta.' } },
+      { type: 'received', text: 'Perfeito! Vou reservar amanhã às 15:00 para Corte + Barba. Qual o seu nome completo?', delay: 1500, step: { title: '6. Coleta de dados', desc: 'A IA coleta as informações necessárias de forma conversacional e amigável.' } },
+      { type: 'sent', text: 'Carlos Eduardo Silva', step: { title: '7. Identificação do cliente', desc: 'Os dados ficam registrados para histórico e CRM do barbeiro.' } },
+      { type: 'received', text: 'Obrigada, Carlos! E o seu email para enviar a confirmação?', delay: 1200, step: { title: '8. Email para confirmação', desc: 'O cliente recebe confirmação por email automaticamente.' } },
+      { type: 'sent', text: 'carlos.silva@gmail.com', step: null },
+      { type: 'received', text: 'Pronto, Carlos! Seu agendamento está confirmado:\n\nCorte + Barba\nAmanhã (quarta), 15:00\nBarbearia Monteiro\n\nVocê vai receber um email de confirmação e um lembrete por WhatsApp 1h antes. Até amanhã!', delay: 2200, step: { title: '9. Confirmação automática', desc: 'Agendamento criado no Google Calendar, email enviado, lembrete WhatsApp programado. Tudo automático, sem intervenção do barbeiro!' } },
+      { type: 'received', text: 'Oi Carlos! Lembrete: seu horário na Barbearia Monteiro é HOJE às 15:00 (Corte + Barba). Te esperamos! Se precisar reagendar, é só me chamar.', delay: 1500, step: { title: '10. Lembrete automático', desc: 'O cliente recebe lembrete 1h antes. Isso reduz faltas em até 70% e o barbeiro não precisa fazer nada.' } },
+    ]
+
+    let demoStep = -1
+    let demoAnimating = false
+    let demoStarted = false
+
+    const body = document.getElementById('demoChatBody')
+    const overlay = document.getElementById('demoOverlay')
+    const status = document.getElementById('demoStatus')
+    const progress = document.getElementById('demoProgress') as HTMLElement | null
+    const stepTitle = document.getElementById('demoStepTitle')
+    const stepDesc = document.getElementById('demoStepDesc')
+    const phone = document.getElementById('demoPhone')
+    const restartBtn = document.getElementById('demoRestartBtn')
+
+    if (!body || !overlay || !status || !progress || !stepTitle || !stepDesc || !phone) return
+
+    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+
+    const getTime = () => {
+      const n = new Date()
+      return n.getHours().toString().padStart(2, '0') + ':' + n.getMinutes().toString().padStart(2, '0')
+    }
+
+    const scrollBody = () => { body.scrollTop = body.scrollHeight }
+
+    const showTyping = () => {
+      const ind = document.createElement('div')
+      ind.className = 'demo-typing visible'
+      ind.id = 'demoTyping'
+      ind.innerHTML = '<div class="demo-typing-dot"></div><div class="demo-typing-dot"></div><div class="demo-typing-dot"></div>'
+      body.appendChild(ind)
+      scrollBody()
+      status.textContent = 'digitando...'
+    }
+
+    const hideTyping = () => {
+      document.getElementById('demoTyping')?.remove()
+      status.textContent = 'online'
+    }
+
+    const addMsg = (type: string, text: string) => {
+      const msg = document.createElement('div')
+      msg.className = 'demo-msg ' + type
+      const time = getTime()
+      const check = type === 'sent' ? ' <span class="dm-check">✓✓</span>' : ''
+      msg.innerHTML = text.replace(/\n/g, '<br>') + '<span class="dm-time">' + time + check + '</span>'
+      body.appendChild(msg)
+      scrollBody()
+    }
+
+    const updateStep = (step: { title: string; desc: string } | null) => {
+      if (!step) return
+      stepTitle.textContent = step.title
+      stepDesc.textContent = step.desc
+    }
+
+    const nextStep = async () => {
+      if (demoAnimating) return
+      demoStep++
+      if (demoStep >= demoConv.length) {
+        stepTitle.textContent = 'Demo completa!'
+        stepDesc.textContent = 'Todo esse fluxo acontece sem intervenção humana. O barbeiro só precisa atender o cliente na hora marcada.'
+        return
+      }
+      demoAnimating = true
+      const item = demoConv[demoStep]
+      if (item.step) updateStep(item.step)
+
+      if (item.type === 'received') {
+        showTyping()
+        await sleep(item.delay || 1500)
+        hideTyping()
+      } else {
+        await sleep(300)
+      }
+
+      addMsg(item.type, item.text)
+      progress.style.width = ((demoStep + 1) / demoConv.length * 100) + '%'
+      demoAnimating = false
+
+      if (item.step === null && demoStep < demoConv.length - 1) {
+        await sleep(600)
+        nextStep()
+      }
+    }
+
+    const startDemo = () => {
+      overlay.classList.add('hidden')
+      demoStarted = true
+      setTimeout(() => nextStep(), 500)
+    }
+
+    const resetDemo = () => {
+      demoStep = -1
+      demoAnimating = false
+      demoStarted = false
+      body.innerHTML = '<div class="demo-date"><span>Hoje</span></div>'
+      progress.style.width = '0%'
+      overlay.classList.remove('hidden')
+      status.textContent = 'online'
+      stepTitle.textContent = 'Aguardando...'
+      stepDesc.textContent = 'Clique no celular ou pressione Espaço para avançar.'
+    }
+
+    const onOverlayClick = () => startDemo()
+    overlay.addEventListener('click', onOverlayClick)
+
+    const onPhoneClick = (e: Event) => {
+      if (!demoStarted || (e.target as HTMLElement).closest('.demo-overlay')) return
+      nextStep()
+    }
+    phone.addEventListener('click', onPhoneClick)
+
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (e.key === 'r' || e.key === 'R') {
+        const rect = phone.getBoundingClientRect()
+        if (rect.top < window.innerHeight && rect.bottom > 0) { resetDemo(); return }
+      }
+      if (!demoStarted) {
+        if (e.key === ' ' || e.key === 'ArrowRight') {
+          const rect = phone.getBoundingClientRect()
+          if (rect.top < window.innerHeight && rect.bottom > 0) { e.preventDefault(); startDemo() }
+        }
+        return
+      }
+      if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        const rect = phone.getBoundingClientRect()
+        if (rect.top < window.innerHeight && rect.bottom > 0) { e.preventDefault(); nextStep() }
+      }
+    }
+    document.addEventListener('keydown', onKey)
+
+    restartBtn?.addEventListener('click', resetDemo)
+
+    return () => {
+      overlay.removeEventListener('click', onOverlayClick)
+      phone.removeEventListener('click', onPhoneClick)
+      document.removeEventListener('keydown', onKey)
+      restartBtn?.removeEventListener('click', resetDemo)
+    }
+  }, [])
+
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index)
   }
 
-  const UC_KEYS: UCKey[] = ['salao', 'clinica', 'oficina', 'estudio', 'restaurante']
+  const faqItems = [
+    {
+      q: 'Preciso saber programar para configurar?',
+      a: 'Não. Você nos conta sobre seu negócio — serviços, horários, preços — e nossa equipe configura o agente para você. No plano Business, a ativação acontece em até 24h.'
+    },
+    {
+      q: 'Como funciona a integração com o WhatsApp?',
+      a: 'Conectamos ao seu número de WhatsApp via conexão direta. Seu número não muda, os clientes continuam falando normalmente — mas agora quem responde é a IA.'
+    },
+    {
+      q: 'A IA responde em português do Brasil com qualidade?',
+      a: 'Sim. Usamos modelos avançados de linguagem em pt-BR, com respostas naturais e contextuais. O agente é treinado com as informações do seu negócio para atender com o seu tom.'
+    },
+    {
+      q: 'Posso cancelar quando quiser?',
+      a: 'Sim, sem multas ou fidelidade mínima. Cancele a qualquer momento entrando em contato com nossa equipe.'
+    }
+  ]
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div data-theme={theme}>
+      <div data-theme="dark">
 
         {/* NAV */}
         <nav>
@@ -1628,30 +1755,16 @@ export default function LandingPage() {
             attende<span style={{ color: 'var(--muted)', fontWeight: 400 }}>.ai</span>
           </a>
           <ul className="nav-links">
-            <li><a href="#como-funciona">{i.nav.howItWorks}</a></li>
-            <li><a href="#casos">{i.nav.useCases}</a></li>
-            <li><a href="#recursos">{i.nav.features}</a></li>
-            <li><a href="#precos">{i.nav.pricing}</a></li>
-            <li><a href="#faq">{i.nav.faq}</a></li>
+            <li><a href="#como-funciona">Como funciona</a></li>
+            <li><a href="#casos">Casos de uso</a></li>
+            <li><a href="#recursos">Recursos</a></li>
+            <li><a href="#precos">Preços</a></li>
+            <li><a href="#faq">FAQ</a></li>
           </ul>
           <div className="nav-right">
-            <div className="lang-selector">
-              {(['pt','en','es'] as Locale[]).map(l => (
-                <button key={l} className={`lang-btn${locale === l ? ' active' : ''}`} onClick={() => changeLocale(l)}>
-                  {l.toUpperCase()}
-                </button>
-              ))}
-            </div>
-            <button className="theme-toggle" onClick={toggleTheme} aria-label="Alternar tema">
-              {theme === 'dark' ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-              )}
-            </button>
-            <a href="/login" className="nav-login-link">{i.nav.login}</a>
+            <a href="/login" className="nav-login-link">Entrar</a>
             <a href="/cadastro" className="nav-cta">
-              {i.nav.signup}
+              Criar conta
               <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
           </div>
@@ -1665,38 +1778,38 @@ export default function LandingPage() {
             <div className="hero-content">
               <div className="hero-pill">
                 <span className="tag"><span className="dot" style={{ display: 'inline-block', marginRight: '4px' }}></span>live</span>
-                {i.hero.pill}
+                IA em produção 24/7 no WhatsApp
               </div>
 
               <h1 className="hero-title">
-                {i.hero.title1}<br />
-                {i.hero.title2} <em>{i.hero.titleEm}</em><br />
-                {i.hero.title3}
+                Seu negócio<br />
+                nunca <em>para de</em><br />
+                atender clientes.
               </h1>
 
               <p className="hero-sub">
-                {i.hero.sub}
+                Um agente de IA que atende clientes pelo WhatsApp, agenda no Google Calendar, responde dúvidas e cuida dos clientes — enquanto você cuida do que importa.
               </p>
 
               <div className="hero-actions">
-                <a href="#como-funciona" className="btn btn-ghost">
+                <a href="#demo" className="btn btn-ghost">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M5 3v10l8-5-8-5z" fill="currentColor"/></svg>
-                  {i.hero.cta}
+                  Ver demonstração
                 </a>
               </div>
 
               <div className="hero-trust">
                 <div className="trust-item">
                   <div className="k"><span className="accent">24</span>/7</div>
-                  <div className="v">{i.hero.trustAvailability}</div>
+                  <div className="v">disponibilidade</div>
                 </div>
                 <div className="trust-item">
                   <div className="k"><span className="accent">98</span>%</div>
-                  <div className="v">{i.hero.trustResponseRate}</div>
+                  <div className="v">taxa de resposta</div>
                 </div>
                 <div className="trust-item">
                   <div className="k">R$<span className="accent">0</span></div>
-                  <div className="v">{i.hero.trustCostPerMissed}</div>
+                  <div className="v">custo por mensagem perdida</div>
                 </div>
               </div>
             </div>
@@ -1711,20 +1824,20 @@ export default function LandingPage() {
                         <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><path d="M12 2v4M8 18v3M16 18v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       </div>
                       <div>
-                        <div className="panel-title">{i.heroConversation.brandName}</div>
-                        <div className="panel-sub">{i.heroConversation.subtitle}</div>
+                        <div className="panel-title">Salão da Ana</div>
+                        <div className="panel-sub">whatsapp · attendeai</div>
                       </div>
                     </div>
-                    <div className="panel-status"><span className="dot"></span>{i.heroConversation.online}</div>
+                    <div className="panel-status"><span className="dot"></span>online</div>
                   </div>
                   <div className="panel-body">
-                    <div className="bubble bot">{i.heroConversation.bot1}</div>
-                    <div className="bubble user">{i.heroConversation.user1}</div>
-                    <div className="bubble bot">{i.heroConversation.bot2}</div>
-                    <div className="bubble user">{i.heroConversation.user2}</div>
+                    <div className="bubble bot">Olá! Bem-vinda ao Salão da Ana. Como posso ajudar hoje?</div>
+                    <div className="bubble user">Quero agendar um corte pra sexta</div>
+                    <div className="bubble bot">Perfeito! Temos horários às 10h, 14h e 16h na sexta. Qual prefere?</div>
+                    <div className="bubble user">14h tá ótimo!</div>
                     <div className="bubble confirm">
                       <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      <div>{i.heroConversation.confirm}</div>
+                      <div>Agendado — sexta, 14h. Te envio um lembrete na véspera.</div>
                     </div>
                     <div className="typing"><i></i><i></i><i></i></div>
                   </div>
@@ -1736,30 +1849,30 @@ export default function LandingPage() {
               <div className="variant v-dashboard">
                 <div className="dash-top">
                   <div className="dash-dots"><i></i><i></i><i></i></div>
-                  <div className="dash-url">{i.heroDashboard.inboxUrl}</div>
+                  <div className="dash-url">app.attende.ai / inbox</div>
                 </div>
                 <div className="dash-body">
                   <div className="dash-stats">
                     <div className="dash-stat">
-                      <div className="l">{i.heroDashboard.attendances}</div>
+                      <div className="l">Atendimentos</div>
                       <div className="n">247</div>
-                      <div className="d">{i.heroDashboard.attendancesChange}</div>
+                      <div className="d">↗ 32% esta semana</div>
                     </div>
                     <div className="dash-stat">
-                      <div className="l">{i.heroDashboard.scheduled}</div>
+                      <div className="l">Agendados</div>
                       <div className="n">89</div>
-                      <div className="d">{i.heroDashboard.scheduledChange}</div>
+                      <div className="d">↗ 18%</div>
                     </div>
                     <div className="dash-stat">
-                      <div className="l">{i.heroDashboard.avgTime}</div>
+                      <div className="l">Tempo médio</div>
                       <div className="n">1.4m</div>
-                      <div className="d down">{i.heroDashboard.avgTimeChange}</div>
+                      <div className="d down">↘ 45%</div>
                     </div>
                   </div>
                   <div className="dash-chart">
                     <div className="dash-chart-hd">
-                      <span className="l">{i.heroDashboard.chartTitle}</span>
-                      <span className="v">{i.heroDashboard.chartSub}</span>
+                      <span className="l">Conversas por dia</span>
+                      <span className="v">últimos 7 dias</span>
                     </div>
                     <svg viewBox="0 0 300 60" preserveAspectRatio="none">
                       <defs>
@@ -1775,17 +1888,17 @@ export default function LandingPage() {
                   <div className="dash-list">
                     <div className="dash-row">
                       <div className="ch"><svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" strokeWidth="1.5"/></svg></div>
-                      <div className="m"><div className="t">{i.heroDashboard.event1Title}</div><div className="s">{i.heroDashboard.event1Sub}</div></div>
+                      <div className="m"><div className="t">Maria Silva confirmou agendamento</div><div className="s">corte · sexta 14:00</div></div>
                       <div className="tm">2min</div>
                     </div>
                     <div className="dash-row">
                       <div className="ch"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/></svg></div>
-                      <div className="m"><div className="t">{i.heroDashboard.event2Title}</div><div className="s">{i.heroDashboard.event2Sub}</div></div>
+                      <div className="m"><div className="t">Chamada atendida · 2m 18s</div><div className="s">+55 11 9···· · belo horizonte</div></div>
                       <div className="tm">5min</div>
                     </div>
                     <div className="dash-row">
                       <div className="ch"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
-                      <div className="m"><div className="t">{i.heroDashboard.event3Title}</div><div className="s">{i.heroDashboard.event3Sub}</div></div>
+                      <div className="m"><div className="t">3 agendamentos criados</div><div className="s">google calendar · sincronizado</div></div>
                       <div className="tm">12min</div>
                     </div>
                   </div>
@@ -1803,18 +1916,18 @@ export default function LandingPage() {
                     <div className="phone-head">
                       <div className="av">A</div>
                       <div className="ti">
-                        <div className="n">{i.heroPhone.brandName}</div>
-                        <div className="s"><i></i> {i.heroPhone.status}</div>
+                        <div className="n">Salão da Ana</div>
+                        <div className="s"><i></i> IA ativa · respondendo</div>
                       </div>
                     </div>
                     <div className="phone-body">
-                      <div className="bubble bot">{i.heroPhone.bot1}</div>
-                      <div className="bubble user">{i.heroPhone.user1}</div>
-                      <div className="bubble bot">{i.heroPhone.bot2}</div>
-                      <div className="bubble user">{i.heroPhone.user2}</div>
+                      <div className="bubble bot">Olá! Como posso ajudar?</div>
+                      <div className="bubble user">Agendar corte sexta</div>
+                      <div className="bubble bot">10h, 14h ou 16h?</div>
+                      <div className="bubble user">14h</div>
                       <div className="bubble confirm">
                         <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        <div>{i.heroPhone.confirm}</div>
+                        <div>Agendado!</div>
                       </div>
                       <div className="typing"><i></i><i></i><i></i></div>
                     </div>
@@ -1828,7 +1941,7 @@ export default function LandingPage() {
         {/* LOGOS */}
         <div className="logos-section">
           <div className="wrap">
-            <div className="logos-label">{i.logos.heading}</div>
+            <div className="logos-label">Integrado com as ferramentas que você já usa</div>
             <div className="logos-row">
               <div className="logo-item"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> Google Calendar</div>
               <div className="logo-item"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3.5-7.1L21 3v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> WhatsApp Business</div>
@@ -1840,20 +1953,85 @@ export default function LandingPage() {
         <section className="how" id="como-funciona">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">{i.howItWorks.eyebrow}</div>
-              <h2 className="section-title">{i.howItWorks.title}</h2>
-              <p className="section-sub">{i.howItWorks.sub}</p>
+              <div className="eyebrow">Como funciona</div>
+              <h2 className="section-title">Do contato ao agendamento em segundos.</h2>
+              <p className="section-sub">Seu agente responde, entende e agenda — sem precisar de nenhuma ação sua.</p>
             </div>
 
             <div className="steps fade-up">
-              {i.howItWorks.steps.map((step, idx) => (
-                <div className="step" key={idx}>
-                  <div className="step-num">{step.num} / {step.label}</div>
-                  <div className="step-ico">{STEP_ICONS[idx]}</div>
-                  <h3>{step.title}</h3>
-                  <p>{step.desc}</p>
+              <div className="step">
+                <div className="step-num">01 / contato</div>
+                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg></div>
+                <h3>Cliente entra em contato</h3>
+                <p>Pelo WhatsApp, o agente atende imediatamente, a qualquer hora do dia ou da noite.</p>
+              </div>
+              <div className="step">
+                <div className="step-num">02 / compreensão</div>
+                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 016 6c0 2-1 3-2 4v3a2 2 0 01-2 2h-4a2 2 0 01-2-2v-3c-1-1-2-2-2-4a6 6 0 016-6zM10 21h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
+                <h3>IA entende e responde</h3>
+                <p>O agente entende a intenção com linguagem natural, responde dúvidas e coleta as informações necessárias.</p>
+              </div>
+              <div className="step">
+                <div className="step-num">03 / agendamento</div>
+                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <h3>Agenda automaticamente</h3>
+                <p>Consulta o Google Calendar em tempo real e confirma o horário diretamente com o cliente.</p>
+              </div>
+              <div className="step">
+                <div className="step-num">04 / confirmado</div>
+                <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <h3>Agendamento salvo</h3>
+                <p>O agendamento é registrado no Google Calendar e no painel. Você acompanha tudo em um só lugar, sem precisar fazer nada.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* DEMO */}
+        <section className="how" id="demo">
+          <div className="wrap">
+            <div className="section-head center fade-up">
+              <div className="eyebrow">Demonstração</div>
+              <h2 className="section-title">Veja a IA atendendo ao vivo.</h2>
+              <p className="section-sub">Uma conversa real entre um cliente e o agente AttendeAI. Clique para avançar cada mensagem.</p>
+            </div>
+
+            <div className="demo-container fade-up">
+              <div className="demo-phone" id="demoPhone">
+                <div className="demo-overlay" id="demoOverlay">
+                  <div className="demo-overlay-title">AttendeAI</div>
+                  <div className="demo-overlay-sub">Agente WhatsApp Inteligente</div>
+                  <button className="demo-play-btn" aria-label="Iniciar demo">&#9654;</button>
+                  <div className="demo-overlay-hint">Clique para iniciar</div>
                 </div>
-              ))}
+
+                <div className="demo-chat-header">
+                  <div className="demo-avatar">B</div>
+                  <div>
+                    <div className="demo-header-name">Bia - Barbearia Monteiro</div>
+                    <div className="demo-header-status online" id="demoStatus">online</div>
+                  </div>
+                </div>
+
+                <div className="demo-chat-body" id="demoChatBody">
+                  <div className="demo-date"><span>Hoje</span></div>
+                </div>
+
+                <div className="demo-input-bar">
+                  <input placeholder="Mensagem" readOnly />
+                </div>
+                <div className="demo-progress" id="demoProgress"></div>
+              </div>
+
+              <div className="demo-side">
+                <div className="demo-step-card" id="demoStepCard">
+                  <div className="ds-title" id="demoStepTitle">Aguardando...</div>
+                  <div className="ds-desc" id="demoStepDesc">Clique no celular ou pressione Espaço para avançar.</div>
+                </div>
+                <div className="demo-nav-hint">
+                  <kbd>Espaço</kbd> ou <kbd>→</kbd> para avançar &bull; <button className="demo-restart-btn" id="demoRestartBtn">Reiniciar</button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1862,26 +2040,30 @@ export default function LandingPage() {
         <section className="usecases" id="casos">
           <div className="wrap">
             <div className="section-head fade-up">
-              <div className="eyebrow">{i.useCases.eyebrow}</div>
-              <h2 className="section-title">{i.useCases.title}</h2>
-              <p className="section-sub">{i.useCases.sub}</p>
+              <div className="eyebrow">Casos de uso</div>
+              <h2 className="section-title">Feito para o ritmo do seu negócio.</h2>
+              <p className="section-sub">Veja como a AttendeAI se adapta à rotina de diferentes segmentos — do salão de beleza à clínica médica.</p>
             </div>
 
             <div className="uc-tabs fade-up" id="ucTabs">
-              {UC_KEYS.map((key, index) => (
+              {(['salao', 'clinica', 'oficina', 'estudio', 'restaurante'] as UCKey[]).map((key) => (
                 <button
                   key={key}
                   className={`uc-tab${activeUC === key ? ' active' : ''}`}
                   onClick={() => setActiveUC(key)}
                 >
-                  {UC_TAB_ICONS[index]}
-                  {i.useCases.tabs[index]}
+                  {key === 'salao' && <svg viewBox="0 0 24 24" fill="none"><path d="M8 4l-2 8m12-8l2 8M6 12a6 6 0 0012 0M12 12v8M9 20h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  {key === 'clinica' && <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                  {key === 'oficina' && <svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5 5L3 18l3 3 6.7-6.7a4 4 0 005-5l-2.3 2.3-2.4-.7-.7-2.4 2.4-2.3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>}
+                  {key === 'estudio' && <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5"/></svg>}
+                  {key === 'restaurante' && <svg viewBox="0 0 24 24" fill="none"><path d="M5 3v18M5 3h3a4 4 0 010 8H5M19 3v18M19 3v6a3 3 0 003 3v9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  {key === 'salao' ? 'Salão de beleza' : key === 'clinica' ? 'Clínica médica' : key === 'oficina' ? 'Oficina' : key === 'estudio' ? 'Estúdio / Academia' : 'Restaurante'}
                 </button>
               ))}
             </div>
 
             <div className="uc-panel fade-up" id="ucPanel">
-              <UCPanel activeKey={activeUC} i={i} />
+              <UCPanel activeKey={activeUC} />
             </div>
           </div>
         </section>
@@ -1890,19 +2072,42 @@ export default function LandingPage() {
         <section id="recursos">
           <div className="wrap">
             <div className="section-head fade-up">
-              <div className="eyebrow">{i.features.eyebrow}</div>
-              <h2 className="section-title">{i.features.title}</h2>
-              <p className="section-sub">{i.features.sub}</p>
+              <div className="eyebrow">Recursos</div>
+              <h2 className="section-title">Tudo que um atendente profissional faz — e mais.</h2>
+              <p className="section-sub">Sem folgas, sem hora extra, sem atestado. O melhor atendente do seu negócio custa menos que um almoço por dia.</p>
             </div>
 
             <div className="features-grid fade-up">
-              {i.features.cards.map((card, idx) => (
-                <div className="feat-card" key={idx}>
-                  <div className="feat-ico">{FEAT_ICONS[idx]}</div>
-                  <h3>{card.title}</h3>
-                  <p>{card.desc}</p>
-                </div>
-              ))}
+              <div className="feat-card">
+                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
+                <h3>WhatsApp inteligente</h3>
+                <p>Responde mensagens com entendimento contextual, envia confirmações e conduz a conversa até o agendamento — de forma natural e automática.</p>
+              </div>
+              <div className="feat-card">
+                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
+                <h3>Agendamento em tempo real</h3>
+                <p>Consulta disponibilidade, cria eventos, envia convites e dispara lembretes — tudo integrado direto ao seu Google Calendar.</p>
+              </div>
+              <div className="feat-card">
+                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
+                <h3>Personalização total</h3>
+                <p>Configure serviços, preços e horários de atendimento de forma simples. O agente aprende sobre seu negócio e atende com o tom certo.</p>
+              </div>
+              <div className="feat-card">
+                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M7 16l4-4 4 4 5-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <h3>Painel de gestão</h3>
+                <p>Agendamentos organizados num painel limpo. Visualize próximas visitas, histórico e status da conexão WhatsApp em um só lugar.</p>
+              </div>
+              <div className="feat-card">
+                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M8 14h4M8 18h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
+                <h3>Histórico de agendamentos</h3>
+                <p>Todos os agendamentos registrados e acessíveis no painel. Veja data, serviço e cliente — sem depender de cadernos ou planilhas.</p>
+              </div>
+              <div className="feat-card">
+                <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <h3>Disponível 24/7</h3>
+                <p>O agente nunca para. Atende clientes de madrugada, fins de semana e feriados sem custo adicional — e sem você precisar fazer nada.</p>
+              </div>
             </div>
           </div>
         </section>
@@ -1911,39 +2116,79 @@ export default function LandingPage() {
         <section className="pricing how" id="precos">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">{i.pricing.eyebrow}</div>
-              <h2 className="section-title">{i.pricing.title}</h2>
-              <p className="section-sub">{i.pricing.sub}</p>
+              <div className="eyebrow">Planos e preços</div>
+              <h2 className="section-title">Comece hoje. Cancele quando quiser.</h2>
+              <p className="section-sub">Sem taxa de adesão, sem fidelidade. Só resultados.</p>
             </div>
 
 
             <div className="plans fade-up">
-              {i.pricing.plans.map((plan, idx) => (
-                <div className={`plan${plan.popular ? ' featured' : ''}`} key={idx}>
-                  {plan.popular && <div className="plan-badge">{i.pricing.badge}</div>}
-                  <div className="plan-name">{plan.name}</div>
-                  <div className="plan-price">
-                    <span className="plan-amount">{billingMode === 'a' ? plan.priceAnnual : plan.price}</span>
-                  </div>
-                  <div className="plan-period">{periodText}</div>
-                  <p className="plan-desc">{plan.desc}</p>
-                  <ul className="plan-feats">
-                    {plan.features.map((feat, fi) => (
-                      <li key={fi}>
-                        <svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <a href={`/cadastro?plano=${['starter','pro','business'][idx]}`} className={`btn-plan ${plan.popular ? 'filled' : 'outline'}`}>
-                    {plan.cta} <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </a>
+              {/* STARTER */}
+              <div className="plan">
+                <div className="plan-name">Starter</div>
+                <div className="plan-price">
+                  <span className="plan-currency">R$</span>
+                  <span className="plan-amount">197</span>
                 </div>
-              ))}
+                <div className="plan-period">por mês · faturado mensalmente</div>
+                <p className="plan-desc">Ideal para barbearias que querem automatizar o agendamento pelo WhatsApp.</p>
+                <ul className="plan-feats">
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agente IA no WhatsApp</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agendamento no Google Calendar</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Verificação de disponibilidade em tempo real</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Confirmação automática pelo WhatsApp</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>1 número de WhatsApp</span></li>
+                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Painel de gestão</span></li>
+                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Onboarding dedicado</span></li>
+                </ul>
+                <a href="/cadastro?plano=starter" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
+              </div>
+
+              {/* PRO */}
+              <div className="plan featured">
+                <div className="plan-badge">Mais popular</div>
+                <div className="plan-name">Pro</div>
+                <div className="plan-price">
+                  <span className="plan-currency">R$</span>
+                  <span className="plan-amount">397</span>
+                </div>
+                <div className="plan-period">por mês · faturado mensalmente</div>
+                <p className="plan-desc">Para barbearias que querem automação completa com visibilidade total do negócio.</p>
+                <ul className="plan-feats">
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Starter</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Painel de gestão completo</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Histórico de agendamentos</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Status da conexão WhatsApp</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configurações da barbearia</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte por e-mail</span></li>
+                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Onboarding dedicado</span></li>
+                </ul>
+                <a href="/cadastro?plano=pro" className="btn-plan filled">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
+              </div>
+
+              {/* BUSINESS */}
+              <div className="plan">
+                <div className="plan-name">Business</div>
+                <div className="plan-price">
+                  <span className="plan-currency">R$</span>
+                  <span className="plan-amount">697</span>
+                </div>
+                <div className="plan-period">por mês · faturado mensalmente</div>
+                <p className="plan-desc">Para quem quer começar sem complicação — a gente configura tudo para você.</p>
+                <ul className="plan-feats">
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Pro</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Onboarding dedicado</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configuração completa do agente</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte prioritário via WhatsApp</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Ativação em até 24h</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Treinamento do agente personalizado</span></li>
+                </ul>
+                <a href="/cadastro?plano=business" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
+              </div>
             </div>
 
             <div className="pricing-foot">
-              <span><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2"/></svg> {i.pricing.footer}</span>
+              <span><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2"/></svg> Pagamento 100% seguro</span>
             </div>
           </div>
         </section>
@@ -1952,12 +2197,12 @@ export default function LandingPage() {
         <section className="how" id="faq">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">{i.faq.eyebrow}</div>
-              <h2 className="section-title">{i.faq.title}</h2>
+              <div className="eyebrow">Perguntas frequentes</div>
+              <h2 className="section-title">Ainda tem dúvidas?</h2>
             </div>
 
             <div className="faq-wrap">
-              {i.faq.items.map((item, index) => (
+              {faqItems.map((item, index) => (
                 <div key={index} className="faq-item fade-up" data-open={openFaq === index ? "true" : undefined}>
                   <button type="button" className="faq-q" onClick={(e) => { e.preventDefault(); toggleFaq(index) }}>
                     {item.q}
@@ -1975,11 +2220,11 @@ export default function LandingPage() {
         {/* CTA FINAL */}
         <div className="cta-final">
           <div className="wrap cta-final-inner fade-up">
-            <div className="eyebrow" style={{ justifyContent: 'center', display: 'inline-flex' }}>{i.ctaFinal.eyebrow}</div>
-            <h2>{i.ctaFinal.titleStart} <em>{i.ctaFinal.titleEm}</em> {i.ctaFinal.titleEnd}</h2>
-            <p>{i.ctaFinal.sub}</p>
+            <div className="eyebrow" style={{ justifyContent: 'center', display: 'inline-flex' }}>Comece agora</div>
+            <h2>Seu próximo cliente está <em>tentando</em> te contatar agora.</h2>
+            <p>Enquanto você dorme, descansa ou está ocupado, a AttendeAI garante que nenhum cliente fique sem resposta.</p>
             <div className="actions">
-              <a href="https://wa.me/5534999819748" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> {i.ctaFinal.cta}</a>
+              <a href="https://wa.me/5534999819748" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> Falar com um humano</a>
             </div>
           </div>
         </div>
@@ -1993,19 +2238,16 @@ export default function LandingPage() {
                 attende<span style={{ color: 'var(--muted)', fontWeight: 400 }}>.ai</span>
               </div>
               <div className="footer-links">
-                <a href="#">{i.footer.terms}</a>
-                <a href="#">{i.footer.privacy}</a>
-                <a href="#">{i.footer.support}</a>
-                <a href="#">{i.footer.blog}</a>
-                <a href="#">{i.footer.contact}</a>
-                <a href="https://www.instagram.com/attendeai.ia" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                </a>
+                <a href="#">Termos</a>
+                <a href="#">Privacidade</a>
+                <a href="#">Suporte</a>
+                <a href="#">Blog</a>
+                <a href="#">Fale conosco</a>
               </div>
             </div>
             <div className="wrap footer-copy">
-              <span>{i.footer.copyright}</span>
-              <span>{i.footer.madeIn}</span>
+              <span>© 2026 AttendeAI</span>
+              <span>feito no brasil 🇧🇷</span>
             </div>
           </div>
         </footer>

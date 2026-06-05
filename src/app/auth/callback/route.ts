@@ -5,11 +5,7 @@ import { cookies } from 'next/headers'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  let next = searchParams.get('next') ?? '/dashboard'
-  // Prevent open redirect: only allow relative paths, block protocol-relative URLs
-  if (!next.startsWith('/') || next.startsWith('//')) {
-    next = '/dashboard'
-  }
+  const next = searchParams.get('next') ?? '/dashboard'
 
   if (code) {
     const cookieStore = await cookies()

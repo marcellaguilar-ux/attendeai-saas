@@ -19,19 +19,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .eq('id', user.id)
     .single()
 
-  if (!userData?.barbershop_id) {
-    return NextResponse.json({ error: 'Usuário sem barbearia associada' }, { status: 403 })
-  }
-
   const { data, error } = await supabase
     .from('appointments')
     .update({ status })
     .eq('id', id)
-    .eq('barbershop_id', userData.barbershop_id)
+    .eq('barbershop_id', userData?.barbershop_id)
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: 'Erro ao atualizar agendamento' }, { status: 500 })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   return NextResponse.json({ ok: true, appointment: data })
 }

@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { LayoutDashboard, Calendar, Settings, MessageCircle, LogOut } from 'lucide-react'
+import { LayoutDashboard, Calendar, Settings, MessageCircle, LogOut, ExternalLink } from 'lucide-react'
 
 const links = [
   { href: '/dashboard', label: 'Visão Geral', icon: LayoutDashboard },
@@ -11,7 +11,7 @@ const links = [
   { href: '/dashboard/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
-export default function Sidebar({ barbershop }: { barbershop?: { nome: string } }) {
+export default function Sidebar({ barbershop }: { barbershop?: { nome: string; slug?: string } }) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -102,6 +102,44 @@ export default function Sidebar({ barbershop }: { barbershop?: { nome: string } 
           )
         })}
       </nav>
+
+      {/* Perfil Público */}
+      {barbershop?.slug && (
+        <div style={{ padding: '0 8px 8px' }}>
+          <a
+            href={`/${barbershop.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 9,
+              padding: '9px 12px',
+              borderRadius: 10,
+              fontSize: 13.5,
+              letterSpacing: '-0.01em',
+              fontWeight: 400,
+              color: '#00e5a0',
+              textDecoration: 'none',
+              border: '1px solid rgba(0,229,160,.2)',
+              transition: 'background .15s, border-color .15s',
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLAnchorElement
+              el.style.background = 'rgba(0,229,160,.06)'
+              el.style.borderColor = 'rgba(0,229,160,.4)'
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLAnchorElement
+              el.style.background = 'transparent'
+              el.style.borderColor = 'rgba(0,229,160,.2)'
+            }}
+          >
+            <ExternalLink style={{ width: 15, height: 15, flexShrink: 0 }} />
+            Perfil Público
+          </a>
+        </div>
+      )}
 
       {/* Logout */}
       <div style={{ padding: '8px 8px 12px', borderTop: '1px solid #1d2429' }}>

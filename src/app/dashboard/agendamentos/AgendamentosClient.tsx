@@ -1,12 +1,14 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Calendar, List, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, List, ChevronLeft, ChevronRight, X, AlertTriangle } from 'lucide-react'
 
 type Appointment = {
   id: string
   client_nome: string
   client_email?: string
   servico: string
+  barbeiro?: string
+  preco?: number
   data: string   // YYYY-MM-DD
   horario: string // HH:MM or HH:MM:SS
   status: string
@@ -45,6 +47,120 @@ function weekStart(d: Date) {
   return c
 }
 
+const MONTHS_LONG = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+
+// ── Appointment detail modal ───────────────────────────────────────────────────
+function AppointmentModal({ appt, onClose, onCancel }: {
+  appt: Appointment
+  onClose: () => void
+  onCancel: (id: string) => Promise<void>
+}) {
+  const [confirming, setConfirming] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const color = STATUS_COLOR[appt.status] || '#6c7884'
+  const bg = STATUS_BG[appt.status] || 'rgba(108,120,132,0.08)'
+  const label = STATUS_LABEL[appt.status] || appt.status
+  const [y, m, d] = appt.data.split('-').map(Number)
+  const dateLabel = `${String(d).padStart(2,'0')} de ${MONTHS_LONG[m-1]} de ${y}`
+
+  async function handleCancel() {
+    setLoading(true)
+    await onCancel(appt.id)
+    setLoading(false)
+    onClose()
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', zIndex: 100,
+        backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
+      }} />
+
+      {/* Panel */}
+      <div style={{
+        position: 'fixed', top: '50%', left: '50%',
+        transform: 'translate(-50%,-50%)',
+        width: '100%', maxWidth: 440,
+        background: '#13181c', border: '1px solid #1d2429',
+        borderRadius: 18, zIndex: 101, padding: 28,
+        display: 'flex', flexDirection: 'column', gap: 20,
+        boxShadow: '0 24px 64px rgba(0,0,0,.6)',
+      }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <p style={{ color: '#6c7884', fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 6 }}>Detalhes do agendamento</p>
+            <h3 style={{ color: '#e9eef3', fontSize: 20, fontWeight: 600, letterSpacing: '-0.02em' }}>{appt.client_nome}</h3>
+            {appt.client_email && <p style={{ color: '#6c7884', fontSize: 13, marginTop: 3 }}>{appt.client_email}</p>}
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: '1px solid #1d2429', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6c7884', flexShrink: 0 }}>
+            <X style={{ width: 15, height: 15 }} />
+          </button>
+        </div>
+
+        {/* Details grid */}
+        <div style={{ background: '#0f1316', borderRadius: 12, padding: '4px 0' }}>
+          {[
+            ['Serviço', appt.servico],
+            ['Barbeiro', appt.barbeiro || '—'],
+            ['Data', dateLabel],
+            ['Horário', String(appt.horario).slice(0,5)],
+            ['Valor', appt.preco ? `R$ ${Number(appt.preco).toFixed(2).replace('.',',')}` : '—'],
+            ['Status', null],
+          ].map(([key, val]) => (
+            <div key={key as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 16px', borderBottom: '1px solid #1d2429' }}>
+              <span style={{ color: '#6c7884', fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase' }}>{key}</span>
+              {key === 'Status'
+                ? <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 10px', borderRadius: 100, fontSize: 12, fontWeight: 500, background: bg, color }}>{label}</span>
+                : <span style={{ color: '#e9eef3', fontSize: 13.5, fontWeight: 500 }}>{val}</span>
+              }
+            </div>
+          ))}
+        </div>
+
+        {/* Actions */}
+        {appt.status === 'confirmed' && !confirming && (
+          <button onClick={() => setConfirming(true)} style={{
+            width: '100%', padding: '11px', borderRadius: 10, border: '1px solid rgba(248,113,113,.3)',
+            background: 'rgba(248,113,113,.06)', color: '#f87171', fontSize: 13.5, fontWeight: 500,
+            cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+          }}>
+            Cancelar agendamento
+          </button>
+        )}
+
+        {confirming && (
+          <div style={{ background: 'rgba(248,113,113,.06)', border: '1px solid rgba(248,113,113,.2)', borderRadius: 10, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <AlertTriangle style={{ width: 16, height: 16, color: '#f87171', flexShrink: 0, marginTop: 1 }} />
+              <p style={{ color: '#f87171', fontSize: 13, lineHeight: 1.5 }}>
+                Tem certeza? O horário será liberado e o cliente não será notificado automaticamente.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setConfirming(false)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: '1px solid #2a343c', background: 'transparent', color: '#aab4bd', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Voltar
+              </button>
+              <button onClick={handleCancel} disabled={loading} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 0, background: '#f87171', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', opacity: loading ? .6 : 1 }}>
+                {loading ? 'Cancelando...' : 'Confirmar cancelamento'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {appt.status !== 'confirmed' && (
+          <p style={{ color: '#3a4551', fontSize: 12, textAlign: 'center', letterSpacing: '.04em', textTransform: 'uppercase' }}>
+            Este agendamento não pode ser alterado
+          </p>
+        )}
+      </div>
+    </>
+  )
+}
+
 // ── Event chip (shared) ───────────────────────────────────────────────────────
 function EventChip({ a, style }: { a: Appointment; style?: React.CSSProperties }) {
   const color = STATUS_COLOR[a.status] || '#00e5a0'
@@ -64,6 +180,11 @@ function EventChip({ a, style }: { a: Appointment; style?: React.CSSProperties }
       <div style={{ color: '#6c7884', fontSize: 10.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 1 }}>
         {a.servico}
       </div>
+      {a.barbeiro && (
+        <div style={{ color: '#3a4551', fontSize: 9.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 1 }}>
+          {a.barbeiro}
+        </div>
+      )}
     </div>
   )
 }
@@ -128,7 +249,7 @@ function MonthView({ current, appointments }: { current: Date; appointments: App
 }
 
 // ── Week view ─────────────────────────────────────────────────────────────────
-function WeekView({ current, appointments }: { current: Date; appointments: Appointment[] }) {
+function WeekView({ current, appointments, onSelect }: { current: Date; appointments: Appointment[]; onSelect: (a: Appointment) => void }) {
   const ws = weekStart(current)
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(ws)
@@ -200,7 +321,7 @@ function WeekView({ current, appointments }: { current: Date; appointments: Appo
                   const [h, m] = a.horario.split(':').map(Number)
                   const top = (h - 8) * HOUR_H + (m / 60) * HOUR_H
                   return (
-                    <div key={a.id} style={{ position: 'absolute', top: top + 2, left: 2, right: 2, zIndex: 5 }}>
+                    <div key={a.id} onClick={() => onSelect(a)} style={{ position: 'absolute', top: top + 2, left: 2, right: 2, zIndex: 5, cursor: 'pointer' }}>
                       <EventChip a={a} />
                     </div>
                   )
@@ -215,7 +336,7 @@ function WeekView({ current, appointments }: { current: Date; appointments: Appo
 }
 
 // ── Day view ──────────────────────────────────────────────────────────────────
-function DayView({ current, appointments }: { current: Date; appointments: Appointment[] }) {
+function DayView({ current, appointments, onSelect }: { current: Date; appointments: Appointment[]; onSelect: (a: Appointment) => void }) {
   const dateStr = toDateStr(current)
   const appts = appointments.filter(a => a.data === dateStr)
   const todayStr = toDateStr(new Date())
@@ -268,7 +389,7 @@ function DayView({ current, appointments }: { current: Date; appointments: Appoi
             const [h, m] = a.horario.split(':').map(Number)
             const top = (h - 8) * HOUR_H + (m / 60) * HOUR_H
             return (
-              <div key={a.id} style={{ position: 'absolute', top: top + 2, left: 8, right: 8, zIndex: 5 }}>
+              <div key={a.id} onClick={() => onSelect(a)} style={{ position: 'absolute', top: top + 2, left: 8, right: 8, zIndex: 5, cursor: 'pointer' }}>
                 <EventChip a={a} />
               </div>
             )
@@ -280,7 +401,7 @@ function DayView({ current, appointments }: { current: Date; appointments: Appoi
 }
 
 // ── List view ─────────────────────────────────────────────────────────────────
-function ListView({ appointments }: { appointments: Appointment[] }) {
+function ListView({ appointments, onSelect }: { appointments: Appointment[]; onSelect: (a: Appointment) => void }) {
   if (!appointments.length) return (
     <div style={{ textAlign: 'center', padding: '60px 0' }}>
       <Calendar style={{ width: 36, height: 36, color: '#2a343c', margin: '0 auto 12px' }} />
@@ -300,14 +421,14 @@ function ListView({ appointments }: { appointments: Appointment[] }) {
         const bg = STATUS_BG[a.status] || 'rgba(108,120,132,0.08)'
         const label = STATUS_LABEL[a.status] || a.status
         return (
-          <div key={a.id} className="appt-row" style={{ display: 'grid', gridTemplateColumns: '1fr 130px 90px 110px', alignItems: 'center', padding: '14px 20px', borderBottom: i < appointments.length - 1 ? '1px solid #1d2429' : 'none', background: 'transparent' }}>
+          <div key={a.id} className="appt-row" onClick={() => onSelect(a)} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 90px 110px', alignItems: 'center', padding: '14px 20px', borderBottom: i < appointments.length - 1 ? '1px solid #1d2429' : 'none', background: 'transparent' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ background: 'rgba(0,229,160,0.08)', borderRadius: 8, padding: 7, flexShrink: 0 }}>
                 <Calendar style={{ width: 13, height: 13, color: '#00e5a0' }} />
               </div>
               <div style={{ minWidth: 0 }}>
                 <p style={{ color: '#e9eef3', fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.client_nome}</p>
-                <p style={{ color: '#6c7884', fontSize: 12, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.servico}{a.client_email ? ` · ${a.client_email}` : ''}</p>
+                <p style={{ color: '#6c7884', fontSize: 12, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.servico}{a.barbeiro ? ` · ${a.barbeiro}` : ''}{a.client_email ? ` · ${a.client_email}` : ''}</p>
               </div>
             </div>
             <span style={{ color: '#aab4bd', fontSize: 13.5 }}>{new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
@@ -321,9 +442,22 @@ function ListView({ appointments }: { appointments: Appointment[] }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export default function AgendamentosClient({ appointments }: { appointments: Appointment[] }) {
+export default function AgendamentosClient({ appointments: initial }: { appointments: Appointment[] }) {
+  const [appointments, setAppointments] = useState<Appointment[]>(initial)
   const [view, setView] = useState<ViewMode>('list')
   const [current, setCurrent] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
+  const [selected, setSelected] = useState<Appointment | null>(null)
+
+  async function handleCancel(id: string) {
+    const res = await fetch(`/api/appointments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'cancelled' }),
+    })
+    if (res.ok) {
+      setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: 'cancelled' } : a))
+    }
+  }
 
   function navigate(dir: 1 | -1) {
     setCurrent(prev => {
@@ -362,7 +496,15 @@ export default function AgendamentosClient({ appointments }: { appointments: App
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: calView ? 'none' : 960 }}>
-      <style>{`.appt-row { transition: background .12s; } .appt-row:hover { background: #181e23 !important; }`}</style>
+      <style>{`.appt-row { transition: background .12s; cursor: pointer; } .appt-row:hover { background: #181e23 !important; }`}</style>
+
+      {selected && (
+        <AppointmentModal
+          appt={selected}
+          onClose={() => setSelected(null)}
+          onCancel={handleCancel}
+        />
+      )}
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
@@ -407,10 +549,10 @@ export default function AgendamentosClient({ appointments }: { appointments: App
 
       {/* Content */}
       <div style={{ background: '#13181c', border: '1px solid #1d2429', borderRadius: 14, overflow: 'hidden' }}>
-        {view === 'list' && <ListView appointments={appointments} />}
+        {view === 'list' && <ListView appointments={appointments} onSelect={setSelected} />}
         {view === 'month' && <MonthView current={current} appointments={appointments} />}
-        {view === 'week' && <WeekView current={current} appointments={appointments} />}
-        {view === 'day' && <DayView current={current} appointments={appointments} />}
+        {view === 'week' && <WeekView current={current} appointments={appointments} onSelect={setSelected} />}
+        {view === 'day' && <DayView current={current} appointments={appointments} onSelect={setSelected} />}
       </div>
     </div>
   )

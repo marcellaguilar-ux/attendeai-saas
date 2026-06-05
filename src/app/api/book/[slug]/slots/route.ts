@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 function genSlots(startH: number, endH: number, stepMin = 30): string[] {
@@ -19,11 +19,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
   const date = req.nextUrl.searchParams.get('date') // YYYY-MM-DD
 
   if (!date) return NextResponse.json({ error: 'date required' }, { status: 400 })
-
-  // Validate date format
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-  if (!dateRegex.test(date) || isNaN(new Date(date + 'T12:00:00').getTime()))
-    return NextResponse.json({ error: 'Formato de data inválido' }, { status: 400 })
 
   const { data: shop } = await supabase
     .from('barbershops')

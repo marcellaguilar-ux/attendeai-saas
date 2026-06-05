@@ -1,6 +1,11 @@
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import BookingPage from './BookingPage'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 // Reserved paths that should not be treated as slugs
 const RESERVED = ['login', 'cadastro', 'dashboard', 'pagamento', 'pagamento-concluido', 'auth', 'api', 'forgot-password', 'reset-password', '_next', 'favicon.ico']
@@ -8,8 +13,7 @@ const RESERVED = ['login', 'cadastro', 'dashboard', 'pagamento', 'pagamento-conc
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   if (RESERVED.includes(slug)) return {}
-  const supabase = await createClient()
-  const { data: shop } = await supabase.from('barbershops').select('nome').eq('slug', slug).eq('ativo', true).single()
+  const { data: shop } = await supabase.from('barbershops').select('nome').eq('slug', slug).single()
   if (!shop) return { title: 'Barbearia não encontrada' }
   return { title: `${shop.nome} — Agendamento Online` }
 }
@@ -19,7 +23,6 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
 
   if (RESERVED.includes(slug)) notFound()
 
-  const supabase = await createClient()
   const { data: shop } = await supabase
     .from('barbershops')
     .select('id, nome, slug, endereco, telefone')
