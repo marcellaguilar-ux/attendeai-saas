@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendeAI - Demo WhatsApp</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0b141a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 760px;
+    background: #0b141a;
+    border-radius: 40px;
+    border: 3px solid #2a2a2a;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  /* Header */
+  .chat-header {
+    background: #1f2c34;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #2a3942;
+    min-height: 64px;
+  }
+
+  .header-back {
+    color: #00a884;
+    font-size: 20px;
+  }
+
+  .header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00a884, #008f6f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .header-info {
+    flex: 1;
+  }
+
+  .header-name {
+    color: #e9edef;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .header-status {
+    color: #8696a0;
+    font-size: 12px;
+  }
+
+  .header-status.online {
+    color: #00a884;
+  }
+
+  /* Chat area */
+  .chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    background: #0b141a;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23111b21' fill-opacity='0.6'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    scroll-behavior: smooth;
+  }
+
+  /* Messages */
+  .message {
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    word-wrap: break-word;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.received {
+    background: #1f2c34;
+    color: #e9edef;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+  }
+
+  .message.sent {
+    background: #005c4b;
+    color: #e9edef;
+    align-self: flex-end;
+    border-top-right-radius: 0;
+  }
+
+  .message .time {
+    font-size: 11px;
+    color: #8696a0;
+    float: right;
+    margin-left: 8px;
+    margin-top: 4px;
+  }
+
+  .message.sent .time {
+    color: #7fb8a8;
+  }
+
+  .message .check {
+    color: #53bdeb;
+    margin-left: 2px;
+  }
+
+  /* Typing indicator */
+  .typing-indicator {
+    align-self: flex-start;
+    background: #1f2c34;
+    border-radius: 8px;
+    border-top-left-radius: 0;
+    padding: 12px 16px;
+    display: none;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .typing-indicator.visible {
+    display: flex;
+  }
+
+  .typing-dot {
+    width: 7px;
+    height: 7px;
+    background: #8696a0;
+    border-radius: 50%;
+    animation: typingBounce 1.4s ease-in-out infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* Input area */
+  .chat-input {
+    background: #1f2c34;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #2a3942;
+  }
+
+  .input-field {
+    flex: 1;
+    background: #2a3942;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 16px;
+    color: #e9edef;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .input-field::placeholder {
+    color: #8696a0;
+  }
+
+  .send-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #00a884;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .send-btn:hover {
+    background: #02c298;
+  }
+
+  /* Date divider */
+  .date-divider {
+    text-align: center;
+    margin: 8px 0;
+  }
+
+  .date-divider span {
+    background: #182229;
+    color: #8696a0;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  /* Start overlay */
+  .start-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+    transition: opacity 0.4s;
+  }
+
+  .start-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .start-overlay .logo {
+    font-size: 42px;
+    font-weight: 700;
+    color: #00a884;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+
+  .start-overlay .logo span {
+    color: #e9edef;
+  }
+
+  .start-overlay .subtitle {
+    color: #8696a0;
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .start-overlay .play-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #00a884;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,168,132,0.4);
+    transition: transform 0.2s;
+  }
+
+  .start-overlay .play-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .start-overlay .hint {
+    color: #8696a0;
+    font-size: 13px;
+    margin-top: 20px;
+  }
+
+  /* Side panel - presentation info */
+  .side-panel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(calc(-50% + 260px), -50%);
+    width: 360px;
+    color: #e9edef;
+    display: none;
+  }
+
+  .side-panel.visible {
+    display: block;
+  }
+
+  .side-panel h2 {
+    color: #00a884;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .side-panel .step-info {
+    background: #1f2c34;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-left: 3px solid #00a884;
+  }
+
+  .side-panel .step-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #00a884;
+  }
+
+  .side-panel .step-desc {
+    font-size: 14px;
+    color: #8696a0;
+    line-height: 1.5;
+  }
+
+  .side-panel .nav-hint {
+    color: #8696a0;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  .side-panel .nav-hint kbd {
+    background: #2a3942;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #e9edef;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: #00a884;
+    transition: width 0.4s ease;
+    z-index: 5;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .side-panel { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="phone">
+  <!-- Start overlay -->
+  <div class="start-overlay" id="startOverlay" onclick="startDemo()">
+    <div class="logo">Attende<span>AI</span></div>
+    <div class="subtitle">Agente WhatsApp Inteligente</div>
+    <button class="play-btn">&#9654;</button>
+    <div class="hint">Clique para iniciar a demo</div>
+  </div>
+
+  <!-- Header -->
+  <div class="chat-header">
+    <span class="header-back">&#8249;</span>
+    <div class="header-avatar">B</div>
+    <div class="header-info">
+      <div class="header-name">Bia - Barbearia Monteiro</div>
+      <div class="header-status" id="headerStatus">online</div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-body" id="chatBody">
+    <div class="date-divider"><span>Hoje</span></div>
+  </div>
+
+  <!-- Typing indicator -->
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input class="input-field" placeholder="Mensagem" readonly>
+    <button class="send-btn">&#10148;</button>
+  </div>
+
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<!-- Side panel -->
+<div class="side-panel" id="sidePanel">
+  <h2>AttendeAI Demo</h2>
+  <div class="step-info">
+    <div class="step-title" id="stepTitle">Aguardando...</div>
+    <div class="step-desc" id="stepDesc">Clique no celular ou pressione uma tecla para avançar.</div>
+  </div>
+  <div class="nav-hint">
+    <kbd>Espaço</kbd> ou <kbd>&#8594;</kbd> para avançar &bull; <kbd>R</kbd> para reiniciar
+  </div>
+</div>
+
+<script>
+const conversation = [
+  // Step 0: Cliente inicia conversa
+  {
+    type: 'sent',
+    text: 'Oi, boa tarde! Queria agendar um horário',
+    step: { title: '1. Cliente inicia contato', desc: 'O cliente envia uma mensagem pelo WhatsApp. A IA responde instantaneamente, 24h por dia.' }
+  },
+  // Step 1: Bia responde
+  {
+    type: 'received',
+    text: 'Oi! Boa tarde! Bem-vindo à Barbearia Monteiro! Eu sou a Bia, assistente virtual. Vou te ajudar a agendar seu horário. Qual serviço você gostaria?\n\nCorte de cabelo\nBarba\nCorte + Barba\nSobrancelha',
+    delay: 1800,
+    step: { title: '2. Saudação + Menu de serviços', desc: 'A IA cumprimenta o cliente pelo nome do negócio e apresenta os serviços disponíveis automaticamente.' }
+  },
+  // Step 2: Cliente escolhe
+  {
+    type: 'sent',
+    text: 'Corte + Barba',
+    step: { title: '3. Cliente escolhe o serviço', desc: 'Interação natural por texto, sem menus complicados. O cliente digita normalmente.' }
+  },
+  // Step 3: Bia mostra horarios
+  {
+    type: 'received',
+    text: 'Ótima escolha! Corte + Barba leva em média 50 minutos. Para quando você gostaria de agendar?\n\nHorários disponíveis para amanhã (quarta):\n\n09:00\n10:00\n11:00\n14:00\n15:00\n16:00',
+    delay: 2000,
+    step: { title: '4. Consulta de agenda em tempo real', desc: 'A IA consulta o Google Calendar do barbeiro e mostra apenas horários realmente livres. Sem conflitos!' }
+  },
+  // Step 4: Cliente escolhe horario
+  {
+    type: 'sent',
+    text: '15:00',
+    step: { title: '5. Cliente escolhe horário', desc: 'Processo simples e rápido. O cliente não precisa ligar nem esperar resposta.' }
+  },
+  // Step 5: Bia pede dados
+  {
+    type: 'received',
+    text: 'Perfeito! Vou reservar amanhã às 15:00 para Corte + Barba. Qual o seu nome completo?',
+    delay: 1500,
+    step: { title: '6. Coleta de dados', desc: 'A IA coleta as informações necessárias de forma conversacional e amigável.' }
+  },
+  // Step 6: Cliente da o nome
+  {
+    type: 'sent',
+    text: 'Carlos Eduardo Silva',
+    step: { title: '7. Identificação do cliente', desc: 'Os dados ficam registrados para histórico e CRM do barbeiro.' }
+  },
+  // Step 7: Bia pede email
+  {
+    type: 'received',
+    text: 'Obrigada, Carlos! E o seu email para enviar a confirmação?',
+    delay: 1200,
+    step: { title: '8. Email para confirmação', desc: 'O cliente recebe confirmação por email automaticamente via Resend API.' }
+  },
+  // Step 8: Cliente da email
+  {
+    type: 'sent',
+    text: 'carlos.silva@gmail.com',
+    step: null
+  },
+  // Step 9: Confirmacao final
+  {
+    type: 'received',
+    text: 'Pronto, Carlos! Seu agendamento está confirmado:\n\nCorte + Barba\nAmanhã (quarta), 15:00\nBarbearia Monteiro\n\nVocê vai receber um email de confirmação e um lembrete por WhatsApp 1h antes. Até amanhã!',
+    delay: 2200,
+    step: { title: '9. Confirmação automática', desc: 'Agendamento criado no Google Calendar, email enviado, lembrete WhatsApp programado. Tudo automático, sem intervenção do barbeiro!' }
+  },
+  // Step 10: Lembrete
+  {
+    type: 'received',
+    text: 'Oi Carlos! Lembrete: seu horário na Barbearia Monteiro é HOJE às 15:00 (Corte + Barba). Te esperamos! Se precisar reagendar, é só me chamar.',
+    delay: 1500,
+    step: { title: '10. Lembrete automático', desc: 'O cliente recebe lembrete 1h antes. Isso reduz faltas em até 70% e o barbeiro não precisa fazer nada.' }
+  }
+];
+
+let currentStep = -1;
+let isAnimating = false;
+let demoStarted = false;
+
+function getTime() {
+  const now = new Date();
+  return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+function scrollToBottom() {
+  const body = document.getElementById('chatBody');
+  body.scrollTop = body.scrollHeight;
+}
+
+function showTyping() {
+  const body = document.getElementById('chatBody');
+  const indicator = document.createElement('div');
+  indicator.className = 'typing-indicator visible';
+  indicator.id = 'typingIndicator';
+  indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  body.appendChild(indicator);
+  scrollToBottom();
+  document.getElementById('headerStatus').textContent = 'digitando...';
+  document.getElementById('headerStatus').className = 'header-status online';
+}
+
+function hideTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+  document.getElementById('headerStatus').textContent = 'online';
+}
+
+function addMessage(type, text) {
+  const body = document.getElementById('chatBody');
+  const msg = document.createElement('div');
+  msg.className = 'message ' + type;
+  const time = getTime();
+  const check = type === 'sent' ? ' <span class="check">&#10003;&#10003;</span>' : '';
+  msg.innerHTML = text.replace(/\n/g, '<br>') + '<span class="time">' + time + check + '</span>';
+  body.appendChild(msg);
+  scrollToBottom();
+}
+
+function updateSidePanel(step) {
+  if (!step) return;
+  document.getElementById('stepTitle').textContent = step.title;
+  document.getElementById('stepDesc').textContent = step.desc;
+  document.getElementById('sidePanel').classList.add('visible');
+}
+
+function updateProgress() {
+  const pct = ((currentStep + 1) / conversation.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+async function nextStep() {
+  if (isAnimating) return;
+  currentStep++;
+
+  if (currentStep >= conversation.length) {
+    // Demo finished
+    document.getElementById('stepTitle').textContent = 'Demo completa!';
+    document.getElementById('stepDesc').textContent = 'Todo esse fluxo acontece sem intervenção humana. O barbeiro só precisa atender o cliente na hora marcada. Pressione R para reiniciar.';
+    return;
+  }
+
+  isAnimating = true;
+  const item = conversation[currentStep];
+
+  if (item.step) {
+    updateSidePanel(item.step);
+  }
+
+  if (item.type === 'received') {
+    showTyping();
+    await sleep(item.delay || 1500);
+    hideTyping();
+  } else {
+    await sleep(300);
+  }
+
+  addMessage(item.type, item.text);
+  updateProgress();
+  isAnimating = false;
+
+  // Auto-advance for email step (no side panel info)
+  if (item.step === null && currentStep < conversation.length - 1) {
+    await sleep(600);
+    nextStep();
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function startDemo() {
+  document.getElementById('startOverlay').classList.add('hidden');
+  demoStarted = true;
+  setTimeout(() => nextStep(), 500);
+}
+
+function resetDemo() {
+  currentStep = -1;
+  isAnimating = false;
+  demoStarted = false;
+  const body = document.getElementById('chatBody');
+  body.innerHTML = '<div class="date-divider"><span>Hoje</span></div>';
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('sidePanel').classList.remove('visible');
+  document.getElementById('startOverlay').classList.remove('hidden');
+  document.getElementById('headerStatus').textContent = 'online';
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'r' || e.key === 'R') {
+    resetDemo();
+    return;
+  }
+  if (!demoStarted) {
+    if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      startDemo();
+    }
+    return;
+  }
+  if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    nextStep();
+  }
+});
+
+// Click navigation
+document.getElementById('phone').addEventListener('click', (e) => {
+  if (!demoStarted || e.target.closest('.start-overlay')) return;
+  nextStep();
+});
+</script>
+
+</body>
+</html>
