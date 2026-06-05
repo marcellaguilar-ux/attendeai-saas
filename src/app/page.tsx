@@ -1756,6 +1756,7 @@ export default function LandingPage() {
           </a>
           <ul className="nav-links">
             <li><a href="#como-funciona">Como funciona</a></li>
+            <li><a href="#demo">Demonstração</a></li>
             <li><a href="#casos">Casos de uso</a></li>
             <li><a href="#recursos">Recursos</a></li>
             <li><a href="#precos">Preços</a></li>
