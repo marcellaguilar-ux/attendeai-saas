@@ -993,6 +993,100 @@ h1.hero-title em {
 .pricing-foot span { display: inline-flex; align-items: center; gap: 6px; }
 .pricing-foot svg { width: 12px; height: 12px; }
 
+/* SDR - PROSPECCAO */
+.sdr-section {
+  background: var(--bg-elev);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.sdr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 900px) { .sdr-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+.sdr-content h3 {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  margin-bottom: 14px;
+  line-height: 1.1;
+}
+.sdr-content p {
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.sdr-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.sdr-list li {
+  font-size: 13.5px;
+  color: var(--text);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.sdr-list svg { width: 14px; height: 14px; color: var(--accent); margin-top: 4px; flex-shrink: 0; }
+
+.sdr-steps-mini {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 600px) { .sdr-steps-mini { grid-template-columns: 1fr; } }
+.sdr-step-mini {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px;
+  transition: background .25s;
+}
+.sdr-step-mini:hover { background: var(--surface-2); }
+.sdr-step-mini .num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.sdr-step-mini h4 {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.sdr-step-mini p {
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.sdr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  background: color-mix(in oklab, var(--info) 8%, transparent);
+  border: 1px solid color-mix(in oklab, var(--info) 20%, transparent);
+  border-radius: 100px;
+  font-size: 11px;
+  color: var(--info);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.sdr-badge .ico {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--info) 15%, transparent);
+  display: grid; place-items: center;
+}
+.sdr-badge .ico svg { width: 12px; height: 12px; }
+
 /* TESTIMONIALS */
 .testimonials-grid {
   display: grid;
@@ -1493,6 +1587,7 @@ export default function ClinicasLandingPage() {
             <li><a href="#demo">Demonstracao</a></li>
             <li><a href="#casos">Segmentos</a></li>
             <li><a href="#recursos">Recursos</a></li>
+            <li><a href="#prospeccao">Prospeccao</a></li>
             <li><a href="#precos">Precos</a></li>
           </ul>
           <div className="nav-right">
@@ -1777,6 +1872,77 @@ export default function ClinicasLandingPage() {
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                 <h3>Disponivel 24/7</h3>
                 <p>O agente nunca para. Atende pacientes de madrugada, fins de semana e feriados — sem custo adicional e sem voce precisar fazer nada.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SDR - PROSPECCAO */}
+        <section className="sdr-section" id="prospeccao">
+          <div className="wrap">
+            <div className="section-head fade-up">
+              <div className="eyebrow">Prospeccao ativa</div>
+              <h2 className="section-title">Nao espere o paciente vir ate voce.</h2>
+              <p className="section-sub">Alem de atender quem chega, a AttendeAI vai atras de novos pacientes para lotar sua agenda.</p>
+            </div>
+
+            <div className="sdr-grid fade-up">
+              <div className="sdr-content">
+                <div className="sdr-badge">
+                  <span className="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
+                  SDR com IA
+                </div>
+                <h3>Um agente comercial que prospecta via WhatsApp enquanto voce atende.</h3>
+                <p>Importe sua lista de contatos — pacientes antigos que nao voltaram, leads do Instagram, indicacoes — e a IA entra em contato automaticamente pelo WhatsApp, com mensagens humanizadas e personalizadas.</p>
+                <ul className="sdr-list">
+                  <li>
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Disparo inteligente via WhatsApp (sem parecer spam)
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    IA conversa com o lead e qualifica o interesse
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Agenda consulta automaticamente para leads quentes
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Reativacao de pacientes que sumiram da agenda
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Dashboard com metricas de conversao e campanhas
+                  </li>
+                </ul>
+                <a href="https://wa.me/5534999819748?text=Quero%20saber%20sobre%20o%20SDR%20para%20minha%20cl%C3%ADnica" className="btn btn-primary">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+                  Quero prospectar pacientes
+                </a>
+              </div>
+
+              <div className="sdr-steps-mini">
+                <div className="sdr-step-mini">
+                  <div className="num">01 &middot; importe</div>
+                  <h4>Envie sua lista de contatos</h4>
+                  <p>Pacientes antigos, leads do Instagram, indicacoes. Upload via CSV ou cole direto no painel.</p>
+                </div>
+                <div className="sdr-step-mini">
+                  <div className="num">02 &middot; dispare</div>
+                  <h4>IA entra em contato</h4>
+                  <p>Mensagens personalizadas pelo WhatsApp, com tom humanizado e intervalos naturais entre envios.</p>
+                </div>
+                <div className="sdr-step-mini">
+                  <div className="num">03 &middot; qualifique</div>
+                  <h4>Qualificacao automatica</h4>
+                  <p>A IA conversa, identifica interesse e classifica cada lead como quente, morno ou frio.</p>
+                </div>
+                <div className="sdr-step-mini">
+                  <div className="num">04 &middot; agende</div>
+                  <h4>Consulta agendada</h4>
+                  <p>Leads qualificados sao agendados direto no Google Calendar. Voce so atende.</p>
+                </div>
               </div>
             </div>
           </div>
