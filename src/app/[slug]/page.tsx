@@ -8,7 +8,7 @@ const supabase = createClient(
 )
 
 // Reserved paths that should not be treated as slugs
-const RESERVED = ['login', 'cadastro', 'dashboard', 'pagamento', 'pagamento-concluido', 'auth', 'api', 'forgot-password', 'reset-password', '_next', 'favicon.ico']
+const RESERVED = ['login', 'cadastro', 'dashboard', 'pagamento', 'pagamento-concluido', 'auth', 'api', 'forgot-password', 'reset-password', '_next', 'favicon.ico', 'clinicas']
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
