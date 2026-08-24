@@ -13,6 +13,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .eq('id', user.id)
     .single()
 
+  const barbershop = userData?.barbershops as { id: string; payment_status: string } | null
+
+  // Bloqueia acesso se pagamento não confirmado
+  if (!barbershop || barbershop.payment_status !== 'paid') {
+    const barbershopId = barbershop?.id || ''
+    redirect(`/pagamento?plano=pro&barbershop_id=${barbershopId}`)
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: '#0a0d10', display: 'flex', fontFamily: "var(--font-geist-sans, 'Inter', sans-serif)" }}>
       <Sidebar barbershop={userData?.barbershops} />

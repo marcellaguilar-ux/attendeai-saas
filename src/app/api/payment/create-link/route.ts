@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase-server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
+
+const supabaseAdmin = createAdmin(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 const PLANS: Record<string, { price: number; name: string }> = {
   starter:  { price: 19700, name: 'AttendeAI Starter' },
@@ -7,7 +14,23 @@ const PLANS: Record<string, { price: number; name: string }> = {
 }
 
 export async function POST(req: NextRequest) {
+  // Verifica autenticação
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { plano, barbershop_id, customer } = await req.json()
+
+  // Verifica que o barbershop_id pertence ao usuário logado
+  const { data: userData } = await supabaseAdmin
+    .from('users')
+    .select('barbershop_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!userData || userData.barbershop_id !== barbershop_id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const plan = PLANS[plano]
   if (!plan) return NextResponse.json({ error: 'Plano inválido' }, { status: 400 })
@@ -43,7 +66,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Erro ao criar link de pagamento', detail: data }, { status: 502 })
   }
 
-  // InfinitePay may return the link under different field names
   const url = data.url || data.link || data.checkout_url || data.payment_url
   if (!url) {
     return NextResponse.json({ error: 'Link não retornado', detail: data }, { status: 502 })

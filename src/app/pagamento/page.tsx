@@ -247,10 +247,17 @@ function PagamentoForm() {
           </p>
         </div>
 
-        <p style={{ textAlign: 'center', color: '#6c7884', fontSize: 12, marginTop: 20 }}>
-          Quer trocar de plano?{' '}
-          <a href="/#precos" style={{ color: '#00e5a0', textDecoration: 'none' }}>Ver planos</a>
-        </p>
+        {barbershop_id && (
+          <p style={{ textAlign: 'center', color: '#6c7884', fontSize: 12, marginTop: 20 }}>
+            Quer trocar de plano?{' '}
+            <a
+              href={`/precos?barbershop_id=${barbershop_id}`}
+              style={{ color: '#00e5a0', textDecoration: 'none' }}
+            >
+              Ver planos
+            </a>
+          </p>
+        )}
       </div>
     </div>
   )
