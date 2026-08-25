@@ -2,11 +2,12 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { LayoutDashboard, Calendar, Settings, MessageCircle, LogOut, ExternalLink } from 'lucide-react'
+import { LayoutDashboard, Calendar, Settings, MessageCircle, MessagesSquare, LogOut, ExternalLink } from 'lucide-react'
 
 const links = [
   { href: '/dashboard', label: 'Visão Geral', icon: LayoutDashboard },
   { href: '/dashboard/agendamentos', label: 'Agendamentos', icon: Calendar },
+  { href: '/dashboard/conversas', label: 'Conversas', icon: MessagesSquare },
   { href: '/dashboard/whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { href: '/dashboard/configuracoes', label: 'Configurações', icon: Settings },
 ]

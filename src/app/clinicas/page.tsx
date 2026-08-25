@@ -797,8 +797,9 @@ h1.hero-title em {
 }
 .demo-input-bar input::placeholder { color: #8696a0; }
 .demo-progress {
-  position: absolute; bottom: 0; left: 0; height: 3px;
-  background: var(--accent); transition: width 0.4s ease; z-index: 2;
+  position: absolute; bottom: 0; left: 0; height: 3px; width: 100%;
+  background: var(--accent); transition: transform 0.4s ease; z-index: 2;
+  transform: scaleX(0); transform-origin: left;
 }
 .demo-overlay {
   position: absolute; inset: 0; background: rgba(0,0,0,0.75);
@@ -1177,15 +1178,20 @@ h1.hero-title em {
 .faq-item[data-open="true"] .faq-arrow { border-color: var(--accent); color: var(--accent); }
 .faq-item[data-open="true"] .faq-arrow svg { transform: rotate(45deg); }
 .faq-a {
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.38s cubic-bezier(0.16,1,0.3,1);
+}
+.faq-item[data-open="true"] .faq-a { grid-template-rows: 1fr; }
+.faq-a-inner {
+  min-height: 0;
   overflow: hidden;
-  transition: max-height .4s ease, padding .3s ease;
+  padding-bottom: 24px;
   color: var(--text-2);
   font-size: 14px;
   line-height: 1.65;
   letter-spacing: -0.005em;
 }
-.faq-item[data-open="true"] .faq-a { max-height: 240px; padding: 0 0 24px; }
 
 /* CTA FINAL */
 .cta-final {
@@ -1264,6 +1270,129 @@ footer {
 .fade-up.delay-1 { transition-delay: .05s; }
 .fade-up.delay-2 { transition-delay: .1s; }
 .fade-up.delay-3 { transition-delay: .15s; }
+
+/* ── SCROLL PROGRESS ─────────────────────────────────────── */
+.scroll-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in oklab, var(--accent) 60%, #5b9cff));
+  z-index: 300;
+  transform-origin: left;
+  transform: scaleX(0);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ── NAV SCROLL STATE ────────────────────────────────────── */
+nav.scrolled {
+  background: color-mix(in oklab, var(--bg) 88%, transparent);
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.4), 0 1px 0 var(--border-strong);
+}
+.nav-links a.nav-active { color: var(--accent); background: var(--accent-soft); }
+
+/* ── NAV LINK HOVER UNDERLINE ───────────────────────────── */
+.nav-links a { position: relative; overflow: hidden; }
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 5px; left: 14px; right: 14px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.22s ease;
+}
+.nav-links a:hover::after,
+.nav-links a.nav-active::after { transform: scaleX(1); transform-origin: left; }
+
+/* ── HERO CONTENT STAGGER ENTRANCE ──────────────────────── */
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-pill    { animation: heroIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.06s both; }
+.hero-title   { animation: heroIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.16s both; }
+.hero-sub     { animation: heroIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.26s both; }
+.hero-actions { animation: heroIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+.hero-trust   { animation: heroIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.48s both; }
+.hero-visual  { animation: heroIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both; }
+
+/* ── HERO PANEL FLOAT ────────────────────────────────────── */
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  38%       { transform: translateY(-10px) rotate(0.4deg); }
+  70%       { transform: translateY(-5px) rotate(-0.25deg); }
+}
+.hero-visual .panel { animation: heroFloat 6.5s ease-in-out infinite; }
+
+/* ── STAGGER CARDS ENTRANCE ──────────────────────────────── */
+.stagger-child {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1), transform 0.55s cubic-bezier(0.16,1,0.3,1);
+}
+.stagger-child.in { opacity: 1; transform: translateY(0); }
+
+/* ── FEAT ICON MICRO-ANIMATION ───────────────────────────── */
+.feat-ico { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), background 0.3s ease, box-shadow 0.3s ease; }
+.feat-card:hover .feat-ico {
+  transform: translateY(-4px) scale(1.1);
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+/* ── STEP ICON MICRO-ANIMATION ───────────────────────────── */
+.step-ico { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.3s ease, box-shadow 0.3s ease; }
+.step:hover .step-ico {
+  transform: scale(1.15) translateY(-3px);
+  background: color-mix(in oklab, var(--accent) 24%, transparent);
+  box-shadow: 0 10px 24px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+/* ── PAIN ICON MICRO-ANIMATION ───────────────────────────── */
+.pain-ico { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+.pain-card:hover .pain-ico { transform: scale(1.1) rotate(-6deg); }
+
+/* ── PLAN CARD HOVER ─────────────────────────────────────── */
+.plan { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; }
+.plan:hover { transform: translateY(-5px); border-color: var(--border-strong); }
+.plan.featured:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 32px 80px -20px color-mix(in oklab, var(--accent) 55%, transparent), inset 0 1px 0 0 var(--accent-line);
+}
+
+/* ── SDR MINI STEP HOVER ─────────────────────────────────── */
+.sdr-step-mini { transition: background .25s, transform 0.28s cubic-bezier(0.16,1,0.3,1), border-color .25s; }
+.sdr-step-mini:hover { background: var(--surface-2); transform: translateX(6px); border-color: var(--accent-line); }
+
+/* ── TESTIMONIAL HOVER ───────────────────────────────────── */
+.testi { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s, box-shadow 0.3s; }
+.testi:hover { transform: translateY(-6px); border-color: var(--border-strong); box-shadow: 0 20px 60px rgba(0,0,0,0.22); }
+
+/* ── CTA CURSOR GLOW ─────────────────────────────────────── */
+.cta-cursor-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--accent) 10%, transparent) 0%, transparent 65%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: left 0.5s ease, top 0.5s ease;
+  z-index: 0;
+}
+
+/* ── REDUCED MOTION ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-pill, .hero-title, .hero-sub, .hero-actions, .hero-trust, .hero-visual {
+    animation: none !important; opacity: 1 !important; transform: none !important;
+  }
+  .hero-visual .panel { animation: none !important; }
+  .stagger-child { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .scroll-bar { display: none; }
+  .feat-ico, .step-ico, .pain-ico, .plan, .sdr-step-mini, .testi { transition: none !important; }
+}
 `
 
 type UCKey = 'estetica' | 'dentista' | 'medico'
@@ -1282,50 +1411,50 @@ interface UCData {
 
 const UC_DATA: Record<UCKey, UCData> = {
   estetica: {
-    title: 'Clinica de estetica',
+    title: 'Clínica de estética',
     desc: 'Pacientes querendo agendar limpeza de pele, botox, preenchimento e outros procedimentos. A IA atende 24h, verifica disponibilidade e confirma o agendamento pelo WhatsApp.',
     points: [
-      'Agendamento de procedimentos esteticos 24h',
+      'Agendamento de procedimentos estéticos 24h',
       'Consulta de disponibilidade por profissional em tempo real',
-      'Confirmacao e lembrete automaticos pelo WhatsApp',
-      'IA treinada com os procedimentos e protocolos da sua clinica'
+      'Confirmação e lembrete automáticos pelo WhatsApp',
+      'IA treinada com os procedimentos e protocolos da sua clínica'
     ],
     preview: [
-      { who: 'bot', text: 'Ola! Bem-vinda a Clinica Derma Glow. Como posso ajudar?' },
+      { who: 'bot', text: 'Olá! Bem-vinda à Clínica Derma Glow. Como posso ajudar?' },
       { who: 'user', text: 'Quero marcar uma limpeza de pele' },
-      { who: 'bot', text: 'Otimo! Temos horarios na quarta 14h e sexta 10h. Qual prefere?' },
+      { who: 'bot', text: 'Ótimo! Temos horários na quarta 14h e sexta 10h. Qual prefere?' },
       { who: 'user', text: 'Sexta 10h' },
       { who: 'confirm', text: 'Confirmado — limpeza de pele, sexta 10h com Dra. Marina.' }
     ]
   },
   dentista: {
-    title: 'Consultorio odontologico',
-    desc: 'Pacientes ligando e mandando mensagem para agendar consultas, limpezas e procedimentos. A IA responde na hora, consulta a agenda do dentista e confirma o horario.',
+    title: 'Consultório odontológico',
+    desc: 'Pacientes ligando e mandando mensagem para agendar consultas, limpezas e procedimentos. A IA responde na hora, consulta a agenda do dentista e confirma o horário.',
     points: [
       'Agendamento de consultas e procedimentos 24h',
-      'Verificacao de disponibilidade por dentista',
-      'Lembrete automatico 24h antes da consulta',
-      'IA treinada com os servicos e especialidades do consultorio'
+      'Verificação de disponibilidade por dentista',
+      'Lembrete automático 24h antes da consulta',
+      'IA treinada com os serviços e especialidades do consultório'
     ],
     preview: [
-      { who: 'bot', text: 'Ola! Odonto Sorriso. Como posso ajudar?' },
+      { who: 'bot', text: 'Olá! Odonto Sorriso. Como posso ajudar?' },
       { who: 'user', text: 'Preciso marcar uma limpeza' },
-      { who: 'bot', text: 'Claro! Dr. Carlos tem horario terca 15h e quinta 09h. Qual prefere?' },
-      { who: 'user', text: 'Terca 15h' },
-      { who: 'confirm', text: 'Agendado — limpeza dental, terca 15h com Dr. Carlos.' }
+      { who: 'bot', text: 'Claro! Dr. Carlos tem horário terça 15h e quinta 09h. Qual prefere?' },
+      { who: 'user', text: 'Terça 15h' },
+      { who: 'confirm', text: 'Agendado — limpeza dental, terça 15h com Dr. Carlos.' }
     ]
   },
   medico: {
-    title: 'Consultorio medico',
-    desc: 'Pacientes buscando agendar consultas, retornos e exames. A IA atende pelo WhatsApp, verifica horarios disponiveis e confirma o agendamento automaticamente.',
+    title: 'Consultório médico',
+    desc: 'Pacientes buscando agendar consultas, retornos e exames. A IA atende pelo WhatsApp, verifica horários disponíveis e confirma o agendamento automaticamente.',
     points: [
       'Agendamento de consultas e retornos 24h',
       'Consulta de disponibilidade em tempo real no Google Calendar',
-      'Confirmacao e lembrete pelo WhatsApp',
-      'IA treinada com as especialidades e informacoes do consultorio'
+      'Confirmação e lembrete pelo WhatsApp',
+      'IA treinada com as especialidades e informações do consultório'
     ],
     preview: [
-      { who: 'bot', text: 'Ola! Consultorio Dra. Fernanda. Como posso ajudar?' },
+      { who: 'bot', text: 'Olá! Consultório Dra. Fernanda. Como posso ajudar?' },
       { who: 'user', text: 'Quero marcar uma consulta de retorno' },
       { who: 'bot', text: 'Claro! Temos segunda 10h e quarta 16h. Qual prefere?' },
       { who: 'user', text: 'Segunda 10h' },
@@ -1381,20 +1510,155 @@ export default function ClinicasLandingPage() {
     return () => io.disconnect()
   }, [])
 
+  // Scroll progress bar + nav scroll state
+  useEffect(() => {
+    const bar = document.createElement('div')
+    bar.className = 'scroll-bar'
+    document.body.appendChild(bar)
+    const nav = document.querySelector('nav')
+
+    const onScroll = () => {
+      const scrolled = window.scrollY
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      bar.style.transform = `scaleX(${max > 0 ? scrolled / max : 0})`
+      nav?.classList.toggle('scrolled', scrolled > 50)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => { window.removeEventListener('scroll', onScroll); bar.remove() }
+  }, [])
+
+  // Staggered card entrance per group
+  useEffect(() => {
+    const groups: Array<{ container: string; selector: string; delay: number }> = [
+      { container: '.pain-grid', selector: '.pain-card', delay: 90 },
+      { container: '.steps', selector: '.step', delay: 110 },
+      { container: '.features-grid', selector: '.feat-card', delay: 70 },
+      { container: '.plans', selector: '.plan', delay: 110 },
+      { container: '.testimonials-grid', selector: '.testi', delay: 130 },
+      { container: '.sdr-steps-mini', selector: '.sdr-step-mini', delay: 100 },
+    ]
+    const observers: IntersectionObserver[] = []
+    groups.forEach(({ container, selector, delay }) => {
+      const el = document.querySelector(container)
+      if (!el) return
+      const children = Array.from(el.querySelectorAll(selector)) as HTMLElement[]
+      children.forEach(child => child.classList.add('stagger-child'))
+      const obs = new IntersectionObserver(([entry]) => {
+        if (!entry.isIntersecting) return
+        children.forEach((child, i) => setTimeout(() => child.classList.add('in'), i * delay))
+        obs.unobserve(el)
+      }, { threshold: 0.08 })
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [])
+
+  // Hero stat counter animation
+  useEffect(() => {
+    const trustSection = document.querySelector('.hero-trust')
+    if (!trustSection) return
+    const items = trustSection.querySelectorAll('.k')
+
+    const countUp = (el: Element, target: number, prefix: string, suffix: string) => {
+      const dur = 1400
+      let start: number | null = null
+      const step = (ts: number) => {
+        if (!start) start = ts
+        const p = Math.min((ts - start) / dur, 1)
+        const eased = 1 - Math.pow(1 - p, 3)
+        el.innerHTML = `${prefix}<span class="accent">${Math.round(eased * target)}</span>${suffix}`
+        if (p < 1) requestAnimationFrame(step)
+      }
+      requestAnimationFrame(step)
+    }
+
+    const obs = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      const [i0, i1, i2] = Array.from(items)
+      if (i0) countUp(i0, 24, '', '/7')
+      if (i1) countUp(i1, 70, '', '%')
+      if (i2) countUp(i2, 5, '&lt;', 's')
+      obs.disconnect()
+    }, { threshold: 0.7 })
+    obs.observe(trustSection)
+    return () => obs.disconnect()
+  }, [])
+
+  // Magnetic hover on primary CTAs
+  useEffect(() => {
+    const btns = Array.from(document.querySelectorAll('.btn-primary, .btn-plan.filled')) as HTMLElement[]
+    const cleanup: Array<() => void> = []
+    btns.forEach(el => {
+      const onMove = (e: MouseEvent) => {
+        const r = el.getBoundingClientRect()
+        const dx = (e.clientX - r.left - r.width / 2) / r.width
+        const dy = (e.clientY - r.top - r.height / 2) / r.height
+        el.style.transform = `translate(${dx * 9}px, ${dy * 9}px)`
+      }
+      const onEnter = () => { el.style.transition = 'transform 0.12s ease, filter 0.2s, box-shadow 0.2s' }
+      const onLeave = () => {
+        el.style.transform = ''
+        el.style.transition = 'transform 0.5s cubic-bezier(0.16,1,0.3,1), filter 0.2s, box-shadow 0.2s'
+      }
+      el.addEventListener('mousemove', onMove)
+      el.addEventListener('mouseenter', onEnter)
+      el.addEventListener('mouseleave', onLeave)
+      cleanup.push(() => {
+        el.removeEventListener('mousemove', onMove)
+        el.removeEventListener('mouseenter', onEnter)
+        el.removeEventListener('mouseleave', onLeave)
+      })
+    })
+    return () => cleanup.forEach(fn => fn())
+  }, [])
+
+  // Nav section awareness — highlight active link
+  useEffect(() => {
+    const sectionIds = ['dores', 'como-funciona', 'demo', 'casos', 'recursos', 'prospeccao', 'precos']
+    const navLinks = document.querySelectorAll('.nav-links a')
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id
+          navLinks.forEach(link => link.classList.toggle('nav-active', link.getAttribute('href') === `#${id}`))
+        }
+      })
+    }, { threshold: 0.35 })
+    sectionIds.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el) })
+    return () => obs.disconnect()
+  }, [])
+
+  // CTA section cursor glow
+  useEffect(() => {
+    const cta = document.querySelector('.cta-final') as HTMLElement | null
+    if (!cta) return
+    const glow = document.createElement('div')
+    glow.className = 'cta-cursor-glow'
+    cta.appendChild(glow)
+    const onMove = (e: MouseEvent) => {
+      const rect = cta.getBoundingClientRect()
+      glow.style.left = `${e.clientX - rect.left}px`
+      glow.style.top = `${e.clientY - rect.top}px`
+    }
+    cta.addEventListener('mousemove', onMove)
+    return () => { cta.removeEventListener('mousemove', onMove); glow.remove() }
+  }, [])
+
   // Demo WhatsApp interativa
   useEffect(() => {
     const demoConv = [
       { type: 'sent', text: 'Oi, boa tarde! Gostaria de agendar um procedimento', step: { title: '1. Paciente inicia contato', desc: 'O paciente envia uma mensagem pelo WhatsApp. A IA responde instantaneamente, 24h por dia, 7 dias por semana.' } },
-      { type: 'received', text: 'Ola! Boa tarde! Bem-vinda a Clinica Derma Glow! Eu sou a Clara, assistente virtual. Vou te ajudar a agendar seu horario. Qual procedimento voce gostaria?\n\nLimpeza de pele\nBotox\nPreenchimento labial\nPeeling quimico\nMicroagulhamento', delay: 1800, step: { title: '2. Saudacao + Menu de servicos', desc: 'A IA cumprimenta o paciente com o nome da clinica e apresenta os procedimentos disponiveis automaticamente.' } },
-      { type: 'sent', text: 'Botox', step: { title: '3. Paciente escolhe o procedimento', desc: 'Interacao natural por texto, sem menus complicados. O paciente digita normalmente.' } },
-      { type: 'received', text: 'Otima escolha! O procedimento de Botox leva em media 30 minutos. Para quando voce gostaria de agendar?\n\nHorarios disponiveis com Dra. Marina:\n\nTerca (12/08): 10:00, 14:00\nQuarta (13/08): 09:00, 15:00\nSexta (15/08): 11:00, 16:00', delay: 2000, step: { title: '4. Consulta de agenda em tempo real', desc: 'A IA consulta o Google Calendar da profissional e mostra apenas horarios realmente livres. Sem conflitos de agenda!' } },
-      { type: 'sent', text: 'Quarta as 15h', step: { title: '5. Paciente escolhe horario', desc: 'Processo simples e rapido. O paciente nao precisa ligar nem esperar resposta da secretaria.' } },
-      { type: 'received', text: 'Perfeito! Vou reservar quarta 13/08 as 15h para Botox com Dra. Marina. Qual o seu nome completo?', delay: 1500, step: { title: '6. Coleta de dados', desc: 'A IA coleta as informacoes necessarias de forma conversacional e amigavel.' } },
-      { type: 'sent', text: 'Ana Paula Oliveira', step: { title: '7. Identificacao do paciente', desc: 'Os dados ficam registrados para historico e gestao da clinica.' } },
-      { type: 'received', text: 'Obrigada, Ana Paula! Para enviar a confirmacao, qual seu email?', delay: 1200, step: { title: '8. Email para confirmacao', desc: 'O paciente recebe confirmacao por email automaticamente.' } },
+      { type: 'received', text: 'Olá! Boa tarde! Bem-vinda à Clínica Derma Glow! Eu sou a Clara, assistente virtual. Vou te ajudar a agendar seu horário. Qual procedimento você gostaria?\n\nLimpeza de pele\nBotox\nPreenchimento labial\nPeeling químico\nMicroagulhamento', delay: 1800, step: { title: '2. Saudação + Menu de serviços', desc: 'A IA cumprimenta o paciente com o nome da clínica e apresenta os procedimentos disponíveis automaticamente.' } },
+      { type: 'sent', text: 'Botox', step: { title: '3. Paciente escolhe o procedimento', desc: 'Interação natural por texto, sem menus complicados. O paciente digita normalmente.' } },
+      { type: 'received', text: 'Ótima escolha! O procedimento de Botox leva em média 30 minutos. Para quando você gostaria de agendar?\n\nHorários disponíveis com Dra. Marina:\n\nTerça (12/08): 10:00, 14:00\nQuarta (13/08): 09:00, 15:00\nSexta (15/08): 11:00, 16:00', delay: 2000, step: { title: '4. Consulta de agenda em tempo real', desc: 'A IA consulta o Google Calendar da profissional e mostra apenas horários realmente livres. Sem conflitos de agenda!' } },
+      { type: 'sent', text: 'Quarta às 15h', step: { title: '5. Paciente escolhe horário', desc: 'Processo simples e rápido. O paciente não precisa ligar nem esperar resposta da secretária.' } },
+      { type: 'received', text: 'Perfeito! Vou reservar quarta 13/08 às 15h para Botox com Dra. Marina. Qual o seu nome completo?', delay: 1500, step: { title: '6. Coleta de dados', desc: 'A IA coleta as informações necessárias de forma conversacional e amigável.' } },
+      { type: 'sent', text: 'Ana Paula Oliveira', step: { title: '7. Identificação do paciente', desc: 'Os dados ficam registrados para histórico e gestão da clínica.' } },
+      { type: 'received', text: 'Obrigada, Ana Paula! Para enviar a confirmação, qual seu email?', delay: 1200, step: { title: '8. Email para confirmação', desc: 'O paciente recebe confirmação por email automaticamente.' } },
       { type: 'sent', text: 'ana.oliveira@gmail.com', step: null },
-      { type: 'received', text: 'Pronto, Ana Paula! Seu agendamento esta confirmado:\n\nBotox com Dra. Marina\nQuarta, 13/08 as 15:00\nClinica Derma Glow\n\nVoce vai receber um email de confirmacao e um lembrete por WhatsApp 24h antes. Ate la!', delay: 2200, step: { title: '9. Confirmacao automatica', desc: 'Agendamento criado no Google Calendar, email enviado, lembrete WhatsApp programado. Tudo automatico, sem intervencao da secretaria!' } },
-      { type: 'received', text: 'Oi Ana Paula! Lembrete: seu horario na Clinica Derma Glow e AMANHA as 15:00 (Botox com Dra. Marina). Te esperamos! Se precisar reagendar, e so me chamar.', delay: 1500, step: { title: '10. Lembrete automatico', desc: 'O paciente recebe lembrete 24h antes. Isso reduz faltas em ate 70% e a clinica nao precisa ligar para confirmar.' } },
+      { type: 'received', text: 'Pronto, Ana Paula! Seu agendamento está confirmado:\n\nBotox com Dra. Marina\nQuarta, 13/08 às 15:00\nClínica Derma Glow\n\nVocê vai receber um email de confirmação e um lembrete por WhatsApp 24h antes. Até lá!', delay: 2200, step: { title: '9. Confirmação automática', desc: 'Agendamento criado no Google Calendar, email enviado, lembrete WhatsApp programado. Tudo automático, sem intervenção da secretária!' } },
+      { type: 'received', text: 'Oi Ana Paula! Lembrete: seu horário na Clínica Derma Glow é AMANHÃ às 15:00 (Botox com Dra. Marina). Te esperamos! Se precisar reagendar, é só me chamar.', delay: 1500, step: { title: '10. Lembrete automático', desc: 'O paciente recebe lembrete 24h antes. Isso reduz faltas em até 70% e a clínica não precisa ligar para confirmar.' } },
     ]
 
     let demoStep = -1
@@ -1457,7 +1721,7 @@ export default function ClinicasLandingPage() {
       demoStep++
       if (demoStep >= demoConv.length) {
         stepTitle.textContent = 'Demo completa!'
-        stepDesc.textContent = 'Todo esse fluxo acontece sem intervencao humana. A clinica so precisa atender o paciente na hora marcada.'
+        stepDesc.textContent = 'Todo esse fluxo acontece sem intervenção humana. A clínica só precisa atender o paciente na hora marcada.'
         return
       }
       demoAnimating = true
@@ -1473,7 +1737,7 @@ export default function ClinicasLandingPage() {
       }
 
       addMsg(item.type, item.text)
-      progress.style.width = ((demoStep + 1) / demoConv.length * 100) + '%'
+      progress.style.transform = `scaleX(${(demoStep + 1) / demoConv.length})`
       demoAnimating = false
 
       if (item.step === null && demoStep < demoConv.length - 1) {
@@ -1493,11 +1757,11 @@ export default function ClinicasLandingPage() {
       demoAnimating = false
       demoStarted = false
       body.innerHTML = '<div class="demo-date"><span>Hoje</span></div>'
-      progress.style.width = '0%'
+      progress.style.transform = 'scaleX(0)'
       overlay.classList.remove('hidden')
       status.textContent = 'online'
       stepTitle.textContent = 'Aguardando...'
-      stepDesc.textContent = 'Clique no celular ou pressione Espaco para avancar.'
+      stepDesc.textContent = 'Clique no celular ou pressione Espaço para avançar.'
     }
 
     const onOverlayClick = () => startDemo()
@@ -1546,28 +1810,28 @@ export default function ClinicasLandingPage() {
 
   const faqItems = [
     {
-      q: 'Funciona para qualquer tipo de clinica?',
-      a: 'Sim. A AttendeAI funciona para clinicas de estetica, consultorios odontologicos, consultorios medicos de diversas especialidades, clinicas de fisioterapia, psicologia e muito mais. Configuramos a IA com os procedimentos e protocolos especificos do seu negocio.'
+      q: 'Funciona para qualquer tipo de clínica?',
+      a: 'Sim. A AttendeAI funciona para clínicas de estética, consultórios odontológicos, consultórios médicos de diversas especialidades, clínicas de fisioterapia, psicologia e muito mais. Configuramos a IA com os procedimentos e protocolos específicos do seu negócio.'
     },
     {
-      q: 'A IA substitui minha secretaria?',
-      a: 'A IA complementa sua equipe. Ela cuida do agendamento 24h, responde perguntas frequentes e envia lembretes — liberando sua secretaria para tarefas que exigem atencao humana, como recepcao presencial e suporte ao paciente.'
+      q: 'A IA substitui minha secretária?',
+      a: 'A IA complementa sua equipe. Ela cuida do agendamento 24h, responde perguntas frequentes e envia lembretes — liberando sua secretária para tarefas que exigem atenção humana, como recepção presencial e suporte ao paciente.'
     },
     {
       q: 'Os dados dos pacientes ficam seguros?',
-      a: 'Sim. Todos os dados sao tratados com criptografia e armazenados de forma segura. A IA nao coleta informacoes medicas sensiveis — apenas dados de agendamento como nome, contato e procedimento desejado.'
+      a: 'Sim. Todos os dados são tratados com criptografia e armazenados de forma segura. A IA não coleta informações médicas sensíveis — apenas dados de agendamento como nome, contato e procedimento desejado.'
     },
     {
-      q: 'Como funciona a integracao com o WhatsApp?',
-      a: 'Conectamos ao seu numero de WhatsApp via conexao direta. Seu numero nao muda, os pacientes continuam falando normalmente — mas agora quem responde e a IA, 24h por dia.'
+      q: 'Como funciona a integração com o WhatsApp?',
+      a: 'Conectamos ao seu número de WhatsApp via conexão direta. Seu número não muda, os pacientes continuam falando normalmente — mas agora quem responde é a IA, 24h por dia.'
     },
     {
-      q: 'Quanto tempo leva para comecar?',
-      a: 'No plano Business, a ativacao acontece em ate 24h. Nos outros planos, o processo leva de 2 a 3 dias uteis. Nossa equipe configura tudo para voce — procedimentos, horarios, tom de voz e personalizacoes.'
+      q: 'Quanto tempo leva para começar?',
+      a: 'No plano Business, a ativação acontece em até 24h. Nos outros planos, o processo leva de 2 a 3 dias úteis. Nossa equipe configura tudo para você — procedimentos, horários, tom de voz e personalizações.'
     },
     {
       q: 'Posso cancelar quando quiser?',
-      a: 'Sim, sem multas ou fidelidade minima. Cancele a qualquer momento entrando em contato com nossa equipe.'
+      a: 'Sim, sem multas ou fidelidade mínima. Cancele a qualquer momento entrando em contato com nossa equipe.'
     }
   ]
 
@@ -1584,14 +1848,14 @@ export default function ClinicasLandingPage() {
           </a>
           <ul className="nav-links">
             <li><a href="#dores">Por que automatizar</a></li>
-            <li><a href="#demo">Demonstracao</a></li>
+            <li><a href="#demo">Demonstração</a></li>
             <li><a href="#casos">Segmentos</a></li>
             <li><a href="#recursos">Recursos</a></li>
-            <li><a href="#prospeccao">Prospeccao</a></li>
-            <li><a href="#precos">Precos</a></li>
+            <li><a href="#prospeccao">Prospecção</a></li>
+            <li><a href="#precos">Preços</a></li>
           </ul>
           <div className="nav-right">
-            <a href="https://wa.me/5534999819748?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="nav-cta">
+            <a href="https://wa.me/5534980799965?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="nav-cta">
               Falar com especialista
               <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
@@ -1605,28 +1869,28 @@ export default function ClinicasLandingPage() {
           <div className="wrap">
             <div className="hero-content">
               <div className="hero-pill">
-                <span className="tag"><span className="dot" style={{ display: 'inline-block', marginRight: '4px' }}></span>saude</span>
-                IA especializada para clinicas e consultorios
+                <span className="tag"><span className="dot" style={{ display: 'inline-block', marginRight: '4px' }}></span>saúde</span>
+                IA especializada para clínicas e consultórios
               </div>
 
               <h1 className="hero-title">
-                Sua clinica<br />
+                Sua clínica<br />
                 nunca <em>para de</em><br />
                 atender pacientes.
               </h1>
 
               <p className="hero-sub">
-                Um agente de IA que atende pacientes pelo WhatsApp, agenda consultas no Google Calendar, responde duvidas e envia lembretes — enquanto voce cuida dos seus pacientes.
+                Um agente de IA que atende pacientes pelo WhatsApp, agenda consultas no Google Calendar, responde dúvidas e envia lembretes — enquanto você cuida dos seus pacientes.
               </p>
 
               <div className="hero-actions">
-                <a href="https://wa.me/5534999819748?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="btn btn-primary">
+                <a href="https://wa.me/5534980799965?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="btn btn-primary">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
                   Falar com especialista
                 </a>
                 <a href="#demo" className="btn btn-ghost">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M5 3v10l8-5-8-5z" fill="currentColor"/></svg>
-                  Ver demonstracao
+                  Ver demonstração
                 </a>
               </div>
 
@@ -1654,16 +1918,16 @@ export default function ClinicasLandingPage() {
                       <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a5 5 0 015 5v3H7V7a5 5 0 015-5zM4 12h16v7a3 3 0 01-3 3H7a3 3 0 01-3-3v-7z" stroke="currentColor" strokeWidth="1.5"/><path d="M9 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                     </div>
                     <div>
-                      <div className="panel-title">Clinica Derma Glow</div>
+                      <div className="panel-title">Clínica Derma Glow</div>
                       <div className="panel-sub">whatsapp &middot; attendeai</div>
                     </div>
                   </div>
                   <div className="panel-status"><span className="dot"></span>online</div>
                 </div>
                 <div className="panel-body">
-                  <div className="bubble bot">Ola! Bem-vinda a Clinica Derma Glow. Como posso ajudar?</div>
-                  <div className="bubble user">Quero agendar uma sessao de botox</div>
-                  <div className="bubble bot">Otimo! Dra. Marina tem horario na quarta 15h e sexta 10h. Qual prefere?</div>
+                  <div className="bubble bot">Olá! Bem-vinda à Clínica Derma Glow. Como posso ajudar?</div>
+                  <div className="bubble user">Quero agendar uma sessão de botox</div>
+                  <div className="bubble bot">Ótimo! Dra. Marina tem horário na quarta 15h e sexta 10h. Qual prefere?</div>
                   <div className="bubble user">Quarta 15h</div>
                   <div className="bubble confirm">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -1679,7 +1943,7 @@ export default function ClinicasLandingPage() {
         {/* LOGOS */}
         <div className="logos-section">
           <div className="wrap">
-            <div className="logos-label">Integrado com as ferramentas que voce ja usa</div>
+            <div className="logos-label">Integrado com as ferramentas que você já usa</div>
             <div className="logos-row">
               <div className="logo-item"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> Google Calendar</div>
               <div className="logo-item"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3.5-7.1L21 3v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> WhatsApp Business</div>
@@ -1692,25 +1956,25 @@ export default function ClinicasLandingPage() {
           <div className="wrap">
             <div className="section-head center fade-up">
               <div className="eyebrow">O problema</div>
-              <h2 className="section-title">Sua clinica esta perdendo pacientes agora.</h2>
-              <p className="section-sub">Enquanto voce atende, opera ou esta fora do consultorio, pacientes tentam contato e desistem.</p>
+              <h2 className="section-title">Sua clínica está perdendo pacientes agora.</h2>
+              <p className="section-sub">Enquanto você atende, opera ou está fora do consultório, pacientes tentam contato e desistem.</p>
             </div>
 
             <div className="pain-grid fade-up">
               <div className="pain-card">
                 <div className="pain-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/><path d="M15 3l6 6M21 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
-                <h3>Ligacoes perdidas</h3>
-                <p>Pacientes ligam durante atendimentos e ninguem atende. Cada ligacao perdida e uma consulta que vai para o concorrente.</p>
+                <h3>Ligações perdidas</h3>
+                <p>Pacientes ligam durante atendimentos e ninguém atende. Cada ligação perdida é uma consulta que vai para o concorrente.</p>
               </div>
               <div className="pain-card">
                 <div className="pain-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Mensagens fora de horario</h3>
-                <p>62% das mensagens de agendamento chegam depois das 18h. Se voce nao responde, o paciente nao espera ate o dia seguinte.</p>
+                <h3>Mensagens fora de horário</h3>
+                <p>62% das mensagens de agendamento chegam depois das 18h. Se você não responde, o paciente não espera até o dia seguinte.</p>
               </div>
               <div className="pain-card">
                 <div className="pain-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M8 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                 <h3>Faltas e no-shows</h3>
-                <p>Ate 30% dos pacientes faltam por esquecimento. Sem lembrete automatico, voce perde tempo e faturamento com horarios vazios.</p>
+                <p>Até 30% dos pacientes faltam por esquecimento. Sem lembrete automático, você perde tempo e faturamento com horários vazios.</p>
               </div>
             </div>
           </div>
@@ -1722,7 +1986,7 @@ export default function ClinicasLandingPage() {
             <div className="section-head center fade-up">
               <div className="eyebrow">Como funciona</div>
               <h2 className="section-title">Do contato ao agendamento em segundos.</h2>
-              <p className="section-sub">Seu agente responde, entende e agenda — sem precisar de nenhuma acao sua.</p>
+              <p className="section-sub">Seu agente responde, entende e agenda — sem precisar de nenhuma ação sua.</p>
             </div>
 
             <div className="steps fade-up">
@@ -1733,22 +1997,22 @@ export default function ClinicasLandingPage() {
                 <p>Pelo WhatsApp, o agente atende imediatamente, a qualquer hora do dia ou da noite.</p>
               </div>
               <div className="step">
-                <div className="step-num">02 / compreensao</div>
+                <div className="step-num">02 / compreensão</div>
                 <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 016 6c0 2-1 3-2 4v3a2 2 0 01-2 2h-4a2 2 0 01-2-2v-3c-1-1-2-2-2-4a6 6 0 016-6zM10 21h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
                 <h3>IA entende e responde</h3>
-                <p>O agente entende o que o paciente precisa, responde duvidas sobre procedimentos e coleta as informacoes necessarias.</p>
+                <p>O agente entende o que o paciente precisa, responde dúvidas sobre procedimentos e coleta as informações necessárias.</p>
               </div>
               <div className="step">
                 <div className="step-num">03 / agendamento</div>
                 <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                 <h3>Agenda automaticamente</h3>
-                <p>Consulta o Google Calendar do profissional em tempo real e confirma o horario diretamente com o paciente.</p>
+                <p>Consulta o Google Calendar do profissional em tempo real e confirma o horário diretamente com o paciente.</p>
               </div>
               <div className="step">
                 <div className="step-num">04 / lembrete</div>
                 <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Lembrete automatico</h3>
-                <p>O paciente recebe lembrete 24h antes pelo WhatsApp. Reducao de ate 70% nas faltas.</p>
+                <h3>Lembrete automático</h3>
+                <p>O paciente recebe lembrete 24h antes pelo WhatsApp. Redução de até 70% nas faltas.</p>
               </div>
             </div>
           </div>
@@ -1758,16 +2022,16 @@ export default function ClinicasLandingPage() {
         <section className="how" id="demo">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">Demonstracao</div>
+              <div className="eyebrow">Demonstração</div>
               <h2 className="section-title">Veja a IA agendando ao vivo.</h2>
-              <p className="section-sub">Uma conversa real entre um paciente e o agente AttendeAI em uma clinica de estetica. Clique para avancar.</p>
+              <p className="section-sub">Uma conversa real entre um paciente e o agente AttendeAI em uma clínica de estética. Clique para avançar.</p>
             </div>
 
             <div className="demo-container fade-up">
               <div className="demo-phone" id="demoPhone">
                 <div className="demo-overlay" id="demoOverlay">
                   <div className="demo-overlay-title">AttendeAI</div>
-                  <div className="demo-overlay-sub">Agente para Clinicas e Consultorios</div>
+                  <div className="demo-overlay-sub">Agente para Clínicas e Consultórios</div>
                   <button className="demo-play-btn" aria-label="Iniciar demo">&#9654;</button>
                   <div className="demo-overlay-hint">Clique para iniciar</div>
                 </div>
@@ -1793,10 +2057,10 @@ export default function ClinicasLandingPage() {
               <div className="demo-side">
                 <div className="demo-step-card" id="demoStepCard">
                   <div className="ds-title" id="demoStepTitle">Aguardando...</div>
-                  <div className="ds-desc" id="demoStepDesc">Clique no celular ou pressione Espaco para avancar.</div>
+                  <div className="ds-desc" id="demoStepDesc">Clique no celular ou pressione Espaço para avançar.</div>
                 </div>
                 <div className="demo-nav-hint">
-                  <kbd>Espaco</kbd> ou <kbd>&rarr;</kbd> para avancar &bull; <button className="demo-restart-btn" id="demoRestartBtn">Reiniciar</button>
+                  <kbd>Espaço</kbd> ou <kbd>&rarr;</kbd> para avançar &bull; <button className="demo-restart-btn" id="demoRestartBtn">Reiniciar</button>
                 </div>
               </div>
             </div>
@@ -1808,8 +2072,8 @@ export default function ClinicasLandingPage() {
           <div className="wrap">
             <div className="section-head fade-up">
               <div className="eyebrow">Segmentos</div>
-              <h2 className="section-title">Feito para o ritmo da area da saude.</h2>
-              <p className="section-sub">Veja como a AttendeAI se adapta a diferentes tipos de clinicas e consultorios.</p>
+              <h2 className="section-title">Feito para o ritmo da área da saúde.</h2>
+              <p className="section-sub">Veja como a AttendeAI se adapta a diferentes tipos de clínicas e consultórios.</p>
             </div>
 
             <div className="uc-tabs fade-up" id="ucTabs">
@@ -1822,7 +2086,7 @@ export default function ClinicasLandingPage() {
                   {key === 'estetica' && <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>}
                   {key === 'dentista' && <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-2 4l1 7a2 2 0 01-2 2h-2a2 2 0 01-2-2l-1-3-1 3a2 2 0 01-2 2H4a2 2 0 01-2-2l1-7a5 5 0 01-2-4V7a5 5 0 015-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
                   {key === 'medico' && <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-                  {key === 'estetica' ? 'Clinica de estetica' : key === 'dentista' ? 'Dentista' : 'Consultorio medico'}
+                  {key === 'estetica' ? 'Clínica de estética' : key === 'dentista' ? 'Dentista' : 'Consultório médico'}
                 </button>
               ))}
             </div>
@@ -1838,40 +2102,40 @@ export default function ClinicasLandingPage() {
           <div className="wrap">
             <div className="section-head fade-up">
               <div className="eyebrow">Recursos</div>
-              <h2 className="section-title">Tudo que uma secretaria faz — e mais.</h2>
-              <p className="section-sub">Sem faltas, sem horario limitado, sem ferias. Sua melhor recepcionista custa menos que um cafe por dia.</p>
+              <h2 className="section-title">Tudo que uma secretária faz — e mais.</h2>
+              <p className="section-sub">Sem faltas, sem horário limitado, sem férias. Sua melhor recepcionista custa menos que um café por dia.</p>
             </div>
 
             <div className="features-grid fade-up">
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
                 <h3>WhatsApp inteligente</h3>
-                <p>Responde mensagens com entendimento contextual, tira duvidas sobre procedimentos e conduz o paciente ate o agendamento de forma natural.</p>
+                <p>Responde mensagens com entendimento contextual, tira dúvidas sobre procedimentos e conduz o paciente até o agendamento de forma natural.</p>
               </div>
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
                 <h3>Agendamento em tempo real</h3>
-                <p>Consulta disponibilidade por profissional, cria eventos no Google Calendar e envia confirmacao automatica ao paciente.</p>
+                <p>Consulta disponibilidade por profissional, cria eventos no Google Calendar e envia confirmação automática ao paciente.</p>
               </div>
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Lembretes automaticos</h3>
-                <p>Envia lembrete pelo WhatsApp 24h antes da consulta. Reduz faltas em ate 70% sem ninguem precisar ligar.</p>
+                <h3>Lembretes automáticos</h3>
+                <p>Envia lembrete pelo WhatsApp 24h antes da consulta. Reduz faltas em até 70% sem ninguém precisar ligar.</p>
               </div>
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
-                <h3>Personalizacao total</h3>
-                <p>Configure procedimentos, profissionais, horarios e tom de voz da clinica. A IA atende com a identidade do seu negocio.</p>
+                <h3>Personalização total</h3>
+                <p>Configure procedimentos, profissionais, horários e tom de voz da clínica. A IA atende com a identidade do seu negócio.</p>
               </div>
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M7 16l4-4 4 4 5-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Painel de gestao</h3>
-                <p>Agendamentos organizados num painel limpo. Visualize consultas do dia, historico de pacientes e metricas de atendimento.</p>
+                <h3>Painel de gestão</h3>
+                <p>Agendamentos organizados num painel limpo. Visualize consultas do dia, histórico de pacientes e métricas de atendimento.</p>
               </div>
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <h3>Disponivel 24/7</h3>
-                <p>O agente nunca para. Atende pacientes de madrugada, fins de semana e feriados — sem custo adicional e sem voce precisar fazer nada.</p>
+                <h3>Disponível 24/7</h3>
+                <p>O agente nunca para. Atende pacientes de madrugada, fins de semana e feriados — sem custo adicional e sem você precisar fazer nada.</p>
               </div>
             </div>
           </div>
@@ -1881,9 +2145,9 @@ export default function ClinicasLandingPage() {
         <section className="sdr-section" id="prospeccao">
           <div className="wrap">
             <div className="section-head fade-up">
-              <div className="eyebrow">Prospeccao ativa</div>
-              <h2 className="section-title">Nao espere o paciente vir ate voce.</h2>
-              <p className="section-sub">Alem de atender quem chega, a AttendeAI vai atras de novos pacientes para lotar sua agenda.</p>
+              <div className="eyebrow">Prospecção ativa</div>
+              <h2 className="section-title">Não espere o paciente vir até você.</h2>
+              <p className="section-sub">Além de atender quem chega, a AttendeAI vai atrás de novos pacientes para lotar sua agenda.</p>
             </div>
 
             <div className="sdr-grid fade-up">
@@ -1892,8 +2156,8 @@ export default function ClinicasLandingPage() {
                   <span className="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
                   SDR com IA
                 </div>
-                <h3>Um agente comercial que prospecta via WhatsApp enquanto voce atende.</h3>
-                <p>Importe sua lista de contatos — pacientes antigos que nao voltaram, leads do Instagram, indicacoes — e a IA entra em contato automaticamente pelo WhatsApp, com mensagens humanizadas e personalizadas.</p>
+                <h3>Um agente comercial que prospecta via WhatsApp enquanto você atende.</h3>
+                <p>Importe sua lista de contatos — pacientes antigos que não voltaram, leads do Instagram, indicações — e a IA entra em contato automaticamente pelo WhatsApp, com mensagens humanizadas e personalizadas.</p>
                 <ul className="sdr-list">
                   <li>
                     <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -1909,14 +2173,14 @@ export default function ClinicasLandingPage() {
                   </li>
                   <li>
                     <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    Reativacao de pacientes que sumiram da agenda
+                    Reativação de pacientes que sumiram da agenda
                   </li>
                   <li>
                     <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    Dashboard com metricas de conversao e campanhas
+                    Dashboard com métricas de conversão e campanhas
                   </li>
                 </ul>
-                <a href="https://wa.me/5534999819748?text=Quero%20saber%20sobre%20o%20SDR%20para%20minha%20cl%C3%ADnica" className="btn btn-primary">
+                <a href="https://wa.me/5534980799965?text=Quero%20saber%20sobre%20o%20SDR%20para%20minha%20cl%C3%ADnica" className="btn btn-primary">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
                   Quero prospectar pacientes
                 </a>
@@ -1926,7 +2190,7 @@ export default function ClinicasLandingPage() {
                 <div className="sdr-step-mini">
                   <div className="num">01 &middot; importe</div>
                   <h4>Envie sua lista de contatos</h4>
-                  <p>Pacientes antigos, leads do Instagram, indicacoes. Upload via CSV ou cole direto no painel.</p>
+                  <p>Pacientes antigos, leads do Instagram, indicações. Upload via CSV ou cole direto no painel.</p>
                 </div>
                 <div className="sdr-step-mini">
                   <div className="num">02 &middot; dispare</div>
@@ -1935,13 +2199,13 @@ export default function ClinicasLandingPage() {
                 </div>
                 <div className="sdr-step-mini">
                   <div className="num">03 &middot; qualifique</div>
-                  <h4>Qualificacao automatica</h4>
+                  <h4>Qualificação automática</h4>
                   <p>A IA conversa, identifica interesse e classifica cada lead como quente, morno ou frio.</p>
                 </div>
                 <div className="sdr-step-mini">
                   <div className="num">04 &middot; agende</div>
                   <h4>Consulta agendada</h4>
-                  <p>Leads qualificados sao agendados direto no Google Calendar. Voce so atende.</p>
+                  <p>Leads qualificados são agendados direto no Google Calendar. Você só atende.</p>
                 </div>
               </div>
             </div>
@@ -1953,13 +2217,13 @@ export default function ClinicasLandingPage() {
           <div className="wrap">
             <div className="section-head center fade-up">
               <div className="eyebrow">Resultados</div>
-              <h2 className="section-title">O que muda na sua clinica.</h2>
+              <h2 className="section-title">O que muda na sua clínica.</h2>
             </div>
 
             <div className="testimonials-grid fade-up">
               <div className="testi">
                 <div className="testi-quote"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z"/></svg></div>
-                <div className="testi-text">"Antes eu perdia em media 8 pacientes por semana so por nao conseguir responder a tempo. Agora a IA responde em segundos, 24h. Minha agenda lotou."</div>
+                <div className="testi-text">"Antes eu perdia em média 8 pacientes por semana só por não conseguir responder a tempo. Agora a IA responde em segundos, 24h. Minha agenda lotou."</div>
                 <div className="testi-author">
                   <div className="testi-avatar">RM</div>
                   <div>
@@ -1970,7 +2234,7 @@ export default function ClinicasLandingPage() {
               </div>
               <div className="testi">
                 <div className="testi-quote"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z"/></svg></div>
-                <div className="testi-text">"As faltas caíram 65% depois que os lembretes automaticos comecaram. So isso ja pagou o investimento no primeiro mes."</div>
+                <div className="testi-text">"As faltas caíram 65% depois que os lembretes automáticos começaram. Só isso já pagou o investimento no primeiro mês."</div>
                 <div className="testi-author">
                   <div className="testi-avatar">CF</div>
                   <div>
@@ -1981,12 +2245,12 @@ export default function ClinicasLandingPage() {
               </div>
               <div className="testi">
                 <div className="testi-quote"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z"/></svg></div>
-                <div className="testi-text">"Minha secretaria agora foca no presencial. A IA cuida de tudo pelo WhatsApp — agendamento, confirmacao, lembrete. Minha clinica parece ter o dobro da equipe."</div>
+                <div className="testi-text">"Minha secretária agora foca no presencial. A IA cuida de tudo pelo WhatsApp — agendamento, confirmação, lembrete. Minha clínica parece ter o dobro da equipe."</div>
                 <div className="testi-author">
                   <div className="testi-avatar">LP</div>
                   <div>
                     <div className="testi-name">Dra. Luciana Pinto</div>
-                    <div className="testi-role">Clinica de Estetica &middot; RJ</div>
+                    <div className="testi-role">Clínica de Estética &middot; RJ</div>
                   </div>
                 </div>
               </div>
@@ -1998,9 +2262,9 @@ export default function ClinicasLandingPage() {
         <section className="pricing how" id="precos">
           <div className="wrap">
             <div className="section-head center fade-up">
-              <div className="eyebrow">Planos e precos</div>
+              <div className="eyebrow">Planos e preços</div>
               <h2 className="section-title">Comece hoje. Cancele quando quiser.</h2>
-              <p className="section-sub">Sem taxa de adesao, sem fidelidade. Menos que o custo de uma falta por mes.</p>
+              <p className="section-sub">Sem taxa de adesão, sem fidelidade. Menos que o custo de uma falta por mês.</p>
             </div>
 
             <div className="plans fade-up">
@@ -2011,18 +2275,18 @@ export default function ClinicasLandingPage() {
                   <span className="plan-currency">R$</span>
                   <span className="plan-amount">197</span>
                 </div>
-                <div className="plan-period">por mes &middot; faturado mensalmente</div>
-                <p className="plan-desc">Ideal para consultorios que querem automatizar o agendamento pelo WhatsApp.</p>
+                <div className="plan-period">por mês &middot; faturado mensalmente</div>
+                <p className="plan-desc">Ideal para consultórios que querem automatizar o agendamento pelo WhatsApp.</p>
                 <ul className="plan-feats">
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agente IA no WhatsApp</span></li>
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agendamento no Google Calendar</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Verificacao de disponibilidade em tempo real</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Confirmacao automatica pelo WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>1 numero de WhatsApp</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Painel de gestao</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Lembretes automaticos</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Verificação de disponibilidade em tempo real</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Confirmação automática pelo WhatsApp</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>1 número de WhatsApp</span></li>
+                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Painel de gestão</span></li>
+                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Lembretes automáticos</span></li>
                 </ul>
-                <a href="https://wa.me/5534999819748?text=Quero%20o%20plano%20Starter%20para%20minha%20cl%C3%ADnica" className="btn-plan outline">Comecar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
+                <a href="https://wa.me/5534980799965?text=Quero%20o%20plano%20Starter%20para%20minha%20cl%C3%ADnica" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
               </div>
 
               {/* PRO */}
@@ -2033,18 +2297,18 @@ export default function ClinicasLandingPage() {
                   <span className="plan-currency">R$</span>
                   <span className="plan-amount">397</span>
                 </div>
-                <div className="plan-period">por mes &middot; faturado mensalmente</div>
-                <p className="plan-desc">Para clinicas que querem automacao completa com visibilidade total da agenda.</p>
+                <div className="plan-period">por mês &middot; faturado mensalmente</div>
+                <p className="plan-desc">Para clínicas que querem automação completa com visibilidade total da agenda.</p>
                 <ul className="plan-feats">
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Starter</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Painel de gestao completo</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Historico de agendamentos</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Lembretes automaticos (24h antes)</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Multiplos profissionais na agenda</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Painel de gestão completo</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Histórico de agendamentos</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Lembretes automáticos (24h antes)</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Múltiplos profissionais na agenda</span></li>
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte por e-mail</span></li>
                   <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Onboarding dedicado</span></li>
                 </ul>
-                <a href="https://wa.me/5534999819748?text=Quero%20o%20plano%20Pro%20para%20minha%20cl%C3%ADnica" className="btn-plan filled">Comecar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
+                <a href="https://wa.me/5534980799965?text=Quero%20o%20plano%20Pro%20para%20minha%20cl%C3%ADnica" className="btn-plan filled">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
               </div>
 
               {/* BUSINESS */}
@@ -2054,17 +2318,17 @@ export default function ClinicasLandingPage() {
                   <span className="plan-currency">R$</span>
                   <span className="plan-amount">697</span>
                 </div>
-                <div className="plan-period">por mes &middot; faturado mensalmente</div>
-                <p className="plan-desc">Para clinicas que querem comecar sem complicacao — a gente configura tudo para voce.</p>
+                <div className="plan-period">por mês &middot; faturado mensalmente</div>
+                <p className="plan-desc">Para clínicas que querem começar sem complicação — a gente configura tudo para você.</p>
                 <ul className="plan-feats">
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Pro</span></li>
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Onboarding dedicado</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configuracao completa do agente</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte prioritario via WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Ativacao em ate 24h</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configuração completa do agente</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte prioritário via WhatsApp</span></li>
+                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Ativação em até 24h</span></li>
                   <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Treinamento personalizado com seus procedimentos</span></li>
                 </ul>
-                <a href="https://wa.me/5534999819748?text=Quero%20o%20plano%20Business%20para%20minha%20cl%C3%ADnica" className="btn-plan outline">Comecar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
+                <a href="https://wa.me/5534980799965?text=Quero%20o%20plano%20Business%20para%20minha%20cl%C3%ADnica" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
               </div>
             </div>
 
@@ -2079,7 +2343,7 @@ export default function ClinicasLandingPage() {
           <div className="wrap">
             <div className="section-head center fade-up">
               <div className="eyebrow">Perguntas frequentes</div>
-              <h2 className="section-title">Ainda tem duvidas?</h2>
+              <h2 className="section-title">Ainda tem dúvidas?</h2>
             </div>
 
             <div className="faq-wrap">
@@ -2091,7 +2355,7 @@ export default function ClinicasLandingPage() {
                       <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                     </span>
                   </button>
-                  <div className="faq-a">{item.a}</div>
+                  <div className="faq-a"><div className="faq-a-inner">{item.a}</div></div>
                 </div>
               ))}
             </div>
@@ -2102,14 +2366,14 @@ export default function ClinicasLandingPage() {
         <div className="cta-final">
           <div className="wrap cta-final-inner fade-up">
             <div className="eyebrow" style={{ justifyContent: 'center', display: 'inline-flex' }}>Comece agora</div>
-            <h2>Seu proximo paciente esta <em>tentando</em> agendar agora.</h2>
-            <p>Enquanto voce atende, opera ou descansa, a AttendeAI garante que nenhum paciente fique sem resposta.</p>
+            <h2>Seu próximo paciente está <em>tentando</em> agendar agora.</h2>
+            <p>Enquanto você atende, opera ou descansa, a AttendeAI garante que nenhum paciente fique sem resposta.</p>
             <div className="actions">
-              <a href="https://wa.me/5534999819748?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="btn btn-primary">
+              <a href="https://wa.me/5534980799965?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="btn btn-primary">
                 <svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
                 Falar com especialista
               </a>
-              <a href="https://wa.me/5534999819748" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> Falar com um humano</a>
+              <a href="https://wa.me/5534980799965" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> Falar com um humano</a>
             </div>
           </div>
         </div>
@@ -2123,11 +2387,11 @@ export default function ClinicasLandingPage() {
                 attende<span style={{ color: 'var(--muted)', fontWeight: 400 }}>.ai</span>
               </div>
               <div className="footer-links">
-                <a href="https://attendeai.ia.br">Pagina principal</a>
+                <a href="https://attendeai.ia.br">Página principal</a>
                 <a href="#">Termos</a>
                 <a href="#">Privacidade</a>
                 <a href="#">Suporte</a>
-                <a href="https://wa.me/5534999819748">Fale conosco</a>
+                <a href="https://wa.me/5534980799965">Fale conosco</a>
               </div>
             </div>
             <div className="wrap footer-copy">

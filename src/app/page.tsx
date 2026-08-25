@@ -1213,8 +1213,9 @@ h1.hero-title em {
 }
 .demo-input-bar input::placeholder { color: #8696a0; }
 .demo-progress {
-  position: absolute; bottom: 0; left: 0; height: 3px;
-  background: var(--accent); transition: width 0.4s ease; z-index: 2;
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent); transform-origin: left; transform: scaleX(0);
+  transition: transform 0.4s ease; z-index: 2;
 }
 .demo-overlay {
   position: absolute; inset: 0; background: rgba(0,0,0,0.75);
@@ -1241,7 +1242,8 @@ h1.hero-title em {
 }
 .demo-step-card {
   background: var(--surface); border-radius: var(--r-md);
-  padding: 24px; border-left: 3px solid var(--accent);
+  padding: 24px; border: 1px solid var(--border);
+  outline: 1px solid color-mix(in oklab, var(--accent) 20%, transparent);
   min-height: 100px; transition: opacity 0.3s;
 }
 .demo-step-card .ds-title { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 6px; }
@@ -1304,15 +1306,20 @@ h1.hero-title em {
 .faq-item[data-open="true"] .faq-arrow { border-color: var(--accent); color: var(--accent); }
 .faq-item[data-open="true"] .faq-arrow svg { transform: rotate(45deg); }
 .faq-a {
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .4s cubic-bezier(0.16,1,0.3,1);
+}
+.faq-item[data-open="true"] .faq-a { grid-template-rows: 1fr; }
+.faq-a-inner {
+  min-height: 0;
   overflow: hidden;
-  transition: max-height .4s ease, padding .3s ease;
+  padding-bottom: 24px;
   color: var(--text-2);
   font-size: 14px;
   line-height: 1.65;
   letter-spacing: -0.005em;
 }
-.faq-item[data-open="true"] .faq-a { max-height: 240px; padding: 0 0 24px; }
 
 /* ═══════════════════════════ CTA FINAL ═══════════════════════════ */
 .cta-final {
@@ -1653,7 +1660,7 @@ export default function LandingPage() {
       }
 
       addMsg(item.type, item.text)
-      progress.style.width = ((demoStep + 1) / demoConv.length * 100) + '%'
+      progress.style.transform = `scaleX(${(demoStep + 1) / demoConv.length})`
       demoAnimating = false
 
       if (item.step === null && demoStep < demoConv.length - 1) {
@@ -1673,7 +1680,7 @@ export default function LandingPage() {
       demoAnimating = false
       demoStarted = false
       body.innerHTML = '<div class="demo-date"><span>Hoje</span></div>'
-      progress.style.width = '0%'
+      progress.style.transform = 'scaleX(0)'
       overlay.classList.remove('hidden')
       status.textContent = 'online'
       stepTitle.textContent = 'Aguardando...'
@@ -2210,7 +2217,7 @@ export default function LandingPage() {
                       <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                     </span>
                   </button>
-                  <div className="faq-a">{item.a}</div>
+                  <div className="faq-a"><div className="faq-a-inner">{item.a}</div></div>
                 </div>
               ))}
             </div>
@@ -2224,7 +2231,7 @@ export default function LandingPage() {
             <h2>Seu próximo cliente está <em>tentando</em> te contatar agora.</h2>
             <p>Enquanto você dorme, descansa ou está ocupado, a AttendeAI garante que nenhum cliente fique sem resposta.</p>
             <div className="actions">
-              <a href="https://wa.me/5534999819748" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> Falar com um humano</a>
+              <a href="https://wa.me/5534980799965" className="btn btn-ghost"><svg viewBox="0 0 16 16" fill="none"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> Falar com um humano</a>
             </div>
           </div>
         </div>
