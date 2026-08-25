@@ -78,7 +78,7 @@ export default function ResetPasswordPage() {
             <Scissors style={{ width: 18, height: 18, color: '#000' }} />
           </div>
           <span style={{ color: '#e9eef3', fontSize: 20, fontWeight: 600, letterSpacing: '-0.025em' }}>
-            BarberAI
+            AttendeAI
           </span>
         </div>
 
