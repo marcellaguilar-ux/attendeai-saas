@@ -32,12 +32,17 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setError('Email ou senha incorretos')
       setLoading(false)
     } else {
-      router.push('/dashboard')
+      const superAdmins = ['attendeai.ia@gmail.com']
+      if (superAdmins.includes(data.user.email ?? '')) {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
     }
   }
 

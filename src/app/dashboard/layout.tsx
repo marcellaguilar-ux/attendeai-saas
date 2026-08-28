@@ -7,6 +7,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Super admin não passa pelo dashboard — vai direto para /admin
+  const SUPER_ADMIN_EMAILS = ['attendeai.ia@gmail.com']
+  if (SUPER_ADMIN_EMAILS.includes(user.email ?? '')) redirect('/admin')
+
   const { data: userData } = await supabase
     .from('users')
     .select('*, barbershops(*)')
