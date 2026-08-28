@@ -12,22 +12,18 @@ export default async function AdminPage() {
   const supabase = await createClient()
 
   const [
-    { count: totalBarbearias },
+    { data: allBarbearias },
     { count: totalConversas },
     { count: totalAgendamentos },
-    { count: paidBarbearias },
   ] = await Promise.all([
-    supabase.from('barbershops').select('*', { count: 'exact', head: true }),
+    supabase.from('barbershops').select('id, nome, slug, payment_status, created_at').order('created_at', { ascending: false }),
     supabase.from('conversations').select('*', { count: 'exact', head: true }),
     supabase.from('appointments').select('*', { count: 'exact', head: true }),
-    supabase.from('barbershops').select('*', { count: 'exact', head: true }).eq('payment_status', 'paid'),
   ])
 
-  const { data: recentBarbearias } = await supabase
-    .from('barbershops')
-    .select('id, nome, slug, payment_status, created_at')
-    .order('created_at', { ascending: false })
-    .limit(5)
+  const totalBarbearias = allBarbearias?.length ?? 0
+  const paidBarbearias = allBarbearias?.filter(b => b.payment_status === 'paid').length ?? 0
+  const recentBarbearias = allBarbearias?.slice(0, 5)
 
   const stats = [
     { label: 'Barbearias', value: totalBarbearias ?? 0, icon: Scissors, color: '#00e5a0', bg: 'rgba(0,229,160,0.08)' },
