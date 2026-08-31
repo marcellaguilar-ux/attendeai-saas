@@ -3,7 +3,6 @@ import { Suspense, useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif&display=swap');
 
 /* ═══════════════════════════ TOKENS ═══════════════════════════ */
 :root {

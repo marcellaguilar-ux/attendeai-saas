@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +11,46 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "AttendeAI",
+      "description": "Agente de IA que atende clientes, verifica horários e confirma agendamentos automaticamente pelo WhatsApp — 24h por dia.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": "https://attendeai.ia.br",
+      "inLanguage": "pt-BR",
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "147",
+        "highPrice": "497",
+        "priceCurrency": "BRL",
+        "offerCount": "3",
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "AttendeAI",
+        "url": "https://attendeai.ia.br",
+      },
+    },
+    {
+      "@type": "Organization",
+      "name": "AttendeAI",
+      "url": "https://attendeai.ia.br",
+      "description": "Plataforma SaaS de agentes de IA para atendimento e agendamento automático via WhatsApp.",
+      "foundingLocation": { "@type": "Place", "addressCountry": "BR" },
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "AttendeAI — Agendamentos Automáticos pelo WhatsApp",
@@ -56,9 +96,15 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

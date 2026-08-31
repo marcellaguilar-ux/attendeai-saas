@@ -1,5 +1,32 @@
 import type { Metadata } from 'next'
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      'name': 'AttendeAI SDR',
+      'description': 'Agente de IA que dispara campanhas via WhatsApp, qualifica leads automaticamente e agenda reuniões com consultores — 24h por dia, sem custo de CLT.',
+      'applicationCategory': 'BusinessApplication',
+      'operatingSystem': 'Web',
+      'url': 'https://attendeai.ia.br/sdr',
+      'inLanguage': 'pt-BR',
+      'offers': {
+        '@type': 'AggregateOffer',
+        'lowPrice': '697',
+        'highPrice': '2497',
+        'priceCurrency': 'BRL',
+        'offerCount': '3',
+      },
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'AttendeAI',
+        'url': 'https://attendeai.ia.br',
+      },
+    },
+  ],
+}
+
 export const metadata: Metadata = {
   title: 'AttendeAI SDR — Seu SDR nunca para de prospectar',
   description:
@@ -47,5 +74,13 @@ export const metadata: Metadata = {
 }
 
 export default function SdrLayout({ children }: { children: React.ReactNode }) {
-  return children
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {children}
+    </>
+  )
 }
