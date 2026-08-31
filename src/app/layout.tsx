@@ -25,6 +25,14 @@ export const metadata: Metadata = {
     siteName: "AttendeAI",
     locale: "pt_BR",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "AttendeAI — Agendamentos Automáticos pelo WhatsApp",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

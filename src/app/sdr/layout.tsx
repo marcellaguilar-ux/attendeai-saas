@@ -37,6 +37,10 @@ export const metadata: Metadata = {
       'Agente de IA que dispara campanhas via WhatsApp, qualifica leads automaticamente e agenda reuniões — 24h por dia.',
     images: ['/sdr/opengraph-image'],
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
   alternates: {
     canonical: 'https://attendeai.ia.br/sdr',
   },
