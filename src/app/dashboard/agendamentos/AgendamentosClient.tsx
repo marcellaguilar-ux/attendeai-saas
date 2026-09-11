@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Calendar, List, ChevronLeft, ChevronRight, X, AlertTriangle } from 'lucide-react'
+import { Calendar, List, ChevronLeft, ChevronRight, X, AlertTriangle, Download } from 'lucide-react'
+import { isBusiness } from '@/lib/plan'
 
 type Appointment = {
   id: string
@@ -441,8 +442,30 @@ function ListView({ appointments, onSelect }: { appointments: Appointment[]; onS
   )
 }
 
+function exportCSV(appts: Appointment[]) {
+  const header = 'Cliente,Email,Serviço,Barbeiro,Data,Horário,Preço,Status'
+  const rows = appts.map(a => [
+    `"${a.client_nome}"`,
+    `"${a.client_email || ''}"`,
+    `"${a.servico}"`,
+    `"${a.barbeiro || ''}"`,
+    a.data,
+    String(a.horario).slice(0, 5),
+    a.preco != null ? String(a.preco) : '',
+    a.status,
+  ].join(','))
+  const csv = [header, ...rows].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const el = document.createElement('a')
+  el.href = url
+  el.download = `agendamentos-${new Date().toISOString().split('T')[0]}.csv`
+  el.click()
+  URL.revokeObjectURL(url)
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
-export default function AgendamentosClient({ appointments: initial }: { appointments: Appointment[] }) {
+export default function AgendamentosClient({ appointments: initial, plano }: { appointments: Appointment[]; plano?: string | null }) {
   const [appointments, setAppointments] = useState<Appointment[]>(initial)
   const [view, setView] = useState<ViewMode>('list')
   const [current, setCurrent] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
@@ -543,6 +566,24 @@ export default function AgendamentosClient({ appointments: initial }: { appointm
                 {getTitle()}
               </span>
             </div>
+          )}
+
+          {/* CSV export — Business only */}
+          {isBusiness(plano) && (
+            <button
+              onClick={() => exportCSV(appointments)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px', borderRadius: 8,
+                border: '1px solid rgba(0,229,160,0.25)',
+                background: 'rgba(0,229,160,0.06)',
+                color: '#00e5a0', fontSize: 13, fontWeight: 500,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              <Download style={{ width: 13, height: 13 }} />
+              Exportar CSV
+            </button>
           )}
         </div>
       </div>

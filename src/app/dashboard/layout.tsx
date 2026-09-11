@@ -17,7 +17,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .eq('id', user.id)
     .single()
 
-  const barbershop = userData?.barbershops as { id: string; payment_status: string } | null
+  const barbershop = userData?.barbershops as {
+    id: string
+    nome: string
+    slug?: string
+    payment_status: string
+    plano: string | null
+  } | null
 
   // Bloqueia acesso se pagamento não confirmado
   if (!barbershop || barbershop.payment_status !== 'paid') {
@@ -27,7 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0d10', display: 'flex', fontFamily: "var(--font-geist-sans, 'Inter', sans-serif)" }}>
-      <Sidebar barbershop={userData?.barbershops} />
+      <Sidebar barbershop={barbershop} plano={barbershop.plano} />
       <main style={{ flex: 1, padding: 32, overflowY: 'auto', minWidth: 0 }}>
         {children}
       </main>

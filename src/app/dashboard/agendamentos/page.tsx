@@ -1,10 +1,17 @@
 import { createClient } from '@/lib/supabase-server'
+import { redirect } from 'next/navigation'
+import { isPro } from '@/lib/plan'
 import AgendamentosClient from './AgendamentosClient'
 
 export default async function AgendamentosPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const { data: userData } = await supabase.from('users').select('barbershop_id').eq('id', user!.id).single()
+
+  const { data: userData } = await supabase
+    .from('users').select('barbershop_id, barbershops(plano)').eq('id', user!.id).single()
+
+  const plano = (userData?.barbershops as unknown as { plano: string | null } | null)?.plano
+  if (!isPro(plano)) redirect('/dashboard')
 
   const { data: appointments } = await supabase
     .from('appointments')
@@ -13,5 +20,5 @@ export default async function AgendamentosPage() {
     .order('data', { ascending: false })
     .order('horario', { ascending: false })
 
-  return <AgendamentosClient appointments={appointments ?? []} />
+  return <AgendamentosClient appointments={appointments ?? []} plano={plano} />
 }
