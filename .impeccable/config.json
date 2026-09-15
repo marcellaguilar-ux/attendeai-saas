@@ -1,0 +1,22 @@
+{
+  "detector": {
+    "ignoreRules": [
+      "bounce-easing"
+    ],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "reason": "AttendeAI brand font — confirmed intentional by user",
+        "createdAt": "2026-08-10T19:52:04.318Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "reason": "AttendeAI brand font — confirmed intentional by user",
+        "createdAt": "2026-08-10T20:06:51.921Z"
+      }
+    ]
+  }
+}

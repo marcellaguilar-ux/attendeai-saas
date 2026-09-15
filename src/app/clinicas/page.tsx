@@ -1614,7 +1614,7 @@ export default function ClinicasLandingPage() {
 
   // Nav section awareness — highlight active link
   useEffect(() => {
-    const sectionIds = ['dores', 'como-funciona', 'demo', 'casos', 'recursos', 'prospeccao', 'precos']
+    const sectionIds = ['dores', 'como-funciona', 'demo', 'casos', 'recursos', 'prospeccao']
     const navLinks = document.querySelectorAll('.nav-links a')
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -1851,7 +1851,7 @@ export default function ClinicasLandingPage() {
             <li><a href="#casos">Segmentos</a></li>
             <li><a href="#recursos">Recursos</a></li>
             <li><a href="#prospeccao">Prospecção</a></li>
-            <li><a href="#precos">Preços</a></li>
+
           </ul>
           <div className="nav-right">
             <a href="https://wa.me/5534980799965?text=Oi%2C%20tenho%20uma%20cl%C3%ADnica%20e%20quero%20saber%20mais%20sobre%20a%20AttendeAI" className="nav-cta">
@@ -2253,86 +2253,6 @@ export default function ClinicasLandingPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* PRICING */}
-        <section className="pricing how" id="precos">
-          <div className="wrap">
-            <div className="section-head center fade-up">
-              <div className="eyebrow">Planos e preços</div>
-              <h2 className="section-title">Comece hoje. Cancele quando quiser.</h2>
-              <p className="section-sub">Sem taxa de adesão, sem fidelidade. Menos que o custo de uma falta por mês.</p>
-            </div>
-
-            <div className="plans fade-up">
-              {/* STARTER */}
-              <div className="plan">
-                <div className="plan-name">Starter</div>
-                <div className="plan-price">
-                  <span className="plan-currency">R$</span>
-                  <span className="plan-amount">197</span>
-                </div>
-                <div className="plan-period">por mês &middot; faturado mensalmente</div>
-                <p className="plan-desc">Ideal para consultórios que querem automatizar o agendamento pelo WhatsApp.</p>
-                <ul className="plan-feats">
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agente IA no WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Agendamento no Google Calendar</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Verificação de disponibilidade em tempo real</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Confirmação automática pelo WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>1 número de WhatsApp</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Painel de gestão</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Lembretes automáticos</span></li>
-                </ul>
-                <a href="https://wa.me/5534980799965?text=Quero%20o%20plano%20Starter%20para%20minha%20cl%C3%ADnica" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-              </div>
-
-              {/* PRO */}
-              <div className="plan featured">
-                <div className="plan-badge">Mais popular</div>
-                <div className="plan-name">Pro</div>
-                <div className="plan-price">
-                  <span className="plan-currency">R$</span>
-                  <span className="plan-amount">397</span>
-                </div>
-                <div className="plan-period">por mês &middot; faturado mensalmente</div>
-                <p className="plan-desc">Para clínicas que querem automação completa com visibilidade total da agenda.</p>
-                <ul className="plan-feats">
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Starter</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Painel de gestão completo</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Histórico de agendamentos</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Lembretes automáticos (24h antes)</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Múltiplos profissionais na agenda</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte por e-mail</span></li>
-                  <li className="muted"><svg className="cross" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg><span>Onboarding dedicado</span></li>
-                </ul>
-                <a href="https://wa.me/5534980799965?text=Quero%20o%20plano%20Pro%20para%20minha%20cl%C3%ADnica" className="btn-plan filled">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-              </div>
-
-              {/* BUSINESS */}
-              <div className="plan">
-                <div className="plan-name">Business</div>
-                <div className="plan-price">
-                  <span className="plan-currency">R$</span>
-                  <span className="plan-amount">697</span>
-                </div>
-                <div className="plan-period">por mês &middot; faturado mensalmente</div>
-                <p className="plan-desc">Para clínicas que querem começar sem complicação — a gente configura tudo para você.</p>
-                <ul className="plan-feats">
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Tudo do Pro</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Onboarding dedicado</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Configuração completa do agente</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Suporte prioritário via WhatsApp</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Ativação em até 24h</span></li>
-                  <li><svg className="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg><span>Treinamento personalizado com seus procedimentos</span></li>
-                </ul>
-                <a href="https://wa.me/5534980799965?text=Quero%20o%20plano%20Business%20para%20minha%20cl%C3%ADnica" className="btn-plan outline">Começar agora <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-              </div>
-            </div>
-
-            <div className="pricing-foot">
-              <span><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2"/></svg> Pagamento 100% seguro</span>
             </div>
           </div>
         </section>
