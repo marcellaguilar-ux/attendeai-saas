@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { LayoutDashboard, Calendar, Settings, MessageCircle, MessagesSquare, LogOut, ExternalLink, BarChart2, Zap } from 'lucide-react'
+import { LayoutDashboard, Calendar, Settings, MessageCircle, MessagesSquare, LogOut, ExternalLink, BarChart2, Zap, BookOpen, BedDouble, UtensilsCrossed, ClipboardList } from 'lucide-react'
 import { isPro, isBusiness, PLAN_LABEL, PLAN_COLOR } from '@/lib/plan'
 
 type Barbershop = { id: string; nome: string; slug?: string; payment_status: string; plano: string | null }
@@ -12,6 +12,7 @@ const ALL_LINKS = [
   { href: '/dashboard/agendamentos',   label: 'Agendamentos',   icon: Calendar,        minPlan: 'pro'      },
   { href: '/dashboard/conversas',      label: 'Conversas',      icon: MessagesSquare,  minPlan: 'pro'      },
   { href: '/dashboard/whatsapp',       label: 'WhatsApp',       icon: MessageCircle,   minPlan: 'pro'      },
+  { href: '/dashboard/conhecimento',   label: 'Conhecimento',   icon: BookOpen,        minPlan: 'pro'      },
   { href: '/dashboard/relatorios',     label: 'Relatórios',     icon: BarChart2,       minPlan: 'business' },
   { href: '/dashboard/configuracoes',  label: 'Configurações',  icon: Settings,        minPlan: 'pro'      },
 ]
@@ -35,7 +36,27 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
 
   const planLabel = plano ? (PLAN_LABEL[plano] ?? plano) : null
   const planColor = plano ? (PLAN_COLOR[plano] ?? '#6c7884') : '#6c7884'
-  const visibleLinks = ALL_LINKS.filter(l => canAccess(plano, l.minPlan))
+  const isPousada = barbershop?.slug === 'el-capitan'
+  const isCafe = barbershop?.slug === 'pingo-doce'
+  const links = isPousada
+    ? ALL_LINKS.filter(l => !['agendamentos'].includes(l.href.split('/').pop()!))
+        .concat([{ href: '/dashboard/reservas', label: 'Reservas', icon: BedDouble, minPlan: 'pro' }])
+        .sort((a, b) => {
+          const order = ['dashboard', 'reservas', 'conversas', 'whatsapp', 'conhecimento', 'relatorios', 'configuracoes']
+          return order.indexOf(a.href.split('/').pop()!) - order.indexOf(b.href.split('/').pop()!)
+        })
+    : isCafe
+    ? ALL_LINKS.filter(l => !['agendamentos'].includes(l.href.split('/').pop()!))
+        .concat([
+          { href: '/dashboard/cardapio', label: 'Cardápio', icon: UtensilsCrossed, minPlan: 'pro' },
+          { href: '/dashboard/pedidos', label: 'Pedidos', icon: ClipboardList, minPlan: 'pro' },
+        ])
+        .sort((a, b) => {
+          const order = ['dashboard', 'cardapio', 'pedidos', 'conversas', 'whatsapp', 'conhecimento', 'relatorios', 'configuracoes']
+          return order.indexOf(a.href.split('/').pop()!) - order.indexOf(b.href.split('/').pop()!)
+        })
+    : ALL_LINKS
+  const visibleLinks = links.filter(l => canAccess(plano, l.minPlan))
 
   return (
     <aside style={{
@@ -132,7 +153,7 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
 
       {/* Perfil Público */}
       {barbershop?.slug && (
-        <div style={{ padding: '0 8px 8px' }}>
+        <div style={{ padding: '0 8px 8px', display: 'flex', flexDirection: 'column', gap: 4 }}>
           <a href={`/${barbershop.slug}`} target="_blank" rel="noopener noreferrer" style={{
             display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
             borderRadius: 10, fontSize: 13.5, letterSpacing: '-0.01em', fontWeight: 400,
@@ -142,6 +163,17 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
             <ExternalLink style={{ width: 15, height: 15, flexShrink: 0 }} />
             Perfil Público
           </a>
+          {isCafe && (
+            <a href={`/${barbershop.slug}/cardapio`} target="_blank" rel="noopener noreferrer" style={{
+              display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
+              borderRadius: 10, fontSize: 13.5, letterSpacing: '-0.01em', fontWeight: 400,
+              color: '#00e5a0', textDecoration: 'none',
+              border: '1px solid rgba(0,229,160,.2)', transition: 'background .15s, border-color .15s',
+            }}>
+              <UtensilsCrossed style={{ width: 15, height: 15, flexShrink: 0 }} />
+              Cardápio Digital
+            </a>
+          )}
         </div>
       )}
 
