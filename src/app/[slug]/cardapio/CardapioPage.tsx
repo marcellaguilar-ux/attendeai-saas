@@ -609,7 +609,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                 {cart.map((item, idx) => (
                   <div key={`${item.product_id}-${item.variant_label}`} className="c-cart-row">
                     <div className="c-cart-row-info">
-                      <p style={{ color: '#e9eef3', fontSize: 15px, fontWeight: 600, letterSpacing: '-0.01em' }}>
+                      <p style={{ color: '#e9eef3', fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>
                         {item.product_name}
                       </p>
                       {item.variant_label && (
