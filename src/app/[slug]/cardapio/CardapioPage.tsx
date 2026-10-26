@@ -65,17 +65,25 @@ const CSS = `
   }
 
   /* ── Category pills ── */
+  .c-cats-wrap {
+    position: relative;
+  }
+  .c-cats-wrap::after {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 40px; height: 100%; pointer-events: none;
+    background: linear-gradient(to right, transparent, #0a0d10);
+  }
   .c-cats {
     display: flex; gap: 8px; overflow-x: auto;
     padding: 4px 20px 14px; scrollbar-width: none;
   }
   .c-cats::-webkit-scrollbar { display: none; }
   .c-pill {
-    white-space: nowrap; min-height: 38px;
-    padding: 0 16px; border-radius: 19px;
+    white-space: nowrap; min-height: 44px;
+    padding: 0 18px; border-radius: 22px;
     display: flex; align-items: center;
     border: 1.5px solid #1d2429; background: transparent;
-    color: #8c959e; font-size: 13px; font-weight: 500;
+    color: #8c959e; font-size: 14px; font-weight: 500;
     cursor: pointer; transition: all .2s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
@@ -89,14 +97,14 @@ const CSS = `
   /* ── Product list ── */
   .c-list {
     flex: 1; padding: 0 20px 120px;
-    display: flex; flex-direction: column; gap: 6px;
+    display: flex; flex-direction: column; gap: 10px;
   }
   .c-cat-title {
-    color: #e9eef3; font-size: 15px; font-weight: 600;
-    letter-spacing: -0.01em;
-    padding: 16px 0 8px;
+    color: #e9eef3; font-size: 16px; font-weight: 700;
+    letter-spacing: -0.015em;
+    padding: 20px 0 6px;
   }
-  .c-cat-title:first-child { padding-top: 4px; }
+  .c-cat-title:first-child { padding-top: 8px; }
 
   /* ── Product card ── */
   .c-card {
@@ -124,27 +132,28 @@ const CSS = `
   }
   .c-card-add {
     position: absolute; bottom: 12px; right: 12px;
-    width: 36px; height: 36px; border-radius: 10px;
-    background: rgba(0,229,160,0.12); border: none;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(0,229,160,0.15); border: none;
     color: #00e5a0; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all .15s ease-out;
     -webkit-tap-highlight-color: transparent;
   }
-  .c-card-add:active { transform: scale(0.9); background: rgba(0,229,160,0.2); }
+  .c-card-add:active { transform: scale(0.9); background: rgba(0,229,160,0.25); }
 
   /* ── Variants ── */
   .c-variants { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .c-var-btn {
-    min-height: 38px; padding: 0 14px; border-radius: 10px;
-    border: 1.5px solid #1d2429; background: transparent;
-    color: #8c959e; font-size: 13px; font-weight: 500;
+    min-height: 44px; padding: 0 16px; border-radius: 10px;
+    border: 1.5px solid #2a343c; background: rgba(0,229,160,0.04);
+    color: #c8d1d9; font-size: 14px; font-weight: 500;
     cursor: pointer; transition: all .15s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
     display: flex; align-items: center;
+    font-variant-numeric: tabular-nums;
   }
-  .c-var-btn:active { transform: scale(0.96); }
-  .c-var-btn:hover { background: rgba(0,229,160,0.06); border-color: #2a343c; }
+  .c-var-btn:active { transform: scale(0.96); background: rgba(0,229,160,0.12); border-color: #00e5a0; }
+  .c-var-btn:hover { background: rgba(0,229,160,0.08); border-color: #3a454f; }
 
   /* ── Product image ── */
   .c-card-img {
@@ -473,6 +482,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         </header>
 
         {/* Category pills */}
+        <div className="c-cats-wrap">
         <nav className="c-cats" aria-label="Categorias">
           <button
             className="c-pill"
@@ -492,6 +502,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
             </button>
           ))}
         </nav>
+        </div>
 
         {/* Products */}
         <div className="c-list" role="list">
@@ -530,7 +541,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                                   onClick={e => { e.stopPropagation(); addToCart(p, v) }}
                                   aria-label={`Adicionar ${p.name} ${v.label} por ${BRL(v.price)}`}
                                 >
-                                  {v.label} · {BRL(v.price)}
+                                  {v.label} — <span style={{ color: '#00e5a0', fontWeight: 600 }}>{BRL(v.price)}</span>
                                 </button>
                               ))}
                             </div>
@@ -547,7 +558,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                             aria-label={`Adicionar ${p.name}`}
                             onClick={e => { e.stopPropagation(); addToCart(p) }}
                           >
-                            <Plus size={18} strokeWidth={2.5} />
+                            <Plus size={20} strokeWidth={2.5} />
                           </button>
                         )}
                       </div>
