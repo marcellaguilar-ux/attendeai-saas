@@ -30,6 +30,7 @@ function heroUrl(url: string): string {
 
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: hidden; }
 
   .sr-only {
     position: absolute; width: 1px; height: 1px;
@@ -59,8 +60,9 @@ const CSS = `
     --placeholder-bg: #f0ebe4;
     --placeholder-icon: #c8bfb3;
 
-    max-width: 480px; margin: 0 auto; min-height: 100dvh;
+    width: 100%; max-width: 480px; margin: 0 auto; min-height: 100dvh;
     display: flex; flex-direction: column;
+    overflow-x: hidden;
     font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
     -webkit-font-smoothing: antialiased;
     background: var(--bg);
@@ -78,7 +80,7 @@ const CSS = `
     color: var(--placeholder-icon);
   }
   .c-hero-info {
-    position: relative; padding: 0 20px;
+    position: relative; padding: 0 20px 4px;
     margin-top: -32px;
   }
   .c-hero-avatar {
@@ -99,9 +101,10 @@ const CSS = `
     letter-spacing: -0.03em;
   }
   .c-shop-name {
-    color: var(--text-primary); font-size: 20px; font-weight: 700;
-    letter-spacing: -0.025em; line-height: 1.15;
+    color: var(--text-primary); font-size: 18px; font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.25;
     margin-top: 12px;
+    word-wrap: break-word; overflow-wrap: break-word;
   }
   .c-shop-address {
     color: var(--text-secondary); font-size: 13px; margin-top: 4px;
@@ -116,11 +119,8 @@ const CSS = `
   .c-header {
     position: sticky; top: 0; z-index: 20;
     background: var(--bg); padding: 0 20px;
-  }
-  .c-header::after {
-    content: ''; display: block;
-    height: 1px; background: var(--border);
-    margin: 0;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
   }
 
   /* ── Channel tabs ── */
@@ -140,16 +140,16 @@ const CSS = `
   }
 
   /* ── Category pills ── */
-  .c-cats-wrap { position: relative; }
+  .c-cats-wrap { position: relative; overflow: hidden; }
   .c-cats-wrap::after {
     content: ''; position: absolute; top: 0; right: 0;
-    width: 40px; height: 100%; pointer-events: none;
+    width: 32px; height: 100%; pointer-events: none;
     background: linear-gradient(to right, transparent, var(--bg));
     z-index: 1;
   }
   .c-cats {
     display: flex; gap: 8px; overflow-x: auto;
-    padding: 4px 20px 14px; scrollbar-width: none;
+    padding: 10px 0; scrollbar-width: none;
   }
   .c-cats::-webkit-scrollbar { display: none; }
   .c-pill {
@@ -851,30 +851,31 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
             <h1 className="c-shop-name">{shop.nome}</h1>
             {shop.endereco && <p className="c-shop-address">{shop.endereco}</p>}
             {mesa != null && <p className="c-mesa">Mesa {mesa}</p>}
+
+            {/* Channel tabs (scroll away with hero) */}
+            <nav className="c-tabs" aria-label="Canal de atendimento">
+              <button
+                className="c-tab"
+                data-active={channel === 'presencial'}
+                onClick={() => { setChannel('presencial'); setActiveCat(null); setVisibleCatId(null) }}
+                aria-pressed={channel === 'presencial'}
+              >
+                <Coffee size={16} strokeWidth={2.2} /> Presencial
+              </button>
+              <button
+                className="c-tab"
+                data-active={channel === 'delivery'}
+                onClick={() => { setChannel('delivery'); setActiveCat(null); setVisibleCatId(null) }}
+                aria-pressed={channel === 'delivery'}
+              >
+                <Truck size={16} strokeWidth={2.2} /> Delivery
+              </button>
+            </nav>
           </div>
         </div>
 
-        {/* Sticky nav */}
+        {/* Sticky pills only */}
         <header className="c-header">
-          <nav className="c-tabs" aria-label="Canal de atendimento">
-            <button
-              className="c-tab"
-              data-active={channel === 'presencial'}
-              onClick={() => { setChannel('presencial'); setActiveCat(null); setVisibleCatId(null) }}
-              aria-pressed={channel === 'presencial'}
-            >
-              <Coffee size={16} strokeWidth={2.2} /> Presencial
-            </button>
-            <button
-              className="c-tab"
-              data-active={channel === 'delivery'}
-              onClick={() => { setChannel('delivery'); setActiveCat(null); setVisibleCatId(null) }}
-              aria-pressed={channel === 'delivery'}
-            >
-              <Truck size={16} strokeWidth={2.2} /> Delivery
-            </button>
-          </nav>
-
         {/* Category pills */}
         <div className="c-cats-wrap">
         <nav className="c-cats" aria-label="Categorias" ref={pillsRef}>
