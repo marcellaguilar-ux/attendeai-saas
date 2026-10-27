@@ -1,6 +1,6 @@
 'use client'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
-import { ShoppingCart, Plus, Minus, X, Send, Coffee, Truck, Check } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, X, Send, Coffee, Truck, Check, ChevronLeft } from 'lucide-react'
 
 type Category = { id: string; name: string; channel: string; sort_order: number }
 type PriceVariant = { label: string; price: number }
@@ -17,6 +17,16 @@ type CartItem = {
 }
 
 const BRL = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+function heroUrl(url: string): string {
+  try {
+    const u = new URL(url)
+    u.searchParams.set('w', '800')
+    u.searchParams.set('h', '500')
+    u.searchParams.set('fit', 'crop')
+    return u.toString()
+  } catch { return url }
+}
 
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -90,9 +100,7 @@ const CSS = `
   }
 
   /* ── Category pills ── */
-  .c-cats-wrap {
-    position: relative;
-  }
+  .c-cats-wrap { position: relative; }
   .c-cats-wrap::after {
     content: ''; position: absolute; top: 0; right: 0;
     width: 40px; height: 100%; pointer-events: none;
@@ -122,27 +130,27 @@ const CSS = `
 
   /* ── Product list ── */
   .c-list {
-    flex: 1; padding: 0 20px 120px;
-    display: flex; flex-direction: column; gap: 10px;
+    flex: 1; padding: 0 0 120px;
+    display: flex; flex-direction: column;
   }
   .c-cat-title {
     color: var(--text-primary); font-size: 16px; font-weight: 700;
     letter-spacing: -0.015em;
-    padding: 20px 0 8px;
+    padding: 20px 20px 10px;
   }
-  .c-cat-title:first-child { padding-top: 8px; }
+  .c-cat-title:first-child { padding-top: 10px; }
   .c-list section { scroll-margin-top: 160px; }
 
-  /* ── Product card ── */
+  /* ── Product card (iFood style) ── */
   .c-card {
-    display: flex; gap: 14px; padding: 16px;
-    background: var(--bg-surface); border-radius: 14px;
-    transition: background .15s ease-out;
+    display: flex; gap: 14px; padding: 16px 20px;
+    background: transparent; cursor: pointer;
+    transition: background .12s ease-out;
     -webkit-tap-highlight-color: transparent;
-    position: relative; overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid var(--border);
   }
-  .c-card[data-clickable="true"] { cursor: pointer; }
-  .c-card:active { background: var(--bg-hover); }
+  .c-card:active { background: var(--bg-surface); }
   .c-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .c-card-name {
     color: var(--text-primary); font-size: 15px; font-weight: 600;
@@ -154,45 +162,173 @@ const CSS = `
     -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .c-card-price {
-    color: var(--accent); font-size: 16px; font-weight: 700;
+    color: var(--accent); font-size: 15px; font-weight: 700;
     margin-top: auto; padding-top: 8px;
     font-variant-numeric: tabular-nums;
   }
-  .c-card-add {
-    position: absolute; bottom: 12px; right: 12px;
-    width: 44px; height: 44px; border-radius: 12px;
-    background: var(--accent-dim); border: none;
-    color: var(--accent); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .15s ease-out;
-    -webkit-tap-highlight-color: transparent;
+  .c-card-from {
+    color: var(--text-muted); font-size: 12px; font-weight: 500;
+    margin-top: auto; padding-top: 8px;
   }
-  .c-card-add:active { transform: scale(0.9); background: var(--accent-press); }
-
-  /* ── Variants ── */
-  .c-variants { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .c-var-btn {
-    min-height: 44px; padding: 0 16px; border-radius: 10px;
-    border: 1.5px solid var(--border-strong); background: var(--accent-subtle);
-    color: var(--text-variant); font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: all .15s ease-out;
-    font-family: inherit; -webkit-tap-highlight-color: transparent;
-    display: flex; align-items: center;
+  .c-card-from-price {
+    color: var(--accent); font-weight: 700; font-size: 15px;
     font-variant-numeric: tabular-nums;
   }
-  .c-var-btn:active { transform: scale(0.96); background: var(--accent-active); border-color: var(--accent); }
-  .c-var-btn:hover { background: var(--accent-hover); border-color: var(--border-hover); }
-  .c-var-price { color: var(--accent); font-weight: 600; }
 
-  /* ── Product image ── */
+  /* ── Product image (card) ── */
   .c-card-img {
-    width: 80px; height: 80px; border-radius: 12px;
+    width: 110px; height: 110px; border-radius: 12px;
     object-fit: cover; flex-shrink: 0; background: var(--border);
   }
+  .c-card-no-img {
+    width: 110px; height: 110px; border-radius: 12px;
+    background: var(--bg-surface); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--border-strong);
+  }
+
+  /* ── Product Detail Sheet ── */
+  .c-detail {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; max-height: 92dvh;
+    background: var(--bg); border-top-left-radius: 20px; border-top-right-radius: 20px;
+    z-index: 50; display: flex; flex-direction: column; overflow: hidden;
+    animation: c-slide-up .25s ease-out;
+  }
+  .c-detail-scroll {
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .c-detail-hero {
+    position: relative; width: 100%; aspect-ratio: 16/10;
+    background: var(--bg-surface);
+  }
+  .c-detail-hero img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-top-left-radius: 20px; border-top-right-radius: 20px;
+  }
+  .c-detail-hero-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--border-strong);
+    border-top-left-radius: 20px; border-top-right-radius: 20px;
+  }
+  .c-detail-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 36px; height: 36px; border-radius: 18px;
+    background: rgba(0,0,0,.55); border: none;
+    color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 2;
+  }
+  .c-detail-close:active { background: rgba(0,0,0,.7); }
+
+  .c-detail-body { padding: 20px 20px 24px; }
+  .c-detail-name {
+    color: var(--text-primary); font-size: 22px; font-weight: 700;
+    letter-spacing: -0.025em; line-height: 1.2;
+  }
+  .c-detail-desc {
+    color: var(--text-secondary); font-size: 14px; line-height: 1.55;
+    margin-top: 10px;
+  }
+  .c-detail-price-row {
+    margin-top: 16px;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .c-detail-price {
+    color: var(--text-primary); font-size: 20px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Detail Variants ── */
+  .c-detail-variants {
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .c-detail-variants-title {
+    color: var(--text-primary); font-size: 15px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .c-detail-variants-sub {
+    color: var(--text-secondary); font-size: 13px;
+    margin-bottom: 14px;
+  }
+  .c-detail-var {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .c-detail-var:last-child { border-bottom: none; }
+  .c-detail-var-info { flex: 1; }
+  .c-detail-var-label {
+    color: var(--text-primary); font-size: 15px; font-weight: 500;
+  }
+  .c-detail-var-price {
+    color: var(--text-secondary); font-size: 14px; margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .c-detail-radio {
+    width: 24px; height: 24px; border-radius: 12px;
+    border: 2px solid var(--border-strong);
+    flex-shrink: 0; margin-left: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s ease-out;
+  }
+  .c-detail-radio[data-selected="true"] {
+    border-color: var(--accent); background: var(--accent);
+  }
+  .c-detail-radio-dot {
+    width: 8px; height: 8px; border-radius: 4px;
+    background: var(--bg);
+  }
+
+  /* ── Detail Footer ── */
+  .c-detail-footer {
+    padding: 14px 20px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    background: var(--bg);
+  }
+  .c-detail-qty {
+    display: flex; align-items: center;
+    border: 1.5px solid var(--border); border-radius: 12px;
+    overflow: hidden;
+  }
+  .c-detail-qty-btn {
+    width: 44px; height: 44px; border: none; background: transparent;
+    color: var(--text-primary); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .1s;
+  }
+  .c-detail-qty-btn:active { background: var(--accent-hover); }
+  .c-detail-qty-btn[data-disabled="true"] {
+    color: var(--border-strong); pointer-events: none;
+  }
+  .c-detail-qty-num {
+    color: var(--text-primary); font-size: 16px; font-weight: 700;
+    min-width: 32px; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .c-detail-add {
+    flex: 1; min-height: 48px; border-radius: 12px;
+    border: none; background: var(--accent); color: var(--bg);
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    font-family: inherit; transition: all .15s ease-out;
+    -webkit-tap-highlight-color: transparent;
+    font-variant-numeric: tabular-nums;
+  }
+  .c-detail-add:active { transform: scale(0.98); }
+  .c-detail-add:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
   /* ── Toast (add feedback) ── */
   .c-toast {
-    position: fixed; bottom: 88px; left: 50%; z-index: 35;
+    position: fixed; bottom: 88px; left: 50%; z-index: 55;
     background: var(--text-primary); color: var(--bg);
     padding: 10px 20px; border-radius: 12px;
     font-size: 14px; font-weight: 600;
@@ -232,9 +368,7 @@ const CSS = `
     from { opacity: 0; transform: translateX(-50%) translateY(100%); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
-  .c-fab-left {
-    display: flex; align-items: center; gap: 10px;
-  }
+  .c-fab-left { display: flex; align-items: center; gap: 10px; }
   .c-fab-badge {
     background: var(--bg); color: var(--accent);
     font-size: 12px; font-weight: 700;
@@ -247,23 +381,24 @@ const CSS = `
     font-size: 17px; font-weight: 800;
   }
 
-  /* ── Overlay + Drawer ── */
+  /* ── Overlay ── */
   .c-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 40;
     animation: c-fade-in .2s ease-out;
   }
   @keyframes c-fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes c-slide-up {
+    from { transform: translateX(-50%) translateY(100%); }
+    to { transform: translateX(-50%) translateY(0); }
+  }
 
+  /* ── Cart Drawer ── */
   .c-drawer {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px; max-height: 85dvh;
     background: var(--bg-elevated); border-top-left-radius: 20px; border-top-right-radius: 20px;
     z-index: 50; display: flex; flex-direction: column; overflow: hidden;
     animation: c-slide-up .25s ease-out;
-  }
-  @keyframes c-slide-up {
-    from { transform: translateX(-50%) translateY(100%); }
-    to { transform: translateX(-50%) translateY(0); }
   }
   .c-drawer-handle {
     width: 36px; height: 4px; border-radius: 2px;
@@ -343,7 +478,6 @@ const CSS = `
   }
   .c-name-input::placeholder { color: var(--text-placeholder); }
   .c-name-input:focus { border-color: var(--accent); }
-
   .c-total-row {
     display: flex; justify-content: space-between;
     align-items: baseline; margin-bottom: 14px;
@@ -353,7 +487,6 @@ const CSS = `
     color: var(--text-primary); font-size: 22px; font-weight: 700;
     letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
   }
-
   .c-submit {
     width: 100%; min-height: 52px; border-radius: 14px;
     border: none; background: var(--accent); color: var(--bg);
@@ -395,8 +528,7 @@ const CSS = `
     width: 64px; height: 64px; border-radius: 32px;
     background: var(--accent-active);
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
-    color: var(--accent);
+    margin: 0 auto 20px; color: var(--accent);
   }
   .c-success-title {
     color: var(--text-primary); font-size: 20px; font-weight: 700;
@@ -409,12 +541,12 @@ const CSS = `
 
   /* ── Reduced motion ── */
   @media (prefers-reduced-motion: reduce) {
-    .c-toast, .c-fab, .c-drawer, .c-overlay, .c-success, .c-success-card {
+    .c-toast, .c-fab, .c-drawer, .c-overlay, .c-success, .c-success-card, .c-detail {
       animation: none !important;
     }
     .c-tab:active, .c-pill:active, .c-card:active,
-    .c-fab:active, .c-var-btn:active, .c-qty-btn:active,
-    .c-submit:active, .c-card-add:active {
+    .c-fab:active, .c-qty-btn:active, .c-submit:active,
+    .c-detail-add:active, .c-detail-qty-btn:active {
       transform: none !important;
     }
   }
@@ -432,9 +564,17 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
   const [success, setSuccess] = useState(false)
   const [toast, setToast] = useState<{ msg: string; error?: boolean } | null>(null)
   const [visibleCatId, setVisibleCatId] = useState<string | null>(null)
+
+  // Product detail sheet
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [detailQty, setDetailQty] = useState(1)
+  const [detailVariant, setDetailVariant] = useState<PriceVariant | null>(null)
+
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(null)
   const drawerRef = useRef<HTMLDivElement>(null)
+  const detailRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const detailCloseRef = useRef<HTMLButtonElement>(null)
   const pillsRef = useRef<HTMLElement>(null)
   const isScrollingToCat = useRef(false)
 
@@ -495,7 +635,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     return () => observer.disconnect()
   }, [filteredCats, channel])
 
-  // Scroll active pill into view in the pills container
+  // Scroll active pill into view
   useEffect(() => {
     if (!visibleCatId || !pillsRef.current) return
     const pill = pillsRef.current.querySelector<HTMLElement>(`[data-pill-id="${visibleCatId}"]`)
@@ -504,17 +644,12 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     }
   }, [visibleCatId])
 
-  // Focus trap + Escape key for drawer
+  // Focus trap + Escape for cart drawer
   useEffect(() => {
     if (!drawerOpen) return
-
     closeRef.current?.focus()
-
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setDrawerOpen(false)
-        return
-      }
+      if (e.key === 'Escape') { setDrawerOpen(false); return }
       if (e.key !== 'Tab' || !drawerRef.current) return
       const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
         'button, input, [tabindex]:not([tabindex="-1"])'
@@ -528,12 +663,34 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         e.preventDefault(); first.focus()
       }
     }
-
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [drawerOpen])
 
-  // Escape key for success overlay
+  // Focus trap + Escape for detail sheet
+  useEffect(() => {
+    if (!selectedProduct) return
+    detailCloseRef.current?.focus()
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setSelectedProduct(null); return }
+      if (e.key !== 'Tab' || !detailRef.current) return
+      const focusable = detailRef.current.querySelectorAll<HTMLElement>(
+        'button, input, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [selectedProduct])
+
+  // Escape for success
   useEffect(() => {
     if (!success) return
     function onKeyDown(e: KeyboardEvent) {
@@ -543,25 +700,36 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [success])
 
-  function addToCart(product: Product, variant?: PriceVariant) {
-    const price = variant?.price ?? product.price
-    const key = `${product.id}|${variant?.label ?? ''}`
+  function openProduct(p: Product) {
+    setSelectedProduct(p)
+    setDetailQty(1)
+    const variants = p.price_variants as PriceVariant[] | null
+    setDetailVariant(variants?.length ? variants[0] : null)
+  }
+
+  function addFromDetail() {
+    if (!selectedProduct) return
+    const variant = detailVariant
+    const price = variant?.price ?? selectedProduct.price
+    const key = `${selectedProduct.id}|${variant?.label ?? ''}`
     setCart(prev => {
       const idx = prev.findIndex(i => `${i.product_id}|${i.variant_label ?? ''}` === key)
       if (idx >= 0) {
         const next = [...prev]
-        next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 }
+        next[idx] = { ...next[idx], quantity: next[idx].quantity + detailQty }
         return next
       }
       return [...prev, {
-        product_id: product.id,
-        product_name: product.name,
+        product_id: selectedProduct.id,
+        product_name: selectedProduct.name,
         variant_label: variant?.label,
         unit_price: price,
-        quantity: 1,
+        quantity: detailQty,
       }]
     })
-    showToast(variant ? `${product.name} (${variant.label})` : product.name)
+    const label = variant ? `${selectedProduct.name} (${variant.label})` : selectedProduct.name
+    showToast(`${detailQty}x ${label}`)
+    setSelectedProduct(null)
   }
 
   function updateQty(productId: string, variantLabel: string | undefined, delta: number) {
@@ -613,6 +781,8 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
   }
 
   const activePillId = activeCat ?? visibleCatId
+  const detailPrice = detailVariant?.price ?? selectedProduct?.price ?? 0
+  const detailTotal = detailPrice * detailQty
 
   return (
     <>
@@ -684,44 +854,32 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                     <h2 className="c-cat-title">{cat.name}</h2>
                     {catProducts.map(p => {
                       const hasVariants = !!p.price_variants?.length
+                      const minPrice = hasVariants
+                        ? Math.min(...(p.price_variants as PriceVariant[]).map(v => v.price))
+                        : p.price
                       return (
                         <div
                           key={p.id}
                           className="c-card"
-                          data-clickable={!hasVariants}
-                          onClick={() => { if (!hasVariants) addToCart(p) }}
+                          onClick={() => openProduct(p)}
                         >
                           <div className="c-card-info">
                             <p className="c-card-name">{p.name}</p>
                             {p.description && <p className="c-card-desc">{p.description}</p>}
                             {hasVariants ? (
-                              <div className="c-variants">
-                                {(p.price_variants as PriceVariant[]).map(v => (
-                                  <button
-                                    key={v.label}
-                                    className="c-var-btn"
-                                    onClick={e => { e.stopPropagation(); addToCart(p, v) }}
-                                    aria-label={`Adicionar ${p.name} ${v.label} por ${BRL(v.price)}`}
-                                  >
-                                    {v.label} — <span className="c-var-price">{BRL(v.price)}</span>
-                                  </button>
-                                ))}
-                              </div>
+                              <p className="c-card-from">
+                                A partir de <span className="c-card-from-price">{BRL(minPrice)}</span>
+                              </p>
                             ) : (
                               <p className="c-card-price">{BRL(p.price)}</p>
                             )}
                           </div>
-                          {p.image_url && (
+                          {p.image_url ? (
                             <img src={p.image_url} alt={p.name} className="c-card-img" loading="lazy" />
-                          )}
-                          {!hasVariants && (
-                            <button
-                              className="c-card-add"
-                              aria-label={`Adicionar ${p.name}`}
-                              onClick={e => { e.stopPropagation(); addToCart(p) }}
-                            >
-                              <Plus size={20} strokeWidth={2.5} />
-                            </button>
+                          ) : (
+                            <div className="c-card-no-img">
+                              <Coffee size={28} strokeWidth={1.5} />
+                            </div>
                           )}
                         </div>
                       )
@@ -740,7 +898,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         )}
 
         {/* Cart FAB */}
-        {cartCount > 0 && (
+        {cartCount > 0 && !selectedProduct && (
           <button className="c-fab" onClick={() => setDrawerOpen(true)} aria-label={`Ver pedido, ${cartCount} itens`}>
             <span className="c-fab-left">
               <ShoppingCart size={18} strokeWidth={2.2} />
@@ -749,6 +907,98 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
             </span>
             <span className="c-fab-price">{BRL(cartTotal)}</span>
           </button>
+        )}
+
+        {/* ── Product Detail Sheet ── */}
+        {selectedProduct && (
+          <>
+            <div className="c-overlay" onClick={() => setSelectedProduct(null)} aria-hidden="true" />
+            <div className="c-detail" role="dialog" aria-modal="true" aria-label={selectedProduct.name} ref={detailRef}>
+              <div className="c-detail-scroll">
+                {/* Hero image */}
+                <div className="c-detail-hero">
+                  {selectedProduct.image_url ? (
+                    <img src={heroUrl(selectedProduct.image_url)} alt={selectedProduct.name} />
+                  ) : (
+                    <div className="c-detail-hero-placeholder">
+                      <Coffee size={56} strokeWidth={1.2} />
+                    </div>
+                  )}
+                  <button
+                    ref={detailCloseRef}
+                    className="c-detail-close"
+                    onClick={() => setSelectedProduct(null)}
+                    aria-label="Fechar"
+                  >
+                    <X size={18} strokeWidth={2.5} />
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="c-detail-body">
+                  <h2 className="c-detail-name">{selectedProduct.name}</h2>
+                  {selectedProduct.description && (
+                    <p className="c-detail-desc">{selectedProduct.description}</p>
+                  )}
+
+                  {!(selectedProduct.price_variants as PriceVariant[] | null)?.length && (
+                    <div className="c-detail-price-row">
+                      <span className="c-detail-price">{BRL(selectedProduct.price)}</span>
+                    </div>
+                  )}
+
+                  {/* Variants */}
+                  {!!(selectedProduct.price_variants as PriceVariant[] | null)?.length && (
+                    <div className="c-detail-variants">
+                      <p className="c-detail-variants-title">Escolha uma opção</p>
+                      <p className="c-detail-variants-sub">Selecione 1 opção</p>
+                      {(selectedProduct.price_variants as PriceVariant[]).map(v => (
+                        <div
+                          key={v.label}
+                          className="c-detail-var"
+                          onClick={() => setDetailVariant(v)}
+                        >
+                          <div className="c-detail-var-info">
+                            <p className="c-detail-var-label">{v.label}</p>
+                            <p className="c-detail-var-price">{BRL(v.price)}</p>
+                          </div>
+                          <div className="c-detail-radio" data-selected={detailVariant?.label === v.label}>
+                            {detailVariant?.label === v.label && <div className="c-detail-radio-dot" />}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer: qty + add */}
+              <div className="c-detail-footer">
+                <div className="c-detail-qty">
+                  <button
+                    className="c-detail-qty-btn"
+                    data-disabled={detailQty <= 1}
+                    onClick={() => setDetailQty(q => Math.max(1, q - 1))}
+                    aria-label="Diminuir quantidade"
+                  >
+                    <Minus size={18} strokeWidth={2.2} />
+                  </button>
+                  <span className="c-detail-qty-num">{detailQty}</span>
+                  <button
+                    className="c-detail-qty-btn"
+                    onClick={() => setDetailQty(q => q + 1)}
+                    aria-label="Aumentar quantidade"
+                  >
+                    <Plus size={18} strokeWidth={2.2} />
+                  </button>
+                </div>
+                <button className="c-detail-add" onClick={addFromDetail}>
+                  Adicionar
+                  <span>{BRL(detailTotal)}</span>
+                </button>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Cart Drawer */}
