@@ -30,7 +30,6 @@ function heroUrl(url: string): string {
 
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { overflow-x: hidden; }
 
   .sr-only {
     position: absolute; width: 1px; height: 1px;
