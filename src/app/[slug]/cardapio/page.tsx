@@ -23,7 +23,7 @@ export default async function CardapioServerPage({ params, searchParams }: {
 
   const { data: shop } = await supabase
     .from('barbershops')
-    .select('id, nome, slug, telefone')
+    .select('id, nome, slug, telefone, endereco, logo_url, cover_url')
     .eq('slug', slug)
     .eq('ativo', true)
     .single()

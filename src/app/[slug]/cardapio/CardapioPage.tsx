@@ -9,7 +9,7 @@ type Product = {
   price: number; price_variants?: PriceVariant[] | null; image_url?: string
   channel: string; available: boolean
 }
-type Shop = { id: string; nome: string; slug: string; telefone?: string }
+type Shop = { id: string; nome: string; slug: string; telefone?: string; endereco?: string; logo_url?: string; cover_url?: string }
 
 type CartItem = {
   product_id: string; product_name: string; variant_label?: string
@@ -66,27 +66,65 @@ const CSS = `
     background: var(--bg);
   }
 
-  /* ── Header ── */
+  /* ── Shop Hero ── */
+  .c-hero-cover {
+    width: 100%; aspect-ratio: 2/1; object-fit: cover; display: block;
+    background: var(--bg-surface);
+  }
+  .c-hero-cover-placeholder {
+    width: 100%; aspect-ratio: 2/1;
+    background: var(--placeholder-bg);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--placeholder-icon);
+  }
+  .c-hero-info {
+    position: relative; padding: 0 20px;
+    margin-top: -32px;
+  }
+  .c-hero-avatar {
+    width: 64px; height: 64px; border-radius: 16px;
+    border: 3px solid var(--bg);
+    background: var(--bg); object-fit: cover;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .c-hero-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .c-hero-avatar-fallback {
+    width: 100%; height: 100%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 24px; font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .c-shop-name {
+    color: var(--text-primary); font-size: 20px; font-weight: 700;
+    letter-spacing: -0.025em; line-height: 1.15;
+    margin-top: 12px;
+  }
+  .c-shop-address {
+    color: var(--text-secondary); font-size: 13px; margin-top: 4px;
+    line-height: 1.4;
+  }
+  .c-mesa {
+    color: var(--accent); font-size: 13px; font-weight: 600; margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Sticky nav (tabs + pills) ── */
   .c-header {
     position: sticky; top: 0; z-index: 20;
-    background: var(--bg); padding: 16px 20px 0;
+    background: var(--bg); padding: 0 20px;
   }
   .c-header::after {
     content: ''; display: block;
     height: 1px; background: var(--border);
     margin: 0;
   }
-  .c-shop-name {
-    color: var(--text-primary); font-size: 20px; font-weight: 700;
-    letter-spacing: -0.025em; line-height: 1.15;
-  }
-  .c-mesa {
-    color: var(--accent); font-size: 13px; font-weight: 600; margin-top: 2px;
-    font-variant-numeric: tabular-nums;
-  }
 
   /* ── Channel tabs ── */
-  .c-tabs { display: flex; gap: 8px; padding: 14px 0 14px; }
+  .c-tabs { display: flex; gap: 8px; padding: 12px 0; }
   .c-tab {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
     min-height: 44px; border-radius: 10px;
@@ -791,10 +829,33 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="c-wrap">
-        {/* Header */}
+        {/* Shop Hero */}
+        <div>
+          {shop.cover_url ? (
+            <img src={shop.cover_url} alt="" className="c-hero-cover" />
+          ) : (
+            <div className="c-hero-cover-placeholder">
+              <Coffee size={40} strokeWidth={1.2} />
+            </div>
+          )}
+          <div className="c-hero-info">
+            <div className="c-hero-avatar">
+              {shop.logo_url ? (
+                <img src={shop.logo_url} alt={shop.nome} />
+              ) : (
+                <div className="c-hero-avatar-fallback">
+                  {shop.nome.charAt(0)}
+                </div>
+              )}
+            </div>
+            <h1 className="c-shop-name">{shop.nome}</h1>
+            {shop.endereco && <p className="c-shop-address">{shop.endereco}</p>}
+            {mesa != null && <p className="c-mesa">Mesa {mesa}</p>}
+          </div>
+        </div>
+
+        {/* Sticky nav */}
         <header className="c-header">
-          <h1 className="c-shop-name">{shop.nome}</h1>
-          {mesa != null && <p className="c-mesa">Mesa {mesa}</p>}
           <nav className="c-tabs" aria-label="Canal de atendimento">
             <button
               className="c-tab"
