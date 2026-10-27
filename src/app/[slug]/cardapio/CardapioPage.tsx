@@ -20,31 +20,56 @@ const BRL = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', curren
 
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0a0d10; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
 
   .c-wrap {
+    --bg: #0a0d10;
+    --bg-surface: #13181c;
+    --bg-elevated: #0f1316;
+    --bg-hover: #181e23;
+    --border: #1d2429;
+    --border-strong: #2a343c;
+    --border-hover: #3a454f;
+    --text-primary: #e9eef3;
+    --text-secondary: #6c7884;
+    --text-muted: #8c959e;
+    --text-placeholder: #3a454f;
+    --text-variant: #c8d1d9;
+    --accent: #00e5a0;
+    --accent-dim: rgba(0,229,160,0.15);
+    --accent-subtle: rgba(0,229,160,0.04);
+    --accent-hover: rgba(0,229,160,0.08);
+    --accent-active: rgba(0,229,160,0.12);
+    --accent-press: rgba(0,229,160,0.25);
+
     max-width: 480px; margin: 0 auto; min-height: 100dvh;
     display: flex; flex-direction: column;
     font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
     -webkit-font-smoothing: antialiased;
+    background: var(--bg);
   }
 
   /* ── Header ── */
   .c-header {
     position: sticky; top: 0; z-index: 20;
-    background: #0a0d10; padding: 16px 20px 0;
+    background: var(--bg); padding: 16px 20px 0;
   }
   .c-header::after {
     content: ''; display: block;
-    height: 1px; background: #1d2429;
+    height: 1px; background: var(--border);
     margin: 0;
   }
   .c-shop-name {
-    color: #e9eef3; font-size: 20px; font-weight: 700;
+    color: var(--text-primary); font-size: 20px; font-weight: 700;
     letter-spacing: -0.025em; line-height: 1.15;
   }
   .c-mesa {
-    color: #00e5a0; font-size: 13px; font-weight: 600; margin-top: 2px;
+    color: var(--accent); font-size: 13px; font-weight: 600; margin-top: 2px;
     font-variant-numeric: tabular-nums;
   }
 
@@ -53,15 +78,15 @@ const CSS = `
   .c-tab {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
     min-height: 44px; border-radius: 10px;
-    border: 1.5px solid #1d2429; background: transparent;
-    color: #6c7884; font-size: 14px; font-weight: 500;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text-secondary); font-size: 14px; font-weight: 500;
     cursor: pointer; transition: all .2s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
   }
   .c-tab:active { transform: scale(0.97); }
   .c-tab[data-active="true"] {
-    background: #00e5a0; color: #0a0d10;
-    border-color: #00e5a0; font-weight: 600;
+    background: var(--accent); color: var(--bg);
+    border-color: var(--accent); font-weight: 600;
   }
 
   /* ── Category pills ── */
@@ -71,7 +96,7 @@ const CSS = `
   .c-cats-wrap::after {
     content: ''; position: absolute; top: 0; right: 0;
     width: 40px; height: 100%; pointer-events: none;
-    background: linear-gradient(to right, transparent, #0a0d10);
+    background: linear-gradient(to right, transparent, var(--bg));
     z-index: 1;
   }
   .c-cats {
@@ -83,16 +108,16 @@ const CSS = `
     white-space: nowrap; min-height: 44px;
     padding: 0 18px; border-radius: 22px;
     display: flex; align-items: center;
-    border: 1.5px solid #1d2429; background: transparent;
-    color: #8c959e; font-size: 14px; font-weight: 500;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text-muted); font-size: 14px; font-weight: 500;
     cursor: pointer; transition: all .2s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
   }
   .c-pill:active { transform: scale(0.96); }
   .c-pill[data-active="true"] {
-    background: #00e5a0; color: #0a0d10;
-    border-color: #00e5a0; font-weight: 600;
+    background: var(--accent); color: var(--bg);
+    border-color: var(--accent); font-weight: 600;
   }
 
   /* ── Product list ── */
@@ -101,7 +126,7 @@ const CSS = `
     display: flex; flex-direction: column; gap: 10px;
   }
   .c-cat-title {
-    color: #e9eef3; font-size: 16px; font-weight: 700;
+    color: var(--text-primary); font-size: 16px; font-weight: 700;
     letter-spacing: -0.015em;
     padding: 20px 0 8px;
   }
@@ -111,67 +136,72 @@ const CSS = `
   /* ── Product card ── */
   .c-card {
     display: flex; gap: 14px; padding: 16px;
-    background: #13181c; border-radius: 14px;
-    cursor: pointer; transition: background .15s ease-out;
+    background: var(--bg-surface); border-radius: 14px;
+    transition: background .15s ease-out;
     -webkit-tap-highlight-color: transparent;
     position: relative; overflow: hidden;
   }
-  .c-card:active { background: #181e23; }
+  .c-card[data-clickable="true"] { cursor: pointer; }
+  .c-card:active { background: var(--bg-hover); }
   .c-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .c-card-name {
-    color: #e9eef3; font-size: 15px; font-weight: 600;
+    color: var(--text-primary); font-size: 15px; font-weight: 600;
     letter-spacing: -0.01em; line-height: 1.3;
   }
   .c-card-desc {
-    color: #6c7884; font-size: 13px; margin-top: 4px;
+    color: var(--text-secondary); font-size: 13px; margin-top: 4px;
     line-height: 1.45; display: -webkit-box;
     -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .c-card-price {
-    color: #00e5a0; font-size: 16px; font-weight: 700;
+    color: var(--accent); font-size: 16px; font-weight: 700;
     margin-top: auto; padding-top: 8px;
     font-variant-numeric: tabular-nums;
   }
   .c-card-add {
     position: absolute; bottom: 12px; right: 12px;
     width: 44px; height: 44px; border-radius: 12px;
-    background: rgba(0,229,160,0.15); border: none;
-    color: #00e5a0; cursor: pointer;
+    background: var(--accent-dim); border: none;
+    color: var(--accent); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all .15s ease-out;
     -webkit-tap-highlight-color: transparent;
   }
-  .c-card-add:active { transform: scale(0.9); background: rgba(0,229,160,0.25); }
+  .c-card-add:active { transform: scale(0.9); background: var(--accent-press); }
 
   /* ── Variants ── */
   .c-variants { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .c-var-btn {
     min-height: 44px; padding: 0 16px; border-radius: 10px;
-    border: 1.5px solid #2a343c; background: rgba(0,229,160,0.04);
-    color: #c8d1d9; font-size: 14px; font-weight: 500;
+    border: 1.5px solid var(--border-strong); background: var(--accent-subtle);
+    color: var(--text-variant); font-size: 14px; font-weight: 500;
     cursor: pointer; transition: all .15s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
     display: flex; align-items: center;
     font-variant-numeric: tabular-nums;
   }
-  .c-var-btn:active { transform: scale(0.96); background: rgba(0,229,160,0.12); border-color: #00e5a0; }
-  .c-var-btn:hover { background: rgba(0,229,160,0.08); border-color: #3a454f; }
+  .c-var-btn:active { transform: scale(0.96); background: var(--accent-active); border-color: var(--accent); }
+  .c-var-btn:hover { background: var(--accent-hover); border-color: var(--border-hover); }
+  .c-var-price { color: var(--accent); font-weight: 600; }
 
   /* ── Product image ── */
   .c-card-img {
     width: 80px; height: 80px; border-radius: 12px;
-    object-fit: cover; flex-shrink: 0; background: #1d2429;
+    object-fit: cover; flex-shrink: 0; background: var(--border);
   }
 
   /* ── Toast (add feedback) ── */
   .c-toast {
     position: fixed; bottom: 88px; left: 50%; z-index: 35;
-    background: #e9eef3; color: #0a0d10;
+    background: var(--text-primary); color: var(--bg);
     padding: 10px 20px; border-radius: 12px;
     font-size: 14px; font-weight: 600;
     display: flex; align-items: center; gap: 8px;
     pointer-events: none;
     animation: c-toast-in .3s ease-out forwards, c-toast-out .3s ease-in .9s forwards;
+  }
+  .c-toast[data-error="true"] {
+    background: #ff4d4f; color: #fff;
   }
   @keyframes c-toast-in {
     from { opacity: 0; transform: translate(-50%, 12px); }
@@ -189,7 +219,7 @@ const CSS = `
     display: flex; align-items: center; justify-content: space-between;
     min-height: 56px; padding: 0 20px;
     padding-bottom: max(0px, env(safe-area-inset-bottom));
-    background: #00e5a0; color: #0a0d10; border: none;
+    background: var(--accent); color: var(--bg); border: none;
     border-top-left-radius: 16px; border-top-right-radius: 16px;
     font-size: 15px; font-weight: 700; cursor: pointer;
     font-family: inherit; z-index: 30;
@@ -206,7 +236,7 @@ const CSS = `
     display: flex; align-items: center; gap: 10px;
   }
   .c-fab-badge {
-    background: #0a0d10; color: #00e5a0;
+    background: var(--bg); color: var(--accent);
     font-size: 12px; font-weight: 700;
     min-width: 24px; height: 24px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
@@ -227,7 +257,7 @@ const CSS = `
   .c-drawer {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px; max-height: 85dvh;
-    background: #0f1316; border-top-left-radius: 20px; border-top-right-radius: 20px;
+    background: var(--bg-elevated); border-top-left-radius: 20px; border-top-right-radius: 20px;
     z-index: 50; display: flex; flex-direction: column; overflow: hidden;
     animation: c-slide-up .25s ease-out;
   }
@@ -237,16 +267,20 @@ const CSS = `
   }
   .c-drawer-handle {
     width: 36px; height: 4px; border-radius: 2px;
-    background: #2a343c; margin: 10px auto 0;
+    background: var(--border-strong); margin: 10px auto 0;
     flex-shrink: 0;
   }
   .c-drawer-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 20px 16px;
   }
+  .c-drawer-title {
+    color: var(--text-primary); font-size: 18px; font-weight: 700;
+    letter-spacing: -0.02em;
+  }
   .c-drawer-close {
     width: 44px; height: 44px; border-radius: 12px;
-    background: none; border: none; color: #6c7884;
+    background: none; border: none; color: var(--text-secondary);
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     -webkit-tap-highlight-color: transparent;
     margin: -8px -8px -8px 0;
@@ -261,23 +295,34 @@ const CSS = `
   }
   .c-cart-row {
     display: flex; align-items: center; gap: 14px;
-    padding: 14px; background: #13181c; border-radius: 12px;
+    padding: 14px; background: var(--bg-surface); border-radius: 12px;
   }
   .c-cart-row-info { flex: 1; min-width: 0; }
+  .c-cart-item-name {
+    color: var(--text-primary); font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .c-cart-item-variant {
+    color: var(--text-secondary); font-size: 13px; margin-top: 2px;
+  }
+  .c-cart-item-price {
+    color: var(--accent); font-size: 15px; font-weight: 700;
+    margin-top: 4px; font-variant-numeric: tabular-nums;
+  }
 
   /* ── Qty controls ── */
   .c-qty { display: flex; align-items: center; gap: 6px; }
   .c-qty-btn {
     width: 44px; height: 44px; border-radius: 12px;
-    border: 1.5px solid #1d2429; background: transparent;
-    color: #e9eef3; display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text-primary); display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-family: inherit;
     -webkit-tap-highlight-color: transparent;
     transition: all .12s ease-out;
   }
-  .c-qty-btn:active { background: rgba(0,229,160,0.08); border-color: #00e5a0; color: #00e5a0; }
+  .c-qty-btn:active { background: var(--accent-hover); border-color: var(--accent); color: var(--accent); }
   .c-qty-num {
-    color: #e9eef3; font-size: 15px; font-weight: 700;
+    color: var(--text-primary); font-size: 15px; font-weight: 700;
     min-width: 24px; text-align: center;
     font-variant-numeric: tabular-nums;
   }
@@ -286,32 +331,32 @@ const CSS = `
   .c-footer { padding: 16px 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
   .c-footer::before {
     content: ''; display: block;
-    height: 1px; background: #1d2429;
+    height: 1px; background: var(--border);
     margin: 0 -20px 16px;
   }
   .c-name-input {
     width: 100%; min-height: 48px; padding: 0 16px;
-    border-radius: 12px; border: 1.5px solid #1d2429;
-    background: #13181c; color: #e9eef3;
+    border-radius: 12px; border: 1.5px solid var(--border);
+    background: var(--bg-surface); color: var(--text-primary);
     font-size: 15px; font-family: inherit; outline: none;
     margin-bottom: 14px; transition: border-color .15s;
   }
-  .c-name-input::placeholder { color: #3a454f; }
-  .c-name-input:focus { border-color: #00e5a0; }
+  .c-name-input::placeholder { color: var(--text-placeholder); }
+  .c-name-input:focus { border-color: var(--accent); }
 
   .c-total-row {
     display: flex; justify-content: space-between;
     align-items: baseline; margin-bottom: 14px;
   }
-  .c-total-label { color: #6c7884; font-size: 14px; font-weight: 500; }
+  .c-total-label { color: var(--text-secondary); font-size: 14px; font-weight: 500; }
   .c-total-value {
-    color: #e9eef3; font-size: 22px; font-weight: 700;
+    color: var(--text-primary); font-size: 22px; font-weight: 700;
     letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
   }
 
   .c-submit {
     width: 100%; min-height: 52px; border-radius: 14px;
-    border: none; background: #00e5a0; color: #0a0d10;
+    border: none; background: var(--accent); color: var(--bg);
     font-size: 16px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     font-family: inherit; transition: all .15s ease-out;
@@ -325,8 +370,8 @@ const CSS = `
     text-align: center; padding: 80px 20px;
     display: flex; flex-direction: column; align-items: center; gap: 12px;
   }
-  .c-empty svg { color: #2a343c; }
-  .c-empty p { color: #6c7884; font-size: 15px; font-weight: 500; }
+  .c-empty svg { color: var(--border-strong); }
+  .c-empty p { color: var(--text-secondary); font-size: 15px; font-weight: 500; }
 
   /* ── Success overlay ── */
   .c-success {
@@ -337,7 +382,7 @@ const CSS = `
     animation: c-fade-in .25s ease-out;
   }
   .c-success-card {
-    background: #13181c; border-radius: 24px;
+    background: var(--bg-surface); border-radius: 24px;
     padding: 48px 32px 36px; text-align: center;
     width: 100%; max-width: 340px;
     animation: c-pop-in .3s ease-out;
@@ -348,10 +393,19 @@ const CSS = `
   }
   .c-success-icon {
     width: 64px; height: 64px; border-radius: 32px;
-    background: rgba(0,229,160,0.12);
+    background: var(--accent-active);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 20px;
+    color: var(--accent);
   }
+  .c-success-title {
+    color: var(--text-primary); font-size: 20px; font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 8px;
+  }
+  .c-success-desc {
+    color: var(--text-secondary); font-size: 14px; line-height: 1.55;
+  }
+  .c-success-action { margin-top: 24px; }
 
   /* ── Reduced motion ── */
   @media (prefers-reduced-motion: reduce) {
@@ -376,8 +430,13 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
   const [clientName, setClientName] = useState('')
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ msg: string; error?: boolean } | null>(null)
+  const [visibleCatId, setVisibleCatId] = useState<string | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const pillsRef = useRef<HTMLElement>(null)
+  const isScrollingToCat = useRef(false)
 
   const filteredCats = useMemo(() =>
     categories.filter(c => c.channel === channel || c.channel === 'ambos'),
@@ -398,15 +457,91 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     cart.reduce((sum, i) => sum + i.quantity, 0), [cart]
   )
 
-  const showToast = useCallback((msg: string) => {
+  const showToast = useCallback((msg: string, error = false) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
-    setToast(msg)
-    toastTimer.current = setTimeout(() => setToast(null), 1300)
+    setToast({ msg, error })
+    toastTimer.current = setTimeout(() => setToast(null), error ? 3500 : 1300)
   }, [])
 
   useEffect(() => () => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
   }, [])
+
+  // IntersectionObserver: track which category section is visible
+  useEffect(() => {
+    const sections = document.querySelectorAll<HTMLElement>('[data-cat-section]')
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isScrollingToCat.current) return
+        let bestId: string | null = null
+        let bestRatio = 0
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-cat-section')
+            if (id && entry.intersectionRatio > bestRatio) {
+              bestId = id
+              bestRatio = entry.intersectionRatio
+            }
+          }
+        })
+        if (bestId) setVisibleCatId(bestId)
+      },
+      { rootMargin: '-160px 0px -60% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
+    )
+
+    sections.forEach(s => observer.observe(s))
+    return () => observer.disconnect()
+  }, [filteredCats, channel])
+
+  // Scroll active pill into view in the pills container
+  useEffect(() => {
+    if (!visibleCatId || !pillsRef.current) return
+    const pill = pillsRef.current.querySelector<HTMLElement>(`[data-pill-id="${visibleCatId}"]`)
+    if (pill) {
+      pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
+  }, [visibleCatId])
+
+  // Focus trap + Escape key for drawer
+  useEffect(() => {
+    if (!drawerOpen) return
+
+    closeRef.current?.focus()
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setDrawerOpen(false)
+        return
+      }
+      if (e.key !== 'Tab' || !drawerRef.current) return
+      const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+        'button, input, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [drawerOpen])
+
+  // Escape key for success overlay
+  useEffect(() => {
+    if (!success) return
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setSuccess(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [success])
 
   function addToCart(product: Product, variant?: PriceVariant) {
     const price = variant?.price ?? product.price
@@ -429,8 +564,11 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     showToast(variant ? `${product.name} (${variant.label})` : product.name)
   }
 
-  function updateQty(idx: number, delta: number) {
+  function updateQty(productId: string, variantLabel: string | undefined, delta: number) {
     setCart(prev => {
+      const key = `${productId}|${variantLabel ?? ''}`
+      const idx = prev.findIndex(i => `${i.product_id}|${i.variant_label ?? ''}` === key)
+      if (idx < 0) return prev
       const next = [...prev]
       next[idx] = { ...next[idx], quantity: next[idx].quantity + delta }
       if (next[idx].quantity <= 0) next.splice(idx, 1)
@@ -458,11 +596,23 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
       setCart([])
       setDrawerOpen(false)
     } catch {
-      alert('Erro ao enviar pedido. Tente novamente.')
+      showToast('Erro ao enviar pedido. Tente novamente.', true)
     } finally {
       setSending(false)
     }
   }
+
+  function scrollToCategory(catId: string) {
+    setActiveCat(null)
+    isScrollingToCat.current = true
+    setVisibleCatId(catId)
+    setTimeout(() => {
+      document.getElementById(`cat-${catId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTimeout(() => { isScrollingToCat.current = false }, 600)
+    }, 50)
+  }
+
+  const activePillId = activeCat ?? visibleCatId
 
   return (
     <>
@@ -476,7 +626,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
             <button
               className="c-tab"
               data-active={channel === 'presencial'}
-              onClick={() => { setChannel('presencial'); setActiveCat(null) }}
+              onClick={() => { setChannel('presencial'); setActiveCat(null); setVisibleCatId(null) }}
               aria-pressed={channel === 'presencial'}
             >
               <Coffee size={16} strokeWidth={2.2} /> Presencial
@@ -484,7 +634,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
             <button
               className="c-tab"
               data-active={channel === 'delivery'}
-              onClick={() => { setChannel('delivery'); setActiveCat(null) }}
+              onClick={() => { setChannel('delivery'); setActiveCat(null); setVisibleCatId(null) }}
               aria-pressed={channel === 'delivery'}
             >
               <Truck size={16} strokeWidth={2.2} /> Delivery
@@ -493,11 +643,11 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
 
         {/* Category pills */}
         <div className="c-cats-wrap">
-        <nav className="c-cats" aria-label="Categorias">
+        <nav className="c-cats" aria-label="Categorias" ref={pillsRef}>
           <button
             className="c-pill"
-            data-active={activeCat === null}
-            onClick={() => setActiveCat(null)}
+            data-active={activePillId === null}
+            onClick={() => { setActiveCat(null); setVisibleCatId(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
           >
             Todos
           </button>
@@ -505,13 +655,9 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
             <button
               key={c.id}
               className="c-pill"
-              data-active={activeCat === c.id}
-              onClick={() => {
-                setActiveCat(null)
-                setTimeout(() => {
-                  document.getElementById(`cat-${c.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }, 50)
-              }}
+              data-active={activePillId === c.id}
+              data-pill-id={c.id}
+              onClick={() => scrollToCategory(c.id)}
             >
               {c.name}
             </button>
@@ -521,11 +667,11 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         </header>
 
         {/* Products */}
-        <div className="c-list" role="list">
+        <div className="c-list">
           {filteredProducts.length === 0 ? (
             <div className="c-empty">
               <Coffee size={48} strokeWidth={1.5} />
-              <p>Nenhum produto disponível</p>
+              <p>Nenhum produto disponivel</p>
             </div>
           ) : (
             filteredCats
@@ -534,51 +680,52 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                 const catProducts = filteredProducts.filter(p => p.category_id === cat.id)
                 if (catProducts.length === 0) return null
                 return (
-                  <section key={cat.id} id={`cat-${cat.id}`}>
+                  <section key={cat.id} id={`cat-${cat.id}`} data-cat-section={cat.id}>
                     <h2 className="c-cat-title">{cat.name}</h2>
-                    {catProducts.map(p => (
-                      <div
-                        key={p.id}
-                        className="c-card"
-                        role="listitem"
-                        onClick={() => {
-                          if (!p.price_variants?.length) addToCart(p)
-                        }}
-                      >
-                        <div className="c-card-info">
-                          <p className="c-card-name">{p.name}</p>
-                          {p.description && <p className="c-card-desc">{p.description}</p>}
-                          {p.price_variants?.length ? (
-                            <div className="c-variants">
-                              {(p.price_variants as PriceVariant[]).map(v => (
-                                <button
-                                  key={v.label}
-                                  className="c-var-btn"
-                                  onClick={e => { e.stopPropagation(); addToCart(p, v) }}
-                                  aria-label={`Adicionar ${p.name} ${v.label} por ${BRL(v.price)}`}
-                                >
-                                  {v.label} — <span style={{ color: '#00e5a0', fontWeight: 600 }}>{BRL(v.price)}</span>
-                                </button>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="c-card-price">{BRL(p.price)}</p>
+                    {catProducts.map(p => {
+                      const hasVariants = !!p.price_variants?.length
+                      return (
+                        <div
+                          key={p.id}
+                          className="c-card"
+                          data-clickable={!hasVariants}
+                          onClick={() => { if (!hasVariants) addToCart(p) }}
+                        >
+                          <div className="c-card-info">
+                            <p className="c-card-name">{p.name}</p>
+                            {p.description && <p className="c-card-desc">{p.description}</p>}
+                            {hasVariants ? (
+                              <div className="c-variants">
+                                {(p.price_variants as PriceVariant[]).map(v => (
+                                  <button
+                                    key={v.label}
+                                    className="c-var-btn"
+                                    onClick={e => { e.stopPropagation(); addToCart(p, v) }}
+                                    aria-label={`Adicionar ${p.name} ${v.label} por ${BRL(v.price)}`}
+                                  >
+                                    {v.label} — <span className="c-var-price">{BRL(v.price)}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="c-card-price">{BRL(p.price)}</p>
+                            )}
+                          </div>
+                          {p.image_url && (
+                            <img src={p.image_url} alt={p.name} className="c-card-img" loading="lazy" />
+                          )}
+                          {!hasVariants && (
+                            <button
+                              className="c-card-add"
+                              aria-label={`Adicionar ${p.name}`}
+                              onClick={e => { e.stopPropagation(); addToCart(p) }}
+                            >
+                              <Plus size={20} strokeWidth={2.5} />
+                            </button>
                           )}
                         </div>
-                        {p.image_url && (
-                          <img src={p.image_url} alt="" className="c-card-img" loading="lazy" />
-                        )}
-                        {!p.price_variants?.length && (
-                          <button
-                            className="c-card-add"
-                            aria-label={`Adicionar ${p.name}`}
-                            onClick={e => { e.stopPropagation(); addToCart(p) }}
-                          >
-                            <Plus size={20} strokeWidth={2.5} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                      )
+                    })}
                   </section>
                 )
               })
@@ -587,8 +734,8 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
 
         {/* Add-to-cart toast */}
         {toast && (
-          <div className="c-toast" key={toast} aria-live="polite">
-            <Check size={16} strokeWidth={2.5} /> {toast}
+          <div className="c-toast" key={toast.msg + (toast.error ? '-err' : '')} data-error={toast.error || undefined} role="status" aria-live="polite">
+            {toast.error ? <X size={16} strokeWidth={2.5} /> : <Check size={16} strokeWidth={2.5} />} {toast.msg}
           </div>
         )}
 
@@ -607,14 +754,13 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         {/* Cart Drawer */}
         {drawerOpen && (
           <>
-            <div className="c-overlay" onClick={() => setDrawerOpen(false)} />
-            <div className="c-drawer" role="dialog" aria-label="Seu pedido">
+            <div className="c-overlay" onClick={() => setDrawerOpen(false)} aria-hidden="true" />
+            <div className="c-drawer" role="dialog" aria-modal="true" aria-label="Seu pedido" ref={drawerRef}>
               <div className="c-drawer-handle" />
               <div className="c-drawer-head">
-                <h2 style={{ color: '#e9eef3', fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>
-                  Seu Pedido
-                </h2>
+                <h2 className="c-drawer-title">Seu Pedido</h2>
                 <button
+                  ref={closeRef}
                   className="c-drawer-close"
                   onClick={() => setDrawerOpen(false)}
                   aria-label="Fechar"
@@ -624,23 +770,21 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
               </div>
 
               <div className="c-cart-items">
-                {cart.map((item, idx) => (
+                {cart.map((item) => (
                   <div key={`${item.product_id}-${item.variant_label}`} className="c-cart-row">
                     <div className="c-cart-row-info">
-                      <p style={{ color: '#e9eef3', fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>
-                        {item.product_name}
-                      </p>
+                      <p className="c-cart-item-name">{item.product_name}</p>
                       {item.variant_label && (
-                        <p style={{ color: '#6c7884', fontSize: 13, marginTop: 2 }}>{item.variant_label}</p>
+                        <p className="c-cart-item-variant">{item.variant_label}</p>
                       )}
-                      <p style={{ color: '#00e5a0', fontSize: 15, fontWeight: 700, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+                      <p className="c-cart-item-price">
                         {BRL(item.unit_price * item.quantity)}
                       </p>
                     </div>
                     <div className="c-qty">
                       <button
                         className="c-qty-btn"
-                        onClick={() => updateQty(idx, -1)}
+                        onClick={() => updateQty(item.product_id, item.variant_label, -1)}
                         aria-label={`Diminuir ${item.product_name}`}
                       >
                         <Minus size={16} strokeWidth={2.2} />
@@ -648,7 +792,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                       <span className="c-qty-num">{item.quantity}</span>
                       <button
                         className="c-qty-btn"
-                        onClick={() => updateQty(idx, 1)}
+                        onClick={() => updateQty(item.product_id, item.variant_label, 1)}
                         aria-label={`Aumentar ${item.product_name}`}
                       >
                         <Plus size={16} strokeWidth={2.2} />
@@ -691,23 +835,20 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
 
         {/* Success */}
         {success && (
-          <div className="c-success" onClick={() => setSuccess(false)}>
+          <div className="c-success" onClick={() => setSuccess(false)} role="dialog" aria-modal="true" aria-label="Pedido enviado">
             <div className="c-success-card" onClick={e => e.stopPropagation()}>
               <div className="c-success-icon">
-                <Check size={28} strokeWidth={2.5} style={{ color: '#00e5a0' }} />
+                <Check size={28} strokeWidth={2.5} />
               </div>
-              <h3 style={{ color: '#e9eef3', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>
-                Pedido enviado
-              </h3>
-              <p style={{ color: '#6c7884', fontSize: 14, lineHeight: 1.55 }}>
+              <h3 className="c-success-title">Pedido enviado</h3>
+              <p className="c-success-desc">
                 {mesa
                   ? `Seu pedido da mesa ${mesa} foi recebido. Aguarde o preparo.`
                   : 'Seu pedido foi recebido. Entraremos em contato.'}
               </p>
               <button
-                className="c-submit"
+                className="c-submit c-success-action"
                 onClick={() => setSuccess(false)}
-                style={{ marginTop: 24 }}
               >
                 Fazer outro pedido
               </button>
