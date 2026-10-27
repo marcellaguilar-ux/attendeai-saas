@@ -37,7 +37,7 @@ const CSS = `
   .c-header::after {
     content: ''; display: block;
     height: 1px; background: #1d2429;
-    margin: 0 -20px;
+    margin: 0;
   }
   .c-shop-name {
     color: #e9eef3; font-size: 20px; font-weight: 700;
@@ -72,6 +72,7 @@ const CSS = `
     content: ''; position: absolute; top: 0; right: 0;
     width: 40px; height: 100%; pointer-events: none;
     background: linear-gradient(to right, transparent, #0a0d10);
+    z-index: 1;
   }
   .c-cats {
     display: flex; gap: 8px; overflow-x: auto;
@@ -102,9 +103,10 @@ const CSS = `
   .c-cat-title {
     color: #e9eef3; font-size: 16px; font-weight: 700;
     letter-spacing: -0.015em;
-    padding: 20px 0 6px;
+    padding: 20px 0 8px;
   }
   .c-cat-title:first-child { padding-top: 8px; }
+  .c-list section { scroll-margin-top: 160px; }
 
   /* ── Product card ── */
   .c-card {
@@ -180,22 +182,28 @@ const CSS = `
     to { opacity: 0; transform: translate(-50%, -8px); }
   }
 
-  /* ── Cart FAB ── */
+  /* ── Cart bottom bar ── */
   .c-fab {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    display: flex; align-items: center; gap: 10px;
-    min-height: 52px; padding: 0 24px;
-    background: #00e5a0; color: #0a0d10; border: none; border-radius: 16px;
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 56px; padding: 0 20px;
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    background: #00e5a0; color: #0a0d10; border: none;
+    border-top-left-radius: 16px; border-top-right-radius: 16px;
     font-size: 15px; font-weight: 700; cursor: pointer;
     font-family: inherit; z-index: 30;
     transition: transform .15s ease-out;
     -webkit-tap-highlight-color: transparent;
-    animation: c-fab-in .3s ease-out;
+    animation: c-fab-in .25s ease-out;
   }
-  .c-fab:active { transform: translateX(-50%) scale(0.96); }
+  .c-fab:active { opacity: 0.9; }
   @keyframes c-fab-in {
-    from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+    from { opacity: 0; transform: translateX(-50%) translateY(100%); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .c-fab-left {
+    display: flex; align-items: center; gap: 10px;
   }
   .c-fab-badge {
     background: #0a0d10; color: #00e5a0;
@@ -204,7 +212,10 @@ const CSS = `
     display: flex; align-items: center; justify-content: center;
     font-variant-numeric: tabular-nums;
   }
-  .c-fab-price { font-variant-numeric: tabular-nums; }
+  .c-fab-price {
+    font-variant-numeric: tabular-nums;
+    font-size: 17px; font-weight: 800;
+  }
 
   /* ── Overlay + Drawer ── */
   .c-overlay {
@@ -479,7 +490,6 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
               <Truck size={16} strokeWidth={2.2} /> Delivery
             </button>
           </nav>
-        </header>
 
         {/* Category pills */}
         <div className="c-cats-wrap">
@@ -496,13 +506,19 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
               key={c.id}
               className="c-pill"
               data-active={activeCat === c.id}
-              onClick={() => setActiveCat(c.id)}
+              onClick={() => {
+                setActiveCat(null)
+                setTimeout(() => {
+                  document.getElementById(`cat-${c.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }, 50)
+              }}
             >
               {c.name}
             </button>
           ))}
         </nav>
         </div>
+        </header>
 
         {/* Products */}
         <div className="c-list" role="list">
@@ -518,7 +534,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                 const catProducts = filteredProducts.filter(p => p.category_id === cat.id)
                 if (catProducts.length === 0) return null
                 return (
-                  <section key={cat.id}>
+                  <section key={cat.id} id={`cat-${cat.id}`}>
                     <h2 className="c-cat-title">{cat.name}</h2>
                     {catProducts.map(p => (
                       <div
@@ -579,9 +595,11 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         {/* Cart FAB */}
         {cartCount > 0 && (
           <button className="c-fab" onClick={() => setDrawerOpen(true)} aria-label={`Ver pedido, ${cartCount} itens`}>
-            <ShoppingCart size={18} strokeWidth={2.2} />
-            Ver Pedido
-            <span className="c-fab-badge">{cartCount}</span>
+            <span className="c-fab-left">
+              <ShoppingCart size={18} strokeWidth={2.2} />
+              Ver Pedido
+              <span className="c-fab-badge">{cartCount}</span>
+            </span>
             <span className="c-fab-price">{BRL(cartTotal)}</span>
           </button>
         )}
