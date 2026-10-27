@@ -38,24 +38,26 @@ const CSS = `
   }
 
   .c-wrap {
-    --bg: #0a0d10;
-    --bg-surface: #13181c;
-    --bg-elevated: #0f1316;
-    --bg-hover: #181e23;
-    --border: #1d2429;
-    --border-strong: #2a343c;
-    --border-hover: #3a454f;
-    --text-primary: #e9eef3;
-    --text-secondary: #6c7884;
-    --text-muted: #8c959e;
-    --text-placeholder: #3a454f;
-    --text-variant: #c8d1d9;
-    --accent: #00e5a0;
-    --accent-dim: rgba(0,229,160,0.15);
-    --accent-subtle: rgba(0,229,160,0.04);
-    --accent-hover: rgba(0,229,160,0.08);
-    --accent-active: rgba(0,229,160,0.12);
-    --accent-press: rgba(0,229,160,0.25);
+    --bg: #ffffff;
+    --bg-surface: #f5f5f5;
+    --bg-elevated: #fafafa;
+    --bg-hover: #f0f0f0;
+    --border: #e8e8e8;
+    --border-strong: #d4d4d4;
+    --border-hover: #bbb;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --text-muted: #8a8a8a;
+    --text-placeholder: #c0c0c0;
+    --text-variant: #444;
+    --accent: #00a86b;
+    --accent-dim: rgba(0,194,124,0.12);
+    --accent-subtle: rgba(0,194,124,0.04);
+    --accent-hover: rgba(0,194,124,0.08);
+    --accent-active: rgba(0,194,124,0.10);
+    --accent-press: rgba(0,194,124,0.18);
+    --placeholder-bg: #f0ebe4;
+    --placeholder-icon: #c8bfb3;
 
     max-width: 480px; margin: 0 auto; min-height: 100dvh;
     display: flex; flex-direction: column;
@@ -95,7 +97,7 @@ const CSS = `
   }
   .c-tab:active { transform: scale(0.97); }
   .c-tab[data-active="true"] {
-    background: var(--accent); color: var(--bg);
+    background: var(--accent); color: #fff;
     border-color: var(--accent); font-weight: 600;
   }
 
@@ -124,7 +126,7 @@ const CSS = `
   }
   .c-pill:active { transform: scale(0.96); }
   .c-pill[data-active="true"] {
-    background: var(--accent); color: var(--bg);
+    background: var(--accent); color: #fff;
     border-color: var(--accent); font-weight: 600;
   }
 
@@ -150,7 +152,7 @@ const CSS = `
     position: relative;
     border-bottom: 1px solid var(--border);
   }
-  .c-card:active { background: var(--bg-surface); }
+  .c-card:active { background: var(--bg-hover); }
   .c-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .c-card-name {
     color: var(--text-primary); font-size: 15px; font-weight: 600;
@@ -182,9 +184,9 @@ const CSS = `
   }
   .c-card-no-img {
     width: 110px; height: 110px; border-radius: 12px;
-    background: var(--bg-surface); flex-shrink: 0;
+    background: var(--placeholder-bg); flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    color: var(--border-strong);
+    color: var(--placeholder-icon);
   }
 
   /* ── Product Detail Sheet ── */
@@ -209,7 +211,8 @@ const CSS = `
   .c-detail-hero-placeholder {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
-    color: var(--border-strong);
+    background: var(--placeholder-bg);
+    color: var(--placeholder-icon);
     border-top-left-radius: 20px; border-top-right-radius: 20px;
   }
   .c-detail-close {
@@ -282,7 +285,7 @@ const CSS = `
   }
   .c-detail-radio-dot {
     width: 8px; height: 8px; border-radius: 4px;
-    background: var(--bg);
+    background: #fff;
   }
 
   /* ── Detail Footer ── */
@@ -316,7 +319,7 @@ const CSS = `
   }
   .c-detail-add {
     flex: 1; min-height: 48px; border-radius: 12px;
-    border: none; background: var(--accent); color: var(--bg);
+    border: none; background: var(--accent); color: #fff;
     font-size: 15px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 12px;
     font-family: inherit; transition: all .15s ease-out;
@@ -329,7 +332,7 @@ const CSS = `
   /* ── Toast (add feedback) ── */
   .c-toast {
     position: fixed; bottom: 88px; left: 50%; z-index: 55;
-    background: var(--text-primary); color: var(--bg);
+    background: #1a1a1a; color: #fff;
     padding: 10px 20px; border-radius: 12px;
     font-size: 14px; font-weight: 600;
     display: flex; align-items: center; gap: 8px;
@@ -355,7 +358,7 @@ const CSS = `
     display: flex; align-items: center; justify-content: space-between;
     min-height: 56px; padding: 0 20px;
     padding-bottom: max(0px, env(safe-area-inset-bottom));
-    background: var(--accent); color: var(--bg); border: none;
+    background: var(--accent); color: #fff; border: none;
     border-top-left-radius: 16px; border-top-right-radius: 16px;
     font-size: 15px; font-weight: 700; cursor: pointer;
     font-family: inherit; z-index: 30;
@@ -370,7 +373,7 @@ const CSS = `
   }
   .c-fab-left { display: flex; align-items: center; gap: 10px; }
   .c-fab-badge {
-    background: var(--bg); color: var(--accent);
+    background: #fff; color: var(--accent);
     font-size: 12px; font-weight: 700;
     min-width: 24px; height: 24px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
@@ -420,7 +423,7 @@ const CSS = `
     -webkit-tap-highlight-color: transparent;
     margin: -8px -8px -8px 0;
   }
-  .c-drawer-close:active { background: rgba(255,255,255,.04); }
+  .c-drawer-close:active { background: rgba(0,0,0,.05); }
 
   /* ── Cart items ── */
   .c-cart-items {
@@ -489,7 +492,7 @@ const CSS = `
   }
   .c-submit {
     width: 100%; min-height: 52px; border-radius: 14px;
-    border: none; background: var(--accent); color: var(--bg);
+    border: none; background: var(--accent); color: #fff;
     font-size: 16px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     font-family: inherit; transition: all .15s ease-out;
@@ -509,7 +512,7 @@ const CSS = `
   /* ── Success overlay ── */
   .c-success {
     position: fixed; inset: 0; z-index: 60;
-    background: rgba(0,0,0,.8);
+    background: rgba(0,0,0,.45);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
     animation: c-fade-in .25s ease-out;
