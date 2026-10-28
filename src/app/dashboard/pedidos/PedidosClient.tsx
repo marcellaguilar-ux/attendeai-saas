@@ -17,14 +17,14 @@ type Order = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: typeof Clock }> = {
   recebido:   { label: 'Recebido',   color: '#5b9cff', bg: 'rgba(91,156,255,0.1)',  icon: Clock },
   em_preparo: { label: 'Em Preparo', color: '#f5a623', bg: 'rgba(245,166,35,0.1)',  icon: ChefHat },
-  pronto:     { label: 'Pronto',     color: '#00e5a0', bg: 'rgba(0,229,160,0.1)',   icon: CheckCircle },
-  entregue:   { label: 'Entregue',   color: '#6c7884', bg: 'rgba(108,120,132,0.1)', icon: Package },
+  pronto:     { label: 'Pronto',     color: 'var(--dash-accent)', bg: 'rgba(0,229,160,0.1)',   icon: CheckCircle },
+  entregue:   { label: 'Entregue',   color: 'var(--dash-text-muted)', bg: 'rgba(108,120,132,0.1)', icon: Package },
   cancelado:  { label: 'Cancelado',  color: '#ff6079', bg: 'rgba(255,96,121,0.1)',  icon: XCircle },
 }
 const STATUS_FLOW = ['recebido', 'em_preparo', 'pronto', 'entregue']
 
 const card: React.CSSProperties = {
-  background: '#13181c', border: '1px solid #1d2429', borderRadius: 14, padding: 18,
+  background: 'var(--dash-bg-card)', border: '1px solid var(--dash-border)', borderRadius: 14, padding: 18,
 }
 
 const BRL = (n: number) => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -103,10 +103,10 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 960 }}>
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#e9eef3', letterSpacing: '-0.025em' }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--dash-text)', letterSpacing: '-0.025em' }}>
           Pedidos
         </h1>
-        <p style={{ color: '#6c7884', fontSize: 13.5, marginTop: 4 }}>
+        <p style={{ color: 'var(--dash-text-muted)', fontSize: 13.5, marginTop: 4 }}>
           {activeCount} pedidos ativos · Atualização em tempo real
         </p>
       </div>
@@ -122,11 +122,11 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
           { key: 'all', label: 'Todos' },
         ].map(f => (
           <button key={f.key} onClick={() => setFilterStatus(f.key)} style={{
-            padding: '6px 14px', borderRadius: 20, border: '1px solid #1d2429',
-            background: filterStatus === f.key ? '#00e5a0' : 'transparent',
-            color: filterStatus === f.key ? '#000' : '#6c7884',
+            padding: '6px 14px', borderRadius: 20, border: '1px solid var(--dash-border)',
+            background: filterStatus === f.key ? 'var(--dash-accent)' : 'transparent',
+            color: filterStatus === f.key ? '#000' : 'var(--dash-text-muted)',
             fontSize: 12.5, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-            borderColor: filterStatus === f.key ? '#00e5a0' : '#1d2429',
+            borderColor: filterStatus === f.key ? 'var(--dash-accent)' : 'var(--dash-border)',
           }}>
             {f.label}
           </button>
@@ -153,26 +153,26 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
                     }}>
                       <Icon size={12} /> {cfg.label}
                     </div>
-                    <span style={{ color: '#3a454f', fontSize: 11.5 }}>
+                    <span style={{ color: 'var(--dash-text-dim)', fontSize: 11.5 }}>
                       {timeAgo(order.created_at)}
                     </span>
                     {order.source === 'qrcode' && (
-                      <span style={{ color: '#6c7884', fontSize: 11 }}>QR Code</span>
+                      <span style={{ color: 'var(--dash-text-muted)', fontSize: 11 }}>QR Code</span>
                     )}
                   </div>
 
                   {/* Client + table */}
-                  <p style={{ color: '#e9eef3', fontSize: 14, fontWeight: 500 }}>
+                  <p style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 500 }}>
                     {order.client_name || 'Cliente anônimo'}
                   </p>
 
                   {/* Items */}
                   <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {order.menu_order_items?.map(item => (
-                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: '#8c959e' }}>
+                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: 'var(--dash-text-secondary)' }}>
                         <span>
                           {item.quantity}x {item.product_name}
-                          {item.variant_label && <span style={{ color: '#6c7884' }}> ({item.variant_label})</span>}
+                          {item.variant_label && <span style={{ color: 'var(--dash-text-muted)' }}> ({item.variant_label})</span>}
                         </span>
                         <span>{BRL(item.unit_price * item.quantity)}</span>
                       </div>
@@ -180,7 +180,7 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
                   </div>
 
                   {/* Total */}
-                  <p style={{ color: '#00e5a0', fontSize: 15, fontWeight: 700, marginTop: 10 }}>
+                  <p style={{ color: 'var(--dash-accent)', fontSize: 15, fontWeight: 700, marginTop: 10 }}>
                     Total: {BRL(order.total)}
                   </p>
                 </div>
@@ -190,7 +190,7 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
                   {next && (
                     <button onClick={() => updateStatus(order.id, next)} style={{
                       padding: '8px 14px', borderRadius: 8, border: 'none',
-                      background: '#00e5a0', color: '#000', fontSize: 12, fontWeight: 600,
+                      background: 'var(--dash-accent)', color: '#000', fontSize: 12, fontWeight: 600,
                       cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
                       display: 'flex', alignItems: 'center', gap: 5,
                     }}>
@@ -214,7 +214,7 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
         })}
 
         {filteredOrders.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 48, color: '#6c7884' }}>
+          <div style={{ textAlign: 'center', padding: 48, color: 'var(--dash-text-muted)' }}>
             <Package size={40} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
             <p style={{ fontSize: 14 }}>Nenhum pedido encontrado</p>
           </div>

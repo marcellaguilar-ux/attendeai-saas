@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CardapioServerPage({ params, searchParams }: {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ mesa?: string }>
+  searchParams: Promise<{ mesa?: string; canal?: string }>
 }) {
   const { slug } = await params
-  const { mesa } = await searchParams
+  const { mesa, canal } = await searchParams
 
   const { data: shop } = await supabase
     .from('barbershops')
@@ -50,7 +50,8 @@ export default async function CardapioServerPage({ params, searchParams }: {
       shop={shop}
       categories={categories ?? []}
       products={products ?? []}
-      mesa={mesa ? parseInt(mesa, 10) : null}
+      mesa={mesa && !isNaN(Number(mesa)) ? parseInt(mesa, 10) : null}
+      initialChannel={canal === 'delivery' ? 'delivery' : 'presencial'}
     />
   )
 }

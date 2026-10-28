@@ -2,7 +2,8 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { LayoutDashboard, Calendar, Settings, MessageCircle, MessagesSquare, LogOut, ExternalLink, BarChart2, Zap, BookOpen, BedDouble, UtensilsCrossed, ClipboardList } from 'lucide-react'
+import { useTheme } from '@/lib/theme'
+import { LayoutDashboard, Calendar, Settings, MessageCircle, MessagesSquare, LogOut, ExternalLink, BarChart2, Zap, BookOpen, BedDouble, UtensilsCrossed, ClipboardList, Sun, Moon } from 'lucide-react'
 import { isPro, isBusiness, PLAN_LABEL, PLAN_COLOR } from '@/lib/plan'
 
 type Barbershop = { id: string; nome: string; slug?: string; payment_status: string; plano: string | null }
@@ -28,6 +29,7 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const { theme, toggle } = useTheme()
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -35,7 +37,7 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
   }
 
   const planLabel = plano ? (PLAN_LABEL[plano] ?? plano) : null
-  const planColor = plano ? (PLAN_COLOR[plano] ?? '#6c7884') : '#6c7884'
+  const planColor = plano ? (PLAN_COLOR[plano] ?? 'var(--dash-text-muted)') : 'var(--dash-text-muted)'
   const isPousada = barbershop?.slug === 'el-capitan'
   const isCafe = barbershop?.slug === 'pingo-doce'
   const links = isPousada
@@ -62,26 +64,27 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
     <aside style={{
       width: 232,
       flexShrink: 0,
-      background: '#0f1316',
-      borderRight: '1px solid #1d2429',
+      background: 'var(--dash-bg-sidebar)',
+      borderRight: '1px solid var(--dash-border)',
       display: 'flex',
       flexDirection: 'column',
       minHeight: '100vh',
+      transition: 'background-color .2s ease, border-color .2s ease',
     }}>
       {/* Logo + plano */}
-      <div style={{ padding: '20px 16px', borderBottom: '1px solid #1d2429' }}>
+      <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--dash-border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            background: '#00e5a0', borderRadius: 8, width: 30, height: 30,
+            background: 'var(--dash-accent)', borderRadius: 8, width: 30, height: 30,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, fontSize: 18, fontWeight: 800, color: '#000', letterSpacing: '-0.04em',
           }}>a</div>
           <div style={{ minWidth: 0 }}>
-            <p style={{ color: '#e9eef3', fontWeight: 600, fontSize: 14, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            <p style={{ color: 'var(--dash-text)', fontWeight: 600, fontSize: 14, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               AttendeAI
             </p>
             <p style={{
-              color: '#6c7884', fontSize: 11.5, letterSpacing: '-0.01em',
+              color: 'var(--dash-text-muted)', fontSize: 11.5, letterSpacing: '-0.01em',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               maxWidth: 152, lineHeight: 1.3, marginTop: 1,
             }}>
@@ -114,8 +117,8 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
               display: 'flex', alignItems: 'center', gap: 9,
               padding: '9px 12px', borderRadius: 10, fontSize: 13.5,
               letterSpacing: '-0.01em', fontWeight: active ? 500 : 400,
-              background: active ? '#00e5a0' : 'transparent',
-              color: active ? '#000' : '#aab4bd',
+              background: active ? 'var(--dash-accent)' : 'transparent',
+              color: active ? '#000' : 'var(--dash-text-secondary)',
               textDecoration: 'none', transition: 'background .15s, color .15s',
             }}>
               <Icon style={{ width: 15, height: 15, flexShrink: 0 }} />
@@ -136,7 +139,7 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
             <p style={{ color: '#5b9cff', fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
               Quer mais recursos?
             </p>
-            <p style={{ color: '#6c7884', fontSize: 11.5, lineHeight: 1.5, marginBottom: 10 }}>
+            <p style={{ color: 'var(--dash-text-muted)', fontSize: 11.5, lineHeight: 1.5, marginBottom: 10 }}>
               Faça upgrade para Pro e acesse painel completo, histórico, conversas e configurações.
             </p>
             <a href="/precos" style={{
@@ -157,8 +160,8 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
           <a href={`/${barbershop.slug}`} target="_blank" rel="noopener noreferrer" style={{
             display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
             borderRadius: 10, fontSize: 13.5, letterSpacing: '-0.01em', fontWeight: 400,
-            color: '#00e5a0', textDecoration: 'none',
-            border: '1px solid rgba(0,229,160,.2)', transition: 'background .15s, border-color .15s',
+            color: 'var(--dash-accent)', textDecoration: 'none',
+            border: '1px solid var(--dash-accent-border)', transition: 'background .15s, border-color .15s',
           }}>
             <ExternalLink style={{ width: 15, height: 15, flexShrink: 0 }} />
             Perfil Público
@@ -167,8 +170,8 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
             <a href={`/${barbershop.slug}/cardapio`} target="_blank" rel="noopener noreferrer" style={{
               display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
               borderRadius: 10, fontSize: 13.5, letterSpacing: '-0.01em', fontWeight: 400,
-              color: '#00e5a0', textDecoration: 'none',
-              border: '1px solid rgba(0,229,160,.2)', transition: 'background .15s, border-color .15s',
+              color: 'var(--dash-accent)', textDecoration: 'none',
+              border: '1px solid var(--dash-accent-border)', transition: 'background .15s, border-color .15s',
             }}>
               <UtensilsCrossed style={{ width: 15, height: 15, flexShrink: 0 }} />
               Cardápio Digital
@@ -177,12 +180,23 @@ export default function Sidebar({ barbershop, plano }: { barbershop?: Barbershop
         </div>
       )}
 
-      {/* Logout */}
-      <div style={{ padding: '8px 8px 12px', borderTop: '1px solid #1d2429' }}>
+      {/* Theme toggle + Logout */}
+      <div style={{ padding: '8px 8px 12px', borderTop: '1px solid var(--dash-border)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <button onClick={toggle} style={{
+          display: 'flex', alignItems: 'center', gap: 9, width: '100%',
+          padding: '9px 12px', borderRadius: 10, fontSize: 13.5, letterSpacing: '-0.01em',
+          color: 'var(--dash-text-muted)', background: 'transparent', border: 'none',
+          cursor: 'pointer', fontFamily: 'inherit', transition: 'background .15s, color .15s',
+        }}>
+          {theme === 'dark'
+            ? <><Sun style={{ width: 15, height: 15 }} /> Modo claro</>
+            : <><Moon style={{ width: 15, height: 15 }} /> Modo escuro</>
+          }
+        </button>
         <button onClick={handleLogout} style={{
           display: 'flex', alignItems: 'center', gap: 9, width: '100%',
           padding: '9px 12px', borderRadius: 10, fontSize: 13.5, letterSpacing: '-0.01em',
-          color: '#6c7884', background: 'transparent', border: 'none',
+          color: 'var(--dash-text-muted)', background: 'transparent', border: 'none',
           cursor: 'pointer', fontFamily: 'inherit', transition: 'background .15s, color .15s',
         }}>
           <LogOut style={{ width: 15, height: 15 }} />

@@ -4,8 +4,8 @@ import { isBusiness } from '@/lib/plan'
 import { BarChart2, TrendingUp, Calendar, DollarSign, Users, Scissors } from 'lucide-react'
 
 const card: React.CSSProperties = {
-  background: '#13181c',
-  border: '1px solid #1d2429',
+  background: 'var(--dash-bg-card)',
+  border: '1px solid var(--dash-border)',
   borderRadius: 14,
   overflow: 'hidden',
 }
@@ -85,22 +85,22 @@ export default async function RelatoriosPage() {
     .slice(0, 3)
 
   const statCards = [
-    { label: 'Agendamentos', value: total, color: '#00e5a0', icon: Calendar },
+    { label: 'Agendamentos', value: total, color: 'var(--dash-accent)', icon: Calendar },
     { label: 'Concluídos', value: done, color: '#5b9cff', icon: TrendingUp },
     { label: 'Cancelados', value: cancelled, color: '#f87171', icon: Users },
     { label: 'Taxa de cancelamento', value: `${cancelRate}%`, color: '#fbbf24', icon: BarChart2 },
-    { label: 'Receita (concluídos)', value: `R$ ${revenue.toFixed(2).replace('.',',')}`, color: '#00e5a0', icon: DollarSign },
-    { label: 'Agendados (pendentes)', value: confirmed, color: '#aab4bd', icon: Scissors },
+    { label: 'Receita (concluídos)', value: `R$ ${revenue.toFixed(2).replace('.',',')}`, color: 'var(--dash-accent)', icon: DollarSign },
+    { label: 'Agendados (pendentes)', value: confirmed, color: 'var(--dash-text-secondary)', icon: Scissors },
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 960 }}>
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#e9eef3', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--dash-text)', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
           Relatórios
         </h1>
-        <p style={{ color: '#6c7884', fontSize: 13.5, marginTop: 4, letterSpacing: '-0.01em' }}>
+        <p style={{ color: 'var(--dash-text-muted)', fontSize: 13.5, marginTop: 4, letterSpacing: '-0.01em' }}>
           Últimos 90 dias · {barbershop?.nome}
         </p>
       </div>
@@ -108,9 +108,9 @@ export default async function RelatoriosPage() {
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
         {statCards.map(({ label, value, color, icon: Icon }) => (
-          <div key={label} style={{ background: '#13181c', border: '1px solid #1d2429', borderRadius: 14, padding: 24 }}>
+          <div key={label} style={{ background: 'var(--dash-bg-card)', border: '1px solid var(--dash-border)', borderRadius: 14, padding: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <p style={{ color: '#6c7884', fontSize: 12.5, fontWeight: 500, letterSpacing: '-0.01em' }}>{label}</p>
+              <p style={{ color: 'var(--dash-text-muted)', fontSize: 12.5, fontWeight: 500, letterSpacing: '-0.01em' }}>{label}</p>
               <div style={{ background: `${color}14`, borderRadius: 8, padding: 6 }}>
                 <Icon style={{ width: 14, height: 14, color }} />
               </div>
@@ -125,34 +125,34 @@ export default async function RelatoriosPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         {/* Top services */}
         <div style={card}>
-          <div style={{ padding: '18px 24px', borderBottom: '1px solid #1d2429', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Scissors style={{ width: 14, height: 14, color: '#00e5a0' }} />
-            <span style={{ color: '#e9eef3', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
+          <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--dash-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Scissors style={{ width: 14, height: 14, color: 'var(--dash-accent)' }} />
+            <span style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
               Serviços mais populares
             </span>
           </div>
           {topServices.length === 0 ? (
-            <p style={{ color: '#6c7884', fontSize: 13, padding: '32px 24px', textAlign: 'center' }}>Sem dados ainda</p>
+            <p style={{ color: 'var(--dash-text-muted)', fontSize: 13, padding: '32px 24px', textAlign: 'center' }}>Sem dados ainda</p>
           ) : (
             <div style={{ padding: '8px 0' }}>
               {topServices.map(([servico, { count, revenue }], i) => {
                 const max = topServices[0][1].count
                 const pct = Math.round((count / max) * 100)
                 return (
-                  <div key={servico} style={{ padding: '10px 24px', borderBottom: i < topServices.length - 1 ? '1px solid #1d2429' : 'none' }}>
+                  <div key={servico} style={{ padding: '10px 24px', borderBottom: i < topServices.length - 1 ? '1px solid var(--dash-border)' : 'none' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ color: '#e9eef3', fontSize: 13.5, fontWeight: 500 }}>{servico}</span>
+                      <span style={{ color: 'var(--dash-text)', fontSize: 13.5, fontWeight: 500 }}>{servico}</span>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <span style={{ color: '#6c7884', fontSize: 12 }}>{count}x</span>
+                        <span style={{ color: 'var(--dash-text-muted)', fontSize: 12 }}>{count}x</span>
                         {revenue > 0 && (
-                          <span style={{ color: '#00e5a0', fontSize: 12, fontWeight: 500 }}>
+                          <span style={{ color: 'var(--dash-accent)', fontSize: 12, fontWeight: 500 }}>
                             R$ {revenue.toFixed(2).replace('.',',')}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div style={{ background: '#1d2429', borderRadius: 4, height: 4 }}>
-                      <div style={{ background: '#00e5a0', borderRadius: 4, height: 4, width: `${pct}%` }} />
+                    <div style={{ background: 'var(--dash-border)', borderRadius: 4, height: 4 }}>
+                      <div style={{ background: 'var(--dash-accent)', borderRadius: 4, height: 4, width: `${pct}%` }} />
                     </div>
                   </div>
                 )
@@ -163,34 +163,34 @@ export default async function RelatoriosPage() {
 
         {/* Monthly breakdown */}
         <div style={card}>
-          <div style={{ padding: '18px 24px', borderBottom: '1px solid #1d2429', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--dash-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <TrendingUp style={{ width: 14, height: 14, color: '#5b9cff' }} />
-            <span style={{ color: '#e9eef3', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
+            <span style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
               Resumo por mês
             </span>
           </div>
           {monthlyEntries.length === 0 ? (
-            <p style={{ color: '#6c7884', fontSize: 13, padding: '32px 24px', textAlign: 'center' }}>Sem dados ainda</p>
+            <p style={{ color: 'var(--dash-text-muted)', fontSize: 13, padding: '32px 24px', textAlign: 'center' }}>Sem dados ainda</p>
           ) : (
             <div style={{ padding: '8px 0' }}>
               {monthlyEntries.map(([key, { total, done, revenue }], i) => {
                 const [y, m] = key.split('-').map(Number)
                 return (
-                  <div key={key} style={{ padding: '14px 24px', borderBottom: i < monthlyEntries.length - 1 ? '1px solid #1d2429' : 'none' }}>
+                  <div key={key} style={{ padding: '14px 24px', borderBottom: i < monthlyEntries.length - 1 ? '1px solid var(--dash-border)' : 'none' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
-                        <p style={{ color: '#e9eef3', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em' }}>
+                        <p style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em' }}>
                           {MONTHS[m-1]} {y}
                         </p>
-                        <p style={{ color: '#6c7884', fontSize: 12.5, marginTop: 3 }}>
+                        <p style={{ color: 'var(--dash-text-muted)', fontSize: 12.5, marginTop: 3 }}>
                           {total} agendamentos · {done} concluídos
                         </p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <p style={{ color: '#00e5a0', fontSize: 15, fontWeight: 600, letterSpacing: '-0.02em' }}>
+                        <p style={{ color: 'var(--dash-accent)', fontSize: 15, fontWeight: 600, letterSpacing: '-0.02em' }}>
                           R$ {revenue.toFixed(2).replace('.',',')}
                         </p>
-                        <p style={{ color: '#6c7884', fontSize: 11.5, marginTop: 2 }}>receita</p>
+                        <p style={{ color: 'var(--dash-text-muted)', fontSize: 11.5, marginTop: 2 }}>receita</p>
                       </div>
                     </div>
                   </div>
@@ -204,9 +204,9 @@ export default async function RelatoriosPage() {
       {/* Barbeiros */}
       {topBarbeiros.length > 0 && (
         <div style={card}>
-          <div style={{ padding: '18px 24px', borderBottom: '1px solid #1d2429', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--dash-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <Users style={{ width: 14, height: 14, color: '#5b9cff' }} />
-            <span style={{ color: '#e9eef3', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
+            <span style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
               Barbeiros
             </span>
           </div>
@@ -214,7 +214,7 @@ export default async function RelatoriosPage() {
             {topBarbeiros.map(([nome, count]) => (
               <div key={nome} style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                background: '#0f1316', border: '1px solid #1d2429', borderRadius: 10,
+                background: 'var(--dash-bg-sidebar)', border: '1px solid var(--dash-border)', borderRadius: 10,
                 padding: '10px 16px',
               }}>
                 <div style={{
@@ -226,8 +226,8 @@ export default async function RelatoriosPage() {
                   {nome[0].toUpperCase()}
                 </div>
                 <div>
-                  <p style={{ color: '#e9eef3', fontSize: 13.5, fontWeight: 500 }}>{nome}</p>
-                  <p style={{ color: '#6c7884', fontSize: 12, marginTop: 1 }}>{count} agendamentos</p>
+                  <p style={{ color: 'var(--dash-text)', fontSize: 13.5, fontWeight: 500 }}>{nome}</p>
+                  <p style={{ color: 'var(--dash-text-muted)', fontSize: 12, marginTop: 1 }}>{count} agendamentos</p>
                 </div>
               </div>
             ))}

@@ -9,11 +9,28 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Busca a instância WhatsApp do barbershop do usuário logado
+  const { data: userRow } = await supabase
+    .from('users')
+    .select('barbershop_id')
+    .eq('id', user.id)
+    .single()
+
+  let vpsUrl = VPS_BASE_URL
+  if (userRow?.barbershop_id) {
+    const { data: instance } = await supabase
+      .from('whatsapp_instances')
+      .select('vps_url')
+      .eq('barbershop_id', userRow.barbershop_id)
+      .single()
+    if (instance?.vps_url) vpsUrl = instance.vps_url
+  }
+
   try {
-    const res = await fetch(`${VPS_BASE_URL}/qr.json`, {
-      headers: { 'x-api-key': VPS_API_KEY },
-      cache: 'no-store',
-    })
+    const headers: Record<string, string> = { 'cache-control': 'no-store' }
+    if (vpsUrl === VPS_BASE_URL) headers['x-api-key'] = VPS_API_KEY
+
+    const res = await fetch(`${vpsUrl}/qr.json`, { headers, cache: 'no-store' })
 
     if (!res.ok) {
       return NextResponse.json({ status: 'disconnected', qr: null })

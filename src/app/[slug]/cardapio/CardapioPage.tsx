@@ -1,6 +1,6 @@
 'use client'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
-import { ShoppingCart, Plus, Minus, X, Send, Coffee, Truck, Check, ChevronLeft } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, X, Send, Coffee, Truck, Check } from 'lucide-react'
 
 type Category = { id: string; name: string; channel: string; sort_order: number }
 type PriceVariant = { label: string; price: number }
@@ -31,6 +31,11 @@ function heroUrl(url: string): string {
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   .sr-only {
     position: absolute; width: 1px; height: 1px;
     padding: 0; margin: -1px; overflow: hidden;
@@ -47,8 +52,8 @@ const CSS = `
     --border-hover: #bbb;
     --text-primary: #1a1a1a;
     --text-secondary: #6b6b6b;
-    --text-muted: #8a8a8a;
-    --text-placeholder: #c0c0c0;
+    --text-muted: #737373;
+    --text-placeholder: #9a9a9a;
     --text-variant: #444;
     --accent: #00a86b;
     --accent-dim: rgba(0,194,124,0.12);
@@ -61,7 +66,7 @@ const CSS = `
 
     width: 100%; max-width: 480px; margin: 0 auto; min-height: 100dvh;
     display: flex; flex-direction: column;
-    overflow-x: hidden;
+    overflow-x: clip;
     font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
     -webkit-font-smoothing: antialiased;
     background: var(--bg);
@@ -119,7 +124,6 @@ const CSS = `
     position: sticky; top: 0; z-index: 20;
     background: var(--bg); padding: 0 20px;
     width: 100%;
-    border-bottom: 1px solid var(--border);
   }
 
   /* ── Channel tabs ── */
@@ -129,7 +133,7 @@ const CSS = `
     min-height: 44px; border-radius: 10px;
     border: 1.5px solid var(--border); background: transparent;
     color: var(--text-secondary); font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: all .2s ease-out;
+    cursor: pointer; transition: background-color .2s ease-out, color .2s ease-out, border-color .2s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
   }
   .c-tab:active { transform: scale(0.97); }
@@ -139,12 +143,10 @@ const CSS = `
   }
 
   /* ── Category pills ── */
-  .c-cats-wrap { position: relative; overflow: hidden; }
-  .c-cats-wrap::after {
-    content: ''; position: absolute; top: 0; right: 0;
-    width: 32px; height: 100%; pointer-events: none;
-    background: linear-gradient(to right, transparent, var(--bg));
-    z-index: 1;
+  .c-cats-wrap {
+    position: relative; overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
   }
   .c-cats {
     display: flex; gap: 8px; overflow-x: auto;
@@ -157,7 +159,7 @@ const CSS = `
     display: flex; align-items: center;
     border: 1.5px solid var(--border); background: transparent;
     color: var(--text-muted); font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: all .2s ease-out;
+    cursor: pointer; transition: background-color .2s ease-out, color .2s ease-out, border-color .2s ease-out;
     font-family: inherit; -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
   }
@@ -184,11 +186,13 @@ const CSS = `
   .c-card {
     display: flex; gap: 14px; padding: 16px 20px;
     background: transparent; cursor: pointer;
-    transition: background .12s ease-out;
+    transition: background-color .12s ease-out;
     -webkit-tap-highlight-color: transparent;
     position: relative;
-    border-bottom: 1px solid var(--border);
+    border: none; text-align: left; width: 100%;
+    font-family: inherit; font-size: inherit; color: inherit;
   }
+  .c-card + .c-card { border-top: 1px solid var(--bg-surface); }
   .c-card:active { background: var(--bg-hover); }
   .c-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .c-card-name {
@@ -253,8 +257,8 @@ const CSS = `
     border-top-left-radius: 20px; border-top-right-radius: 20px;
   }
   .c-detail-close {
-    position: absolute; top: 12px; right: 12px;
-    width: 36px; height: 36px; border-radius: 18px;
+    position: absolute; top: 10px; right: 10px;
+    width: 44px; height: 44px; border-radius: 22px;
     background: rgba(0,0,0,.55); border: none;
     color: #fff; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -284,7 +288,8 @@ const CSS = `
   /* ── Detail Variants ── */
   .c-detail-variants {
     margin-top: 20px; padding-top: 20px;
-    border-top: 1px solid var(--border);
+    background: var(--bg-surface); border-radius: 12px;
+    padding: 16px; margin-left: -4px; margin-right: -4px;
   }
   .c-detail-variants-title {
     color: var(--text-primary); font-size: 15px; font-weight: 700;
@@ -296,12 +301,13 @@ const CSS = `
   }
   .c-detail-var {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 12px 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: inherit; font-size: inherit; color: inherit;
   }
-  .c-detail-var:last-child { border-bottom: none; }
+  .c-detail-var + .c-detail-var { margin-top: 4px; }
   .c-detail-var-info { flex: 1; }
   .c-detail-var-label {
     color: var(--text-primary); font-size: 15px; font-weight: 500;
@@ -315,7 +321,7 @@ const CSS = `
     border: 2px solid var(--border-strong);
     flex-shrink: 0; margin-left: 14px;
     display: flex; align-items: center; justify-content: center;
-    transition: all .15s ease-out;
+    transition: background-color .15s ease-out, border-color .15s ease-out;
   }
   .c-detail-radio[data-selected="true"] {
     border-color: var(--accent); background: var(--accent);
@@ -329,9 +335,8 @@ const CSS = `
   .c-detail-footer {
     padding: 14px 20px;
     padding-bottom: max(14px, env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
     display: flex; align-items: center; gap: 14px;
-    background: var(--bg);
+    background: var(--bg-surface);
   }
   .c-detail-qty {
     display: flex; align-items: center;
@@ -359,7 +364,7 @@ const CSS = `
     border: none; background: var(--accent); color: #fff;
     font-size: 15px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 12px;
-    font-family: inherit; transition: all .15s ease-out;
+    font-family: inherit; transition: opacity .15s ease-out, transform .15s ease-out;
     -webkit-tap-highlight-color: transparent;
     font-variant-numeric: tabular-nums;
   }
@@ -374,7 +379,7 @@ const CSS = `
     font-size: 14px; font-weight: 600;
     display: flex; align-items: center; gap: 8px;
     pointer-events: none;
-    animation: c-toast-in .3s ease-out forwards, c-toast-out .3s ease-in .9s forwards;
+    animation: c-toast-in .3s ease-out forwards, c-toast-out .3s ease-out .9s forwards;
   }
   .c-toast[data-error="true"] {
     background: #ff4d4f; color: #fff;
@@ -493,7 +498,7 @@ const CSS = `
     color: var(--text-primary); display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-family: inherit;
     -webkit-tap-highlight-color: transparent;
-    transition: all .12s ease-out;
+    transition: background-color .12s ease-out, border-color .12s ease-out, color .12s ease-out;
   }
   .c-qty-btn:active { background: var(--accent-hover); border-color: var(--accent); color: var(--accent); }
   .c-qty-num {
@@ -503,17 +508,15 @@ const CSS = `
   }
 
   /* ── Cart footer ── */
-  .c-footer { padding: 16px 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
-  .c-footer::before {
-    content: ''; display: block;
-    height: 1px; background: var(--border);
-    margin: 0 -20px 16px;
+  .c-footer {
+    padding: 16px 20px; padding-bottom: max(16px, env(safe-area-inset-bottom));
+    background: var(--bg-surface);
   }
   .c-name-input {
     width: 100%; min-height: 48px; padding: 0 16px;
     border-radius: 12px; border: 1.5px solid var(--border);
     background: var(--bg-surface); color: var(--text-primary);
-    font-size: 15px; font-family: inherit; outline: none;
+    font-size: 16px; font-family: inherit; outline: none;
     margin-bottom: 14px; transition: border-color .15s;
   }
   .c-name-input::placeholder { color: var(--text-placeholder); }
@@ -532,7 +535,7 @@ const CSS = `
     border: none; background: var(--accent); color: #fff;
     font-size: 16px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-family: inherit; transition: all .15s ease-out;
+    font-family: inherit; transition: opacity .15s ease-out, transform .15s ease-out;
     -webkit-tap-highlight-color: transparent;
   }
   .c-submit:active { transform: scale(0.98); }
@@ -581,7 +584,7 @@ const CSS = `
 
   /* ── Reduced motion ── */
   @media (prefers-reduced-motion: reduce) {
-    .c-toast, .c-fab, .c-drawer, .c-overlay, .c-success, .c-success-card, .c-detail {
+    .c-toast, .c-fab, .c-drawer, .c-overlay, .c-success, .c-success-card, .c-detail, .c-pop-in {
       animation: none !important;
     }
     .c-tab:active, .c-pill:active, .c-card:active,
@@ -592,10 +595,11 @@ const CSS = `
   }
 `
 
-export default function CardapioPage({ shop, categories, products, mesa }: {
+export default function CardapioPage({ shop, categories, products, mesa, initialChannel = 'presencial' }: {
   shop: Shop; categories: Category[]; products: Product[]; mesa: number | null
+  initialChannel?: 'presencial' | 'delivery'
 }) {
-  const [channel, setChannel] = useState<'presencial' | 'delivery'>('presencial')
+  const [channel, setChannel] = useState<'presencial' | 'delivery'>(initialChannel)
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [cart, setCart] = useState<CartItem[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -675,12 +679,15 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     return () => observer.disconnect()
   }, [filteredCats, channel])
 
-  // Scroll active pill into view
+  // Scroll active pill into view (use scrollLeft to avoid window scroll reset on mobile)
   useEffect(() => {
     if (!visibleCatId || !pillsRef.current) return
-    const pill = pillsRef.current.querySelector<HTMLElement>(`[data-pill-id="${visibleCatId}"]`)
+    const container = pillsRef.current
+    const pill = container.querySelector<HTMLElement>(`[data-pill-id="${visibleCatId}"]`)
     if (pill) {
-      pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      const pillCenter = pill.offsetLeft + pill.offsetWidth / 2
+      const scrollTarget = pillCenter - container.clientWidth / 2
+      container.scrollTo({ left: scrollTarget, behavior: 'smooth' })
     }
   }, [visibleCatId])
 
@@ -689,7 +696,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     if (!drawerOpen) return
     closeRef.current?.focus()
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setDrawerOpen(false); return }
+      if (e.key === 'Escape') { closeDrawer(); return }
       if (e.key !== 'Tab' || !drawerRef.current) return
       const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
         'button, input, [tabindex]:not([tabindex="-1"])'
@@ -712,7 +719,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     if (!selectedProduct) return
     detailCloseRef.current?.focus()
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setSelectedProduct(null); return }
+      if (e.key === 'Escape') { closeDetail(); return }
       if (e.key !== 'Tab' || !detailRef.current) return
       const focusable = detailRef.current.querySelectorAll<HTMLElement>(
         'button, input, [tabindex]:not([tabindex="-1"])'
@@ -730,15 +737,51 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [selectedProduct])
 
-  // Escape for success
+  // Focus + Escape for success
+  const successBtnRef = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (!success) return
+    successBtnRef.current?.focus()
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setSuccess(false)
+      if (e.key === 'Escape') closeSuccess()
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [success])
+
+  // Back button closes modals via popstate
+  const modalStack = useRef<string[]>([])
+  const pushModal = useCallback((id: string) => {
+    modalStack.current.push(id)
+    history.pushState({ modal: id }, '')
+  }, [])
+  const popModal = useCallback((id: string) => {
+    const idx = modalStack.current.lastIndexOf(id)
+    if (idx >= 0) {
+      modalStack.current.splice(idx, 1)
+      if (history.state?.modal === id) history.back()
+    }
+  }, [])
+
+  useEffect(() => {
+    const onPopState = () => {
+      const top = modalStack.current.pop()
+      if (top === 'success') setSuccess(false)
+      else if (top === 'drawer') setDrawerOpen(false)
+      else if (top === 'detail') setSelectedProduct(null)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  // Push/pop history entries when modals open/close
+  useEffect(() => { if (selectedProduct) pushModal('detail'); return () => { /* popModal handled in close fns */ } }, [!!selectedProduct])
+  useEffect(() => { if (drawerOpen) pushModal('drawer') }, [drawerOpen])
+  useEffect(() => { if (success && !modalStack.current.includes('success')) pushModal('success') }, [success])
+
+  const closeDetail = useCallback(() => { setSelectedProduct(null); popModal('detail') }, [popModal])
+  const closeDrawer = useCallback(() => { setDrawerOpen(false); popModal('drawer') }, [popModal])
+  const closeSuccess = useCallback(() => { setSuccess(false); popModal('success') }, [popModal])
 
   function openProduct(p: Product) {
     setSelectedProduct(p)
@@ -769,7 +812,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
     })
     const label = variant ? `${selectedProduct.name} (${variant.label})` : selectedProduct.name
     showToast(`${detailQty}x ${label}`)
-    setSelectedProduct(null)
+    closeDetail()
   }
 
   function updateQty(productId: string, variantLabel: string | undefined, delta: number) {
@@ -800,9 +843,16 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         }),
       })
       if (!res.ok) throw new Error('Erro ao enviar pedido')
-      setSuccess(true)
       setCart([])
       setDrawerOpen(false)
+      // Swap drawer→success in stack and history (replaceState avoids
+      // the popstate race that would immediately close the success overlay)
+      const idx = modalStack.current.lastIndexOf('drawer')
+      if (idx >= 0) {
+        modalStack.current[idx] = 'success'
+        history.replaceState({ modal: 'success' }, '')
+      }
+      setSuccess(true)
     } catch {
       showToast('Erro ao enviar pedido. Tente novamente.', true)
     } finally {
@@ -831,7 +881,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         {/* Shop Hero */}
         <div>
           {shop.cover_url ? (
-            <img src={shop.cover_url} alt="" className="c-hero-cover" />
+            <img src={shop.cover_url} alt="" className="c-hero-cover" fetchPriority="high" />
           ) : (
             <div className="c-hero-cover-placeholder">
               <Coffee size={40} strokeWidth={1.2} />
@@ -881,6 +931,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
           <button
             className="c-pill"
             data-active={activePillId === null}
+            aria-pressed={activePillId === null}
             onClick={() => { setActiveCat(null); setVisibleCatId(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
           >
             Todos
@@ -890,6 +941,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
               key={c.id}
               className="c-pill"
               data-active={activePillId === c.id}
+              aria-pressed={activePillId === c.id}
               data-pill-id={c.id}
               onClick={() => scrollToCategory(c.id)}
             >
@@ -905,7 +957,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
           {filteredProducts.length === 0 ? (
             <div className="c-empty">
               <Coffee size={48} strokeWidth={1.5} />
-              <p>Nenhum produto disponivel</p>
+              <p>Nenhum produto disponível</p>
             </div>
           ) : (
             filteredCats
@@ -922,10 +974,11 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                         ? Math.min(...(p.price_variants as PriceVariant[]).map(v => v.price))
                         : p.price
                       return (
-                        <div
+                        <button
                           key={p.id}
                           className="c-card"
                           onClick={() => openProduct(p)}
+                          aria-label={`${p.name}, ${hasVariants ? `a partir de ${BRL(minPrice)}` : BRL(p.price)}`}
                         >
                           <div className="c-card-info">
                             <p className="c-card-name">{p.name}</p>
@@ -939,13 +992,13 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                             )}
                           </div>
                           {p.image_url ? (
-                            <img src={p.image_url} alt={p.name} className="c-card-img" loading="lazy" />
+                            <img src={p.image_url} alt="" className="c-card-img" loading="lazy" />
                           ) : (
-                            <div className="c-card-no-img">
+                            <div className="c-card-no-img" aria-hidden="true">
                               <Coffee size={28} strokeWidth={1.5} />
                             </div>
                           )}
-                        </div>
+                        </button>
                       )
                     })}
                   </section>
@@ -976,7 +1029,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         {/* ── Product Detail Sheet ── */}
         {selectedProduct && (
           <>
-            <div className="c-overlay" onClick={() => setSelectedProduct(null)} aria-hidden="true" />
+            <div className="c-overlay" onClick={closeDetail} aria-hidden="true" />
             <div className="c-detail" role="dialog" aria-modal="true" aria-label={selectedProduct.name} ref={detailRef}>
               <div className="c-detail-scroll">
                 {/* Hero image */}
@@ -991,7 +1044,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                   <button
                     ref={detailCloseRef}
                     className="c-detail-close"
-                    onClick={() => setSelectedProduct(null)}
+                    onClick={closeDetail}
                     aria-label="Fechar"
                   >
                     <X size={18} strokeWidth={2.5} />
@@ -1017,19 +1070,21 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                       <p className="c-detail-variants-title">Escolha uma opção</p>
                       <p className="c-detail-variants-sub">Selecione 1 opção</p>
                       {(selectedProduct.price_variants as PriceVariant[]).map(v => (
-                        <div
+                        <button
                           key={v.label}
                           className="c-detail-var"
                           onClick={() => setDetailVariant(v)}
+                          aria-pressed={detailVariant?.label === v.label}
+                          aria-label={`${v.label}, ${BRL(v.price)}`}
                         >
                           <div className="c-detail-var-info">
                             <p className="c-detail-var-label">{v.label}</p>
                             <p className="c-detail-var-price">{BRL(v.price)}</p>
                           </div>
-                          <div className="c-detail-radio" data-selected={detailVariant?.label === v.label}>
+                          <div className="c-detail-radio" data-selected={detailVariant?.label === v.label} aria-hidden="true">
                             {detailVariant?.label === v.label && <div className="c-detail-radio-dot" />}
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -1056,7 +1111,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                     <Plus size={18} strokeWidth={2.2} />
                   </button>
                 </div>
-                <button className="c-detail-add" onClick={addFromDetail}>
+                <button className="c-detail-add" onClick={addFromDetail} aria-label={`Adicionar ${selectedProduct.name}, ${BRL(detailTotal)}`}>
                   Adicionar
                   <span>{BRL(detailTotal)}</span>
                 </button>
@@ -1068,15 +1123,15 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
         {/* Cart Drawer */}
         {drawerOpen && (
           <>
-            <div className="c-overlay" onClick={() => setDrawerOpen(false)} aria-hidden="true" />
+            <div className="c-overlay" onClick={closeDrawer} aria-hidden="true" />
             <div className="c-drawer" role="dialog" aria-modal="true" aria-label="Seu pedido" ref={drawerRef}>
-              <div className="c-drawer-handle" />
+              <div className="c-drawer-handle" aria-hidden="true" />
               <div className="c-drawer-head">
                 <h2 className="c-drawer-title">Seu Pedido</h2>
                 <button
                   ref={closeRef}
                   className="c-drawer-close"
-                  onClick={() => setDrawerOpen(false)}
+                  onClick={closeDrawer}
                   aria-label="Fechar"
                 >
                   <X size={20} strokeWidth={2.2} />
@@ -1085,7 +1140,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
 
               <div className="c-cart-items">
                 {cart.map((item) => (
-                  <div key={`${item.product_id}-${item.variant_label}`} className="c-cart-row">
+                  <div key={`${item.product_id}|${item.variant_label ?? ''}`} className="c-cart-row">
                     <div className="c-cart-row-info">
                       <p className="c-cart-item-name">{item.product_name}</p>
                       {item.variant_label && (
@@ -1149,7 +1204,7 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
 
         {/* Success */}
         {success && (
-          <div className="c-success" onClick={() => setSuccess(false)} role="dialog" aria-modal="true" aria-label="Pedido enviado">
+          <div className="c-success" onClick={closeSuccess} role="dialog" aria-modal="true" aria-label="Pedido enviado">
             <div className="c-success-card" onClick={e => e.stopPropagation()}>
               <div className="c-success-icon">
                 <Check size={28} strokeWidth={2.5} />
@@ -1161,8 +1216,9 @@ export default function CardapioPage({ shop, categories, products, mesa }: {
                   : 'Seu pedido foi recebido. Entraremos em contato.'}
               </p>
               <button
+                ref={successBtnRef}
                 className="c-submit c-success-action"
-                onClick={() => setSuccess(false)}
+                onClick={closeSuccess}
               >
                 Fazer outro pedido
               </button>

@@ -15,20 +15,20 @@ type Product = {
 }
 
 const card: React.CSSProperties = {
-  background: '#13181c', border: '1px solid #1d2429', borderRadius: 14, padding: 24,
+  background: 'var(--dash-bg-card)', border: '1px solid var(--dash-border)', borderRadius: 14, padding: 24,
 }
 const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #1d2429',
-  background: '#0a0d10', color: '#e9eef3', fontSize: 14, fontFamily: 'inherit', outline: 'none',
+  width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--dash-border)',
+  background: 'var(--dash-bg)', color: 'var(--dash-text)', fontSize: 14, fontFamily: 'inherit', outline: 'none',
 }
 const btnPrimary: React.CSSProperties = {
-  padding: '10px 20px', borderRadius: 8, border: 'none', background: '#00e5a0',
+  padding: '10px 20px', borderRadius: 8, border: 'none', background: 'var(--dash-accent)',
   color: '#000', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
   display: 'inline-flex', alignItems: 'center', gap: 6,
 }
 const btnGhost: React.CSSProperties = {
-  padding: '6px 10px', borderRadius: 6, border: '1px solid #1d2429', background: 'transparent',
-  color: '#6c7884', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
+  padding: '6px 10px', borderRadius: 6, border: '1px solid var(--dash-border)', background: 'transparent',
+  color: 'var(--dash-text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
   display: 'inline-flex', alignItems: 'center', gap: 4,
 }
 
@@ -122,10 +122,10 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 600, color: '#e9eef3', letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--dash-text)', letterSpacing: '-0.025em' }}>
             Cardápio
           </h1>
-          <p style={{ color: '#6c7884', fontSize: 13.5, marginTop: 4 }}>
+          <p style={{ color: 'var(--dash-text-muted)', fontSize: 13.5, marginTop: 4 }}>
             {products.length} produtos · {categories.length} categorias
           </p>
         </div>
@@ -141,9 +141,9 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
         {['all', 'presencial', 'delivery'].map(ch => (
           <button key={ch} onClick={() => setFilterChannel(ch)} style={{
             ...btnGhost,
-            background: filterChannel === ch ? '#00e5a0' : 'transparent',
-            color: filterChannel === ch ? '#000' : '#6c7884',
-            borderColor: filterChannel === ch ? '#00e5a0' : '#1d2429',
+            background: filterChannel === ch ? 'var(--dash-accent)' : 'transparent',
+            color: filterChannel === ch ? '#000' : 'var(--dash-text-muted)',
+            borderColor: filterChannel === ch ? 'var(--dash-accent)' : 'var(--dash-border)',
           }}>
             {ch === 'all' ? 'Todos' : ch === 'presencial' ? <><Coffee size={12} /> Presencial</> : <><Truck size={12} /> Delivery</>}
           </button>
@@ -168,19 +168,19 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
           }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <p style={{ color: '#e9eef3', fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                <p style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em' }}>
                   {p.name}
                 </p>
                 <span style={{
                   fontSize: 10, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase',
                   padding: '2px 6px', borderRadius: 4,
                   background: p.channel === 'delivery' ? 'rgba(91,156,255,0.1)' : 'rgba(0,229,160,0.1)',
-                  color: p.channel === 'delivery' ? '#5b9cff' : '#00e5a0',
+                  color: p.channel === 'delivery' ? '#5b9cff' : 'var(--dash-accent)',
                 }}>
                   {p.channel}
                 </span>
               </div>
-              <p style={{ color: '#6c7884', fontSize: 12, marginTop: 2 }}>
+              <p style={{ color: 'var(--dash-text-muted)', fontSize: 12, marginTop: 2 }}>
                 {getCatName(p.category_id)} · R$ {Number(p.price).toFixed(2)}
               </p>
             </div>
@@ -197,7 +197,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
           </div>
         ))}
         {filteredProducts.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 40, color: '#6c7884' }}>
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--dash-text-muted)' }}>
             Nenhum produto encontrado
           </div>
         )}
@@ -210,33 +210,33 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
             onClick={() => setEditingProduct(null)} />
           <div style={{
             position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-            width: '90%', maxWidth: 440, background: '#0f1316', border: '1px solid #1d2429',
+            width: '90%', maxWidth: 440, background: 'var(--dash-bg-sidebar)', border: '1px solid var(--dash-border)',
             borderRadius: 16, padding: 24, zIndex: 50, display: 'flex', flexDirection: 'column', gap: 14,
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ color: '#e9eef3', fontSize: 16, fontWeight: 600 }}>
+              <h3 style={{ color: 'var(--dash-text)', fontSize: 16, fontWeight: 600 }}>
                 {editingProduct.id ? 'Editar Produto' : 'Novo Produto'}
               </h3>
-              <button onClick={() => setEditingProduct(null)} style={{ background: 'none', border: 'none', color: '#6c7884', cursor: 'pointer' }}>
+              <button onClick={() => setEditingProduct(null)} style={{ background: 'none', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
                 <X size={18} />
               </button>
             </div>
 
             <div>
-              <label style={{ color: '#6c7884', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Nome</label>
+              <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Nome</label>
               <input style={inputStyle} value={editingProduct.name || ''} onChange={e => setEditingProduct(prev => ({ ...prev!, name: e.target.value }))} />
             </div>
             <div>
-              <label style={{ color: '#6c7884', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Descrição</label>
+              <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Descrição</label>
               <input style={inputStyle} value={editingProduct.description || ''} onChange={e => setEditingProduct(prev => ({ ...prev!, description: e.target.value }))} />
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ flex: 1 }}>
-                <label style={{ color: '#6c7884', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Preço (R$)</label>
+                <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Preço (R$)</label>
                 <input style={inputStyle} type="number" step="0.01" value={editingProduct.price || ''} onChange={e => setEditingProduct(prev => ({ ...prev!, price: parseFloat(e.target.value) || 0 }))} />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ color: '#6c7884', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Canal</label>
+                <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Canal</label>
                 <select style={inputStyle} value={editingProduct.channel || 'ambos'} onChange={e => setEditingProduct(prev => ({ ...prev!, channel: e.target.value }))}>
                   <option value="ambos">Ambos</option>
                   <option value="presencial">Presencial</option>
@@ -245,7 +245,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
               </div>
             </div>
             <div>
-              <label style={{ color: '#6c7884', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Categoria</label>
+              <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Categoria</label>
               <select style={inputStyle} value={editingProduct.category_id || ''} onChange={e => setEditingProduct(prev => ({ ...prev!, category_id: e.target.value }))}>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name} ({c.channel})</option>)}
               </select>

@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase-server'
 import { Calendar, CheckCircle, TrendingUp } from 'lucide-react'
 
 const card: React.CSSProperties = {
-  background: '#13181c',
-  border: '1px solid #1d2429',
+  background: 'var(--dash-bg-card)',
+  border: '1px solid var(--dash-border)',
   borderRadius: 14,
   padding: 24,
 }
@@ -38,19 +38,19 @@ export default async function DashboardPage() {
     .limit(5)
 
   const stats = [
-    { label: 'Check-ins hoje', value: totalHoje ?? 0, icon: Calendar, color: '#00e5a0', bg: 'rgba(0,229,160,0.08)' },
+    { label: 'Check-ins hoje', value: totalHoje ?? 0, icon: Calendar, color: 'var(--dash-accent)', bg: 'rgba(0,229,160,0.08)' },
     { label: 'Este mês', value: totalMes ?? 0, icon: TrendingUp, color: '#5b9cff', bg: 'rgba(91,156,255,0.08)' },
-    { label: 'Confirmadas', value: confirmados ?? 0, icon: CheckCircle, color: '#00e5a0', bg: 'rgba(0,229,160,0.08)' },
+    { label: 'Confirmadas', value: confirmados ?? 0, icon: CheckCircle, color: 'var(--dash-accent)', bg: 'rgba(0,229,160,0.08)' },
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 960 }}>
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#e9eef3', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--dash-text)', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
           Visão Geral
         </h1>
-        <p style={{ color: '#6c7884', fontSize: 13.5, marginTop: 4, letterSpacing: '-0.01em' }}>
+        <p style={{ color: 'var(--dash-text-muted)', fontSize: 13.5, marginTop: 4, letterSpacing: '-0.01em' }}>
           Acompanhe suas reservas
         </p>
       </div>
@@ -61,8 +61,8 @@ export default async function DashboardPage() {
           <div key={label} style={card}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ color: '#6c7884', fontSize: 12.5, letterSpacing: '-0.01em', fontWeight: 500 }}>{label}</p>
-                <p style={{ fontSize: 36, fontWeight: 600, color: '#e9eef3', letterSpacing: '-0.04em', lineHeight: 1.1, marginTop: 8 }}>
+                <p style={{ color: 'var(--dash-text-muted)', fontSize: 12.5, letterSpacing: '-0.01em', fontWeight: 500 }}>{label}</p>
+                <p style={{ fontSize: 36, fontWeight: 600, color: 'var(--dash-text)', letterSpacing: '-0.04em', lineHeight: 1.1, marginTop: 8 }}>
                   {value}
                 </p>
               </div>
@@ -77,16 +77,16 @@ export default async function DashboardPage() {
       {/* Próximos agendamentos */}
       <div style={card}>
         <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Calendar style={{ width: 15, height: 15, color: '#00e5a0' }} />
-          <span style={{ color: '#e9eef3', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
+          <Calendar style={{ width: 15, height: 15, color: 'var(--dash-accent)' }} />
+          <span style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em' }}>
             Próximas reservas
           </span>
         </div>
 
         {!proximosAgendamentos?.length ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Calendar style={{ width: 36, height: 36, color: '#2a343c', margin: '0 auto 12px' }} />
-            <p style={{ color: '#6c7884', fontSize: 13.5 }}>Nenhuma reserva próxima</p>
+            <Calendar style={{ width: 36, height: 36, color: 'var(--dash-text-dim)', margin: '0 auto 12px' }} />
+            <p style={{ color: 'var(--dash-text-muted)', fontSize: 13.5 }}>Nenhuma reserva próxima</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -96,26 +96,26 @@ export default async function DashboardPage() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '12px 16px',
-                background: '#181e23',
+                background: 'var(--dash-bg-input)',
                 borderRadius: 10,
-                border: '1px solid #1d2429',
+                border: '1px solid var(--dash-border)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ background: 'rgba(0,229,160,0.08)', borderRadius: 8, padding: 8 }}>
-                    <Calendar style={{ width: 14, height: 14, color: '#00e5a0' }} />
+                    <Calendar style={{ width: 14, height: 14, color: 'var(--dash-accent)' }} />
                   </div>
                   <div>
-                    <p style={{ color: '#e9eef3', fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                    <p style={{ color: 'var(--dash-text)', fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.01em' }}>
                       {a.cliente_nome}
                     </p>
-                    <p style={{ color: '#6c7884', fontSize: 12, marginTop: 2 }}>{a.acomodacao_nome}</p>
+                    <p style={{ color: 'var(--dash-text-muted)', fontSize: 12, marginTop: 2 }}>{a.acomodacao_nome}</p>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ color: '#00e5a0', fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  <p style={{ color: 'var(--dash-accent)', fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.01em' }}>
                     {new Date(a.data_checkin + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
                   </p>
-                  <p style={{ color: '#6c7884', fontSize: 12, marginTop: 2 }}>
+                  <p style={{ color: 'var(--dash-text-muted)', fontSize: 12, marginTop: 2 }}>
                     {new Date(a.data_checkout + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
                   </p>
                 </div>
