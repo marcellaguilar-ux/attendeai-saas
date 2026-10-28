@@ -1388,15 +1388,367 @@ footer {
 }
 
 /* ═══════════════════════════ ANIMATIONS ═══════════════════════════ */
+
+/* Easing tokens */
+:root {
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Nav entrance ── */
+nav {
+  animation: navSlideDown 0.7s var(--ease-out-expo) 0.6s both;
+}
+@keyframes navSlideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); filter: blur(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); filter: blur(0); }
+}
+
+/* ── Hero entrance choreography ── */
+.hero-content > * {
+  opacity: 0;
+  transform: translateY(36px);
+  filter: blur(6px);
+  animation: heroIn 1s var(--ease-out-expo) forwards;
+}
+.hero-content > *:nth-child(1) { animation-delay: 0.15s; }
+.hero-content > *:nth-child(2) { animation-delay: 0.3s; }
+.hero-content > *:nth-child(3) { animation-delay: 0.45s; }
+.hero-content > *:nth-child(4) { animation-delay: 0.58s; }
+.hero-content > *:nth-child(5) { animation-delay: 0.72s; }
+
+@keyframes heroIn {
+  0%   { opacity: 0; transform: translateY(36px); filter: blur(6px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.hero-visual {
+  opacity: 0;
+  transform: translateY(48px) scale(0.92);
+  filter: blur(10px);
+  animation: heroVisualIn 1.2s var(--ease-out-expo) 0.5s forwards;
+}
+@keyframes heroVisualIn {
+  0%   { opacity: 0; transform: translateY(48px) scale(0.92); filter: blur(10px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* ── Hero background breathing ── */
+.hero-bg {
+  animation: heroBgDrift 10s ease-in-out infinite alternate;
+}
+@keyframes heroBgDrift {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-30px, 15px) scale(1.06); opacity: 0.8; }
+}
+
+/* Hero grid subtle pulse */
+.hero-grid {
+  animation: gridPulse 8s ease-in-out infinite alternate;
+}
+@keyframes gridPulse {
+  0%   { opacity: .7; }
+  100% { opacity: .35; }
+}
+
+/* ── Section reveals ── */
 .fade-up {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity .7s cubic-bezier(.2,.6,.2,1), transform .7s cubic-bezier(.2,.6,.2,1);
+  transform: translateY(28px);
+  filter: blur(4px);
+  transition: opacity .8s var(--ease-out-expo), transform .8s var(--ease-out-expo), filter .8s var(--ease-out-expo);
 }
-.fade-up.visible { opacity: 1; transform: translateY(0); }
-.fade-up.delay-1 { transition-delay: .05s; }
-.fade-up.delay-2 { transition-delay: .1s; }
-.fade-up.delay-3 { transition-delay: .15s; }
+.fade-up.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+.fade-up.delay-1 { transition-delay: .1s; }
+.fade-up.delay-2 { transition-delay: .2s; }
+.fade-up.delay-3 { transition-delay: .3s; }
+
+/* ══════ STEPS — "Como funciona" dramatic entrance ══════ */
+.steps .step {
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  filter: blur(8px);
+}
+.steps.visible .step {
+  animation: stepReveal 0.9s var(--ease-out-expo) forwards;
+}
+.steps.visible .step:nth-child(1) { animation-delay: 0s; }
+.steps.visible .step:nth-child(2) { animation-delay: 0.12s; }
+.steps.visible .step:nth-child(3) { animation-delay: 0.24s; }
+.steps.visible .step:nth-child(4) { animation-delay: 0.36s; }
+@keyframes stepReveal {
+  0%   { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(8px); }
+  60%  { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Step icon — slides in from left + rotates */
+.steps .step .step-ico {
+  opacity: 0;
+  transform: translateX(-16px) rotate(-12deg) scale(0.8);
+  transition: all .5s var(--ease-out-expo);
+}
+.steps.visible .step .step-ico {
+  opacity: 1;
+  transform: translateX(0) rotate(0) scale(1);
+}
+.steps.visible .step:nth-child(1) .step-ico { transition-delay: 0.2s; }
+.steps.visible .step:nth-child(2) .step-ico { transition-delay: 0.32s; }
+.steps.visible .step:nth-child(3) .step-ico { transition-delay: 0.44s; }
+.steps.visible .step:nth-child(4) .step-ico { transition-delay: 0.56s; }
+
+/* Step number — clip-path wipe */
+.steps .step .step-num {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all .4s var(--ease-out-expo);
+}
+.steps.visible .step .step-num {
+  opacity: 1;
+  transform: translateX(0);
+}
+.steps.visible .step:nth-child(1) .step-num { transition-delay: 0.15s; }
+.steps.visible .step:nth-child(2) .step-num { transition-delay: 0.27s; }
+.steps.visible .step:nth-child(3) .step-num { transition-delay: 0.39s; }
+.steps.visible .step:nth-child(4) .step-num { transition-delay: 0.51s; }
+
+/* Step hover — accent glow + lift */
+.step {
+  transition: background .3s, transform .3s var(--ease-out-quart), box-shadow .3s;
+}
+.step:hover {
+  background: var(--surface-2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px -12px var(--accent-soft);
+}
+.step:hover .step-ico {
+  transform: scale(1.12) rotate(-4deg);
+  box-shadow: 0 0 20px -4px color-mix(in oklab, var(--accent) 30%, transparent);
+  transition: all .3s var(--ease-out-quart);
+}
+
+/* ══════ Feature cards — stagger with scale + blur ══════ */
+.features-grid .feat-card {
+  opacity: 0;
+  transform: translateY(32px) scale(0.96);
+  filter: blur(6px);
+}
+.features-grid.visible .feat-card {
+  animation: featReveal 0.7s var(--ease-out-expo) forwards;
+}
+.features-grid.visible .feat-card:nth-child(1) { animation-delay: 0s; }
+.features-grid.visible .feat-card:nth-child(2) { animation-delay: 0.08s; }
+.features-grid.visible .feat-card:nth-child(3) { animation-delay: 0.16s; }
+.features-grid.visible .feat-card:nth-child(4) { animation-delay: 0.24s; }
+.features-grid.visible .feat-card:nth-child(5) { animation-delay: 0.32s; }
+.features-grid.visible .feat-card:nth-child(6) { animation-delay: 0.40s; }
+@keyframes featReveal {
+  0%   { opacity: 0; transform: translateY(32px) scale(0.96); filter: blur(6px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Feature icon hover — glow + spin */
+.feat-ico { transition: all .3s var(--ease-out-quart); }
+.feat-card:hover .feat-ico {
+  transform: scale(1.15) rotate(-6deg);
+  box-shadow: 0 0 24px -4px color-mix(in oklab, var(--accent) 35%, transparent);
+}
+.feat-card {
+  transition: background .3s, transform .3s var(--ease-out-quart), box-shadow .3s;
+}
+.feat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px -8px rgba(0,0,0,.3);
+}
+
+/* ══════ Plans — dramatic scale entrance ══════ */
+.plans .plan {
+  opacity: 0;
+  transform: translateY(48px) scale(0.92);
+  filter: blur(8px);
+}
+.plans.visible .plan {
+  animation: planReveal 0.85s var(--ease-out-expo) forwards;
+}
+.plans.visible .plan:nth-child(1) { animation-delay: 0s; }
+.plans.visible .plan:nth-child(2) { animation-delay: 0.15s; }
+.plans.visible .plan:nth-child(3) { animation-delay: 0.3s; }
+@keyframes planReveal {
+  0%   { opacity: 0; transform: translateY(48px) scale(0.92); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Featured plan shimmer glow */
+.plan.featured {
+  animation: featuredGlow 4s ease-in-out infinite alternate;
+  animation-delay: 1.5s;
+}
+.plans.visible .plan.featured {
+  animation: planReveal 0.85s var(--ease-out-expo) 0.15s forwards, featuredGlow 4s ease-in-out 2s infinite alternate;
+}
+@keyframes featuredGlow {
+  0%   { box-shadow: 0 20px 60px -30px color-mix(in oklab, var(--accent) 35%, transparent), inset 0 1px 0 0 var(--accent-line); }
+  100% { box-shadow: 0 24px 80px -24px color-mix(in oklab, var(--accent) 55%, transparent), inset 0 1px 0 0 var(--accent-line); }
+}
+
+/* Plan hover lift */
+.plan {
+  transition: transform .3s var(--ease-out-quart), box-shadow .3s;
+}
+.plan:hover {
+  transform: translateY(-6px);
+}
+
+/* ══════ Use case panel transition ══════ */
+.uc-panel {
+  transition: opacity .35s var(--ease-out-expo);
+}
+
+/* ══════ Testimonials stagger ══════ */
+.testimonials-grid .testi {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(4px);
+}
+.testimonials-grid.visible .testi {
+  animation: testiReveal 0.7s var(--ease-out-expo) forwards;
+}
+.testimonials-grid.visible .testi:nth-child(1) { animation-delay: 0s; }
+.testimonials-grid.visible .testi:nth-child(2) { animation-delay: 0.1s; }
+.testimonials-grid.visible .testi:nth-child(3) { animation-delay: 0.2s; }
+@keyframes testiReveal {
+  0%   { opacity: 0; transform: translateY(28px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ══════ FAQ items stagger ══════ */
+.faq-wrap .faq-item {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .5s var(--ease-out-expo), transform .5s var(--ease-out-expo);
+}
+.faq-wrap.visible .faq-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+.faq-wrap.visible .faq-item:nth-child(1) { transition-delay: 0s; }
+.faq-wrap.visible .faq-item:nth-child(2) { transition-delay: .06s; }
+.faq-wrap.visible .faq-item:nth-child(3) { transition-delay: .12s; }
+.faq-wrap.visible .faq-item:nth-child(4) { transition-delay: .18s; }
+.faq-wrap.visible .faq-item:nth-child(5) { transition-delay: .24s; }
+.faq-wrap.visible .faq-item:nth-child(6) { transition-delay: .3s; }
+.faq-wrap.visible .faq-item:nth-child(7) { transition-delay: .36s; }
+
+/* FAQ arrow spin on open */
+.faq-arrow { transition: all .4s var(--ease-out-expo); }
+.faq-item[data-open="true"] .faq-arrow {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* ── Logo bar slide-in ── */
+.logos-section .logos-label {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .5s var(--ease-out-expo), transform .5s var(--ease-out-expo);
+}
+.logos-section.visible .logos-label { opacity: 1; transform: translateY(0); }
+.logos-section .logos-row {
+  opacity: 0;
+  transform: translateY(16px);
+  filter: blur(4px);
+  transition: opacity .7s var(--ease-out-expo) .15s, transform .7s var(--ease-out-expo) .15s, filter .7s var(--ease-out-expo) .15s;
+}
+.logos-section.visible .logos-row {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ── CTA final — dramatic entrance ── */
+.cta-final-inner {
+  opacity: 0;
+  transform: translateY(40px) scale(0.96);
+  filter: blur(8px);
+  transition: opacity 1s var(--ease-out-expo), transform 1s var(--ease-out-expo), filter 1s var(--ease-out-expo);
+}
+.cta-final-inner.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* CTA background glow pulse */
+.cta-final::before {
+  animation: ctaGlow 6s ease-in-out infinite alternate;
+}
+@keyframes ctaGlow {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* ── Micro-interactions ── */
+.btn:active, .nav-cta:active { transform: scale(0.95); transition-duration: 0.08s; }
+.btn-plan:active { transform: scale(0.97); transition-duration: 0.08s; }
+
+/* Button hover glow */
+.btn-primary {
+  transition: all .25s var(--ease-out-quart);
+}
+.btn-primary:hover {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent), 0 16px 40px -8px color-mix(in oklab, var(--accent) 60%, transparent);
+}
+
+/* Hero pill subtle float */
+.hero-pill {
+  animation: pillFloat 3s ease-in-out infinite alternate;
+}
+@keyframes pillFloat {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+/* Hero pill dot glow */
+.hero-pill .dot {
+  animation: pulse 2s infinite, dotGlow 2s infinite;
+}
+@keyframes dotGlow {
+  0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); }
+  50% { box-shadow: 0 0 12px 3px color-mix(in oklab, var(--accent) 40%, transparent); }
+}
+
+/* ═══════════════════════════ REDUCED MOTION ═══════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
+  }
+  .hero-content > *,
+  .hero-visual,
+  .steps .step,
+  .steps .step .step-ico,
+  .steps .step .step-num,
+  .features-grid .feat-card,
+  .plans .plan,
+  .testimonials-grid .testi,
+  .faq-wrap .faq-item,
+  .logos-section .logos-row,
+  .logos-section .logos-label,
+  .cta-final-inner,
+  .fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .hero-bg, .hero-grid, .hero-pill, .cta-final::before { animation: none !important; }
+  .plan.featured { animation: none !important; }
+  nav { opacity: 1 !important; transform: translateX(-50%) !important; filter: none !important; }
+}
 `
 
 type UCKey = 'salao' | 'clinica' | 'oficina' | 'estudio' | 'restaurante'
@@ -1557,12 +1909,19 @@ export default function LandingPage() {
   }, [])
 
   useEffect(() => {
-    // Scroll animations
+    // Scroll animations — observe all revealable elements
     const io = new IntersectionObserver(
-      (es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('visible')),
+      (es) => es.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible')
+          io.unobserve(e.target)
+        }
+      }),
       { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     )
-    document.querySelectorAll('.fade-up').forEach((el) => io.observe(el))
+    document.querySelectorAll(
+      '.fade-up, .steps, .features-grid, .plans, .testimonials-grid, .faq-wrap, .logos-section, .cta-final-inner'
+    ).forEach((el) => io.observe(el))
 
     return () => io.disconnect()
   }, [])
@@ -1964,7 +2323,7 @@ export default function LandingPage() {
               <p className="section-sub">Seu agente responde, entende e agenda — sem precisar de nenhuma ação sua.</p>
             </div>
 
-            <div className="steps fade-up">
+            <div className="steps">
               <div className="step">
                 <div className="step-num">01 / contato</div>
                 <div className="step-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg></div>
@@ -2083,7 +2442,7 @@ export default function LandingPage() {
               <p className="section-sub">Sem folgas, sem hora extra, sem atestado. O melhor atendente do seu negócio custa menos que um almoço por dia.</p>
             </div>
 
-            <div className="features-grid fade-up">
+            <div className="features-grid">
               <div className="feat-card">
                 <div className="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
                 <h3>WhatsApp inteligente</h3>
@@ -2128,7 +2487,7 @@ export default function LandingPage() {
             </div>
 
 
-            <div className="plans fade-up">
+            <div className="plans">
               {/* STARTER */}
               <div className="plan">
                 <div className="plan-name">Starter</div>
@@ -2209,7 +2568,7 @@ export default function LandingPage() {
 
             <div className="faq-wrap">
               {faqItems.map((item, index) => (
-                <div key={index} className="faq-item fade-up" data-open={openFaq === index ? "true" : undefined}>
+                <div key={index} className="faq-item" data-open={openFaq === index ? "true" : undefined}>
                   <button type="button" className="faq-q" onClick={(e) => { e.preventDefault(); toggleFaq(index) }}>
                     {item.q}
                     <span className="faq-arrow">
@@ -2225,7 +2584,7 @@ export default function LandingPage() {
 
         {/* CTA FINAL */}
         <div className="cta-final">
-          <div className="wrap cta-final-inner fade-up">
+          <div className="wrap cta-final-inner">
             <div className="eyebrow" style={{ justifyContent: 'center', display: 'inline-flex' }}>Comece agora</div>
             <h2>Seu próximo cliente está <em>tentando</em> te contatar agora.</h2>
             <p>Enquanto você dorme, descansa ou está ocupado, a AttendeAI garante que nenhum cliente fique sem resposta.</p>
