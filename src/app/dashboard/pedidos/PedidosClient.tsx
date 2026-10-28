@@ -183,31 +183,82 @@ export default function PedidosClient({ barbershopId, initialOrders }: {
                   <p style={{ color: 'var(--dash-accent)', fontSize: 15, fontWeight: 700, marginTop: 10 }}>
                     Total: {BRL(order.total)}
                   </p>
+
+                  {/* Status stepper */}
+                  {order.status !== 'cancelado' && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginTop: 14 }}>
+                      {STATUS_FLOW.map((step, i) => {
+                        const stepCfg = STATUS_CONFIG[step]
+                        const StepIcon = stepCfg.icon
+                        const currentIdx = STATUS_FLOW.indexOf(order.status)
+                        const isDone = i <= currentIdx
+                        const isCurrent = i === currentIdx
+                        const isNext = i === currentIdx + 1
+                        const isClickable = isNext && currentIdx < STATUS_FLOW.length - 1
+
+                        return (
+                          <div key={step} style={{ display: 'flex', alignItems: 'center', flex: i < STATUS_FLOW.length - 1 ? 1 : undefined }}>
+                            <button
+                              onClick={isClickable ? () => updateStatus(order.id, step) : undefined}
+                              disabled={!isClickable}
+                              title={isClickable ? `Avançar para ${stepCfg.label}` : stepCfg.label}
+                              style={{
+                                width: 36, height: 36, borderRadius: 10, border: 'none', flexShrink: 0,
+                                background: isDone ? stepCfg.bg : isNext ? 'var(--dash-bg-hover)' : 'var(--dash-bg)',
+                                color: isDone ? stepCfg.color : isNext ? 'var(--dash-text-muted)' : 'var(--dash-text-dim)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: isClickable ? 'pointer' : 'default',
+                                transition: 'all .15s ease',
+                                outline: isCurrent ? `2px solid ${stepCfg.color}` : isNext ? '2px dashed var(--dash-border-hover)' : 'none',
+                                outlineOffset: 2,
+                                position: 'relative',
+                              }}
+                            >
+                              <StepIcon size={16} strokeWidth={isDone ? 2.5 : 1.8} />
+                            </button>
+                            {i < STATUS_FLOW.length - 1 && (
+                              <div style={{
+                                flex: 1, height: 2, minWidth: 12,
+                                background: i < currentIdx ? stepCfg.color : 'var(--dash-border)',
+                                opacity: i < currentIdx ? 0.4 : 1,
+                                transition: 'background .15s ease',
+                              }} />
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {order.status !== 'cancelado' && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, padding: '0 2px' }}>
+                      {STATUS_FLOW.map((step, i) => {
+                        const stepCfg = STATUS_CONFIG[step]
+                        const currentIdx = STATUS_FLOW.indexOf(order.status)
+                        const isDone = i <= currentIdx
+                        return (
+                          <span key={step} style={{
+                            fontSize: 9.5, fontWeight: isDone ? 600 : 400, letterSpacing: '-0.01em',
+                            color: isDone ? stepCfg.color : 'var(--dash-text-dim)',
+                            textAlign: 'center', width: 52,
+                          }}>
+                            {stepCfg.label}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
 
-                {/* Action buttons */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                  {next && (
-                    <button onClick={() => updateStatus(order.id, next)} style={{
-                      padding: '8px 14px', borderRadius: 8, border: 'none',
-                      background: 'var(--dash-accent)', color: '#000', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
-                      display: 'flex', alignItems: 'center', gap: 5,
-                    }}>
-                      <RefreshCw size={12} />
-                      {STATUS_CONFIG[next]?.label}
-                    </button>
-                  )}
-                  {order.status !== 'cancelado' && order.status !== 'entregue' && (
-                    <button onClick={() => updateStatus(order.id, 'cancelado')} style={{
-                      padding: '6px 14px', borderRadius: 8, border: '1px solid #ff607933',
-                      background: 'transparent', color: '#ff6079', fontSize: 11.5, fontWeight: 500,
-                      cursor: 'pointer', fontFamily: 'inherit',
-                    }}>
-                      Cancelar
-                    </button>
-                  )}
-                </div>
+                {/* Cancel */}
+                {order.status !== 'cancelado' && order.status !== 'entregue' && (
+                  <button onClick={() => updateStatus(order.id, 'cancelado')} style={{
+                    padding: '6px 10px', borderRadius: 8, border: '1px solid #ff607933',
+                    background: 'transparent', color: '#ff6079', fontSize: 11, fontWeight: 500,
+                    cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+                  }}>
+                    <XCircle size={13} />
+                  </button>
+                )}
               </div>
             </div>
           )
