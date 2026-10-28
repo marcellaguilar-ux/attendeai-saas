@@ -1,7 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
-import { Plus, Eye, EyeOff, Pencil, Trash2, X, Save, Coffee, Truck } from 'lucide-react'
+import { Plus, Eye, EyeOff, Pencil, Trash2, X, Save, Coffee, Truck, ImagePlus, Loader2 } from 'lucide-react'
 
 type Category = {
   id: string; barbershop_id: string; name: string; channel: string
@@ -42,6 +42,39 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
   const [filterCat, setFilterCat] = useState<string>('all')
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  function openEditor(product: Partial<Product>) {
+    setEditingProduct(product)
+    setPreviewUrl(product.image_url || null)
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) return
+
+    setUploading(true)
+    try {
+      const ext = file.name.split('.').pop() || 'jpg'
+      const path = `${barbershopId}/${Date.now()}.${ext}`
+      const { error } = await supabase.storage.from('menu-images').upload(path, file, { upsert: true })
+      if (error) throw error
+      const { data: { publicUrl } } = supabase.storage.from('menu-images').getPublicUrl(path)
+      setPreviewUrl(publicUrl)
+      setEditingProduct(prev => prev ? { ...prev, image_url: publicUrl } : prev)
+    } catch {
+      alert('Erro ao fazer upload da imagem')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  function removeImage() {
+    setPreviewUrl(null)
+    setEditingProduct(prev => prev ? { ...prev, image_url: null } : prev)
+  }
 
   const filteredProducts = useMemo(() => {
     let list = products
@@ -80,6 +113,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
             price: editingProduct.price || 0,
             category_id: editingProduct.category_id,
             channel: editingProduct.channel || 'ambos',
+            image_url: editingProduct.image_url || null,
           })
           .eq('id', editingProduct.id)
           .select()
@@ -98,6 +132,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
             price: editingProduct.price || 0,
             category_id: editingProduct.category_id,
             channel: editingProduct.channel || 'ambos',
+            image_url: editingProduct.image_url || null,
             available: true,
             sort_order: products.length,
           })
@@ -108,6 +143,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
         }
       }
       setEditingProduct(null)
+      setPreviewUrl(null)
     } finally {
       setSaving(false)
     }
@@ -119,6 +155,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 960 }}>
+      <style dangerouslySetInnerHTML={{ __html: `@keyframes spin { to { transform: rotate(360deg) } }` }} />
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
@@ -129,7 +166,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
             {products.length} produtos · {categories.length} categorias
           </p>
         </div>
-        <button style={btnPrimary} onClick={() => setEditingProduct({
+        <button style={btnPrimary} onClick={() => openEditor({
           channel: 'ambos', category_id: categories[0]?.id, price: 0,
         })}>
           <Plus size={14} /> Novo Produto
@@ -166,6 +203,20 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
             display: 'flex', alignItems: 'center', gap: 14,
             opacity: p.available ? 1 : 0.5,
           }}>
+            {p.image_url ? (
+              <img src={p.image_url} alt="" style={{
+                width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0,
+                background: 'var(--dash-bg)',
+              }} />
+            ) : (
+              <div style={{
+                width: 48, height: 48, borderRadius: 8, flexShrink: 0,
+                background: 'var(--dash-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--dash-text-dim)',
+              }}>
+                <Coffee size={20} strokeWidth={1.5} />
+              </div>
+            )}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <p style={{ color: 'var(--dash-text)', fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em' }}>
@@ -188,7 +239,7 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
             <button onClick={() => toggleAvailable(p)} style={btnGhost} title={p.available ? 'Pausar' : 'Ativar'}>
               {p.available ? <Eye size={14} /> : <EyeOff size={14} />}
             </button>
-            <button onClick={() => setEditingProduct(p)} style={btnGhost}>
+            <button onClick={() => openEditor(p)} style={btnGhost}>
               <Pencil size={14} />
             </button>
             <button onClick={() => deleteProduct(p.id)} style={{ ...btnGhost, color: '#ff6079', borderColor: '#ff607933' }}>
@@ -207,17 +258,18 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
       {editingProduct && (
         <>
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 40 }}
-            onClick={() => setEditingProduct(null)} />
+            onClick={() => { setEditingProduct(null); setPreviewUrl(null) }} />
           <div style={{
             position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-            width: '90%', maxWidth: 440, background: 'var(--dash-bg-sidebar)', border: '1px solid var(--dash-border)',
+            width: '90%', maxWidth: 440, maxHeight: '90vh', overflowY: 'auto',
+            background: 'var(--dash-bg-sidebar)', border: '1px solid var(--dash-border)',
             borderRadius: 16, padding: 24, zIndex: 50, display: 'flex', flexDirection: 'column', gap: 14,
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ color: 'var(--dash-text)', fontSize: 16, fontWeight: 600 }}>
                 {editingProduct.id ? 'Editar Produto' : 'Novo Produto'}
               </h3>
-              <button onClick={() => setEditingProduct(null)} style={{ background: 'none', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
+              <button onClick={() => { setEditingProduct(null); setPreviewUrl(null) }} style={{ background: 'none', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
                 <X size={18} />
               </button>
             </div>
@@ -244,6 +296,41 @@ export default function CardapioClient({ barbershopId, categories: initCats, pro
                 </select>
               </div>
             </div>
+            {/* Image upload */}
+            <div>
+              <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 6, display: 'block' }}>Foto do produto</label>
+              {previewUrl ? (
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '16/10', borderRadius: 10, overflow: 'hidden', background: 'var(--dash-bg)' }}>
+                  <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <button onClick={removeImage} style={{
+                    position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14,
+                    background: 'rgba(0,0,0,.6)', border: 'none', color: '#fff', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <label style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  width: '100%', aspectRatio: '16/10', borderRadius: 10,
+                  border: '2px dashed var(--dash-border)', background: 'var(--dash-bg)',
+                  cursor: uploading ? 'wait' : 'pointer', transition: 'border-color .15s, background .15s',
+                  color: 'var(--dash-text-muted)', fontSize: 13,
+                }}>
+                  {uploading ? (
+                    <Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <>
+                      <ImagePlus size={28} strokeWidth={1.5} />
+                      <span>Clique para adicionar foto</span>
+                    </>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} disabled={uploading} />
+                </label>
+              )}
+            </div>
+
             <div>
               <label style={{ color: 'var(--dash-text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 4, display: 'block' }}>Categoria</label>
               <select style={inputStyle} value={editingProduct.category_id || ''} onChange={e => setEditingProduct(prev => ({ ...prev!, category_id: e.target.value }))}>
