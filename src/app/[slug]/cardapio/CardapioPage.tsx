@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
-import { ShoppingCart, Plus, Minus, X, Send, Coffee, Truck, Check } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, X, Send, Coffee, Truck, Check, Clock, ChefHat, CheckCircle, Package } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
 
 type Category = { id: string; name: string; channel: string; sort_order: number }
 type PriceVariant = { label: string; price: number }
@@ -582,9 +583,71 @@ const CSS = `
   }
   .c-success-action { margin-top: 24px; }
 
+  /* ── Order tracker ── */
+  .c-tracker { margin-top: 28px; }
+  .c-tracker-steps {
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: 0; padding: 0 8px;
+  }
+  .c-tracker-step {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex: 0 0 auto; position: relative;
+  }
+  .c-tracker-node {
+    width: 40px; height: 40px; border-radius: 12px; border: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .3s, color .3s, outline-color .3s;
+    flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .c-tracker-node[data-done="true"] {
+    background: var(--accent-active); color: var(--accent);
+  }
+  .c-tracker-node[data-current="true"] {
+    background: var(--accent-active); color: var(--accent);
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  .c-tracker-node[data-future="true"] {
+    background: var(--bg-card); color: var(--text-tertiary);
+  }
+  .c-tracker-label {
+    font-size: 10px; font-weight: 600; text-align: center;
+    letter-spacing: -0.01em; line-height: 1.2;
+    transition: color .3s;
+  }
+  .c-tracker-label[data-active="true"] { color: var(--accent); }
+  .c-tracker-label[data-active="false"] { color: var(--text-tertiary); }
+  .c-tracker-line-wrap {
+    display: flex; align-items: center; flex: 1; min-width: 20px;
+    padding-top: 20px; /* vertically center with node */
+    align-self: flex-start;
+  }
+  .c-tracker-line {
+    height: 2px; width: 100%; border-radius: 1px;
+    transition: background .3s;
+  }
+  .c-tracker-line[data-done="true"] { background: var(--accent); opacity: 0.4; }
+  .c-tracker-line[data-done="false"] { background: var(--border-color); }
+  .c-tracker-status {
+    margin-top: 20px; text-align: center;
+    color: var(--text-secondary); font-size: 13px; line-height: 1.5;
+  }
+  .c-tracker-status strong { color: var(--accent); font-weight: 600; }
+  .c-tracker-done {
+    color: var(--accent); font-weight: 600; font-size: 14px;
+    margin-top: 16px; text-align: center;
+  }
+  .c-tracker-new { margin-top: 20px; }
+  @keyframes c-pulse {
+    0%, 100% { outline-color: var(--accent); }
+    50% { outline-color: transparent; }
+  }
+  .c-tracker-node[data-current="true"] {
+    animation: c-pulse 2s ease-in-out infinite;
+  }
+
   /* ── Reduced motion ── */
   @media (prefers-reduced-motion: reduce) {
-    .c-toast, .c-fab, .c-drawer, .c-overlay, .c-success, .c-success-card, .c-detail, .c-pop-in {
+    .c-toast, .c-fab, .c-drawer, .c-overlay, .c-success, .c-success-card, .c-detail, .c-pop-in, .c-tracker-node[data-current="true"] {
       animation: none !important;
     }
     .c-tab:active, .c-pill:active, .c-card:active,
@@ -606,6 +669,8 @@ export default function CardapioPage({ shop, categories, products, mesa, initial
   const [clientName, setClientName] = useState('')
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [orderId, setOrderId] = useState<string | null>(null)
+  const [orderStatus, setOrderStatus] = useState<string>('recebido')
   const [toast, setToast] = useState<{ msg: string; error?: boolean } | null>(null)
   const [visibleCatId, setVisibleCatId] = useState<string | null>(null)
 
@@ -749,6 +814,48 @@ export default function CardapioPage({ shop, categories, products, mesa, initial
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [success])
 
+  // Realtime order status tracking
+  useEffect(() => {
+    if (!orderId) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`order_${orderId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'menu_orders',
+        filter: `id=eq.${orderId}`,
+      }, (payload) => {
+        if (payload.new?.status) setOrderStatus(payload.new.status as string)
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [orderId])
+
+  // Restore last order from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`order_${shop.id}`)
+      if (!stored) return
+      const { id, ts } = JSON.parse(stored)
+      // Only restore if less than 4 hours old
+      if (Date.now() - ts > 4 * 60 * 60 * 1000) {
+        localStorage.removeItem(`order_${shop.id}`)
+        return
+      }
+      const supabase = createClient()
+      supabase.from('menu_orders').select('id, status').eq('id', id).single().then(({ data }) => {
+        if (data && data.status !== 'entregue' && data.status !== 'cancelado') {
+          setOrderId(data.id)
+          setOrderStatus(data.status)
+          setSuccess(true)
+        } else {
+          localStorage.removeItem(`order_${shop.id}`)
+        }
+      })
+    } catch {}
+  }, [shop.id])
+
   // Back button closes modals via popstate
   const modalStack = useRef<string[]>([])
   const pushModal = useCallback((id: string) => {
@@ -781,7 +888,13 @@ export default function CardapioPage({ shop, categories, products, mesa, initial
 
   const closeDetail = useCallback(() => { setSelectedProduct(null); popModal('detail') }, [popModal])
   const closeDrawer = useCallback(() => { setDrawerOpen(false); popModal('drawer') }, [popModal])
-  const closeSuccess = useCallback(() => { setSuccess(false); popModal('success') }, [popModal])
+  const closeSuccess = useCallback(() => {
+    setSuccess(false)
+    setOrderId(null)
+    setOrderStatus('recebido')
+    try { localStorage.removeItem(`order_${shop.id}`) } catch {}
+    popModal('success')
+  }, [popModal, shop.id])
 
   function openProduct(p: Product) {
     setSelectedProduct(p)
@@ -843,6 +956,10 @@ export default function CardapioPage({ shop, categories, products, mesa, initial
         }),
       })
       if (!res.ok) throw new Error('Erro ao enviar pedido')
+      const data = await res.json()
+      setOrderId(data.id)
+      setOrderStatus('recebido')
+      try { localStorage.setItem(`order_${shop.id}`, JSON.stringify({ id: data.id, ts: Date.now() })) } catch {}
       setCart([])
       setDrawerOpen(false)
       // Swap drawer→success in stack and history (replaceState avoids
@@ -1202,29 +1319,82 @@ export default function CardapioPage({ shop, categories, products, mesa, initial
           </>
         )}
 
-        {/* Success */}
-        {success && (
-          <div className="c-success" onClick={closeSuccess} role="dialog" aria-modal="true" aria-label="Pedido enviado">
-            <div className="c-success-card" onClick={e => e.stopPropagation()}>
-              <div className="c-success-icon">
-                <Check size={28} strokeWidth={2.5} />
+        {/* Success + Order Tracker */}
+        {success && (() => {
+          const STEPS = [
+            { key: 'recebido', label: 'Recebido', icon: Clock },
+            { key: 'em_preparo', label: 'Preparando', icon: ChefHat },
+            { key: 'pronto', label: 'Pronto', icon: CheckCircle },
+            { key: 'entregue', label: 'Entregue', icon: Package },
+          ]
+          const currentIdx = STEPS.findIndex(s => s.key === orderStatus)
+          const isDelivered = orderStatus === 'entregue'
+          const isCancelled = orderStatus === 'cancelado'
+          return (
+            <div className="c-success" onClick={closeSuccess} role="dialog" aria-modal="true" aria-label="Acompanhar pedido">
+              <div className="c-success-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 380 }}>
+                <div className="c-success-icon">
+                  {isDelivered ? <Check size={28} strokeWidth={2.5} />
+                    : isCancelled ? <X size={28} strokeWidth={2.5} />
+                    : <Clock size={28} strokeWidth={2.5} />}
+                </div>
+                <h3 className="c-success-title">
+                  {isDelivered ? 'Pedido entregue!' : isCancelled ? 'Pedido cancelado' : 'Acompanhe seu pedido'}
+                </h3>
+                {!isCancelled && (
+                  <div className="c-tracker">
+                    <div className="c-tracker-steps">
+                      {STEPS.map((step, i) => {
+                        const Icon = step.icon
+                        const isDone = i <= currentIdx
+                        const isCurrent = i === currentIdx
+                        return (
+                          <div key={step.key} style={{ display: 'flex', alignItems: 'flex-start', flex: i < STEPS.length - 1 ? 1 : undefined }}>
+                            <div className="c-tracker-step">
+                              <div
+                                className="c-tracker-node"
+                                data-done={isDone ? 'true' : undefined}
+                                data-current={isCurrent ? 'true' : undefined}
+                                data-future={!isDone && !isCurrent ? 'true' : undefined}
+                              >
+                                <Icon size={18} strokeWidth={isDone ? 2.5 : 1.8} />
+                              </div>
+                              <span className="c-tracker-label" data-active={isDone ? 'true' : 'false'}>
+                                {step.label}
+                              </span>
+                            </div>
+                            {i < STEPS.length - 1 && (
+                              <div className="c-tracker-line-wrap">
+                                <div className="c-tracker-line" data-done={i < currentIdx ? 'true' : 'false'} />
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {!isDelivered && (
+                      <p className="c-tracker-status">
+                        {orderStatus === 'recebido' && 'Seu pedido foi recebido. Em breve começaremos a preparar.'}
+                        {orderStatus === 'em_preparo' && <><strong>Preparando</strong> seu pedido agora...</>}
+                        {orderStatus === 'pronto' && <><strong>Pronto!</strong> {mesa ? 'Já vamos levar até você.' : 'Aguardando retirada.'}</>}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {isCancelled && (
+                  <p className="c-success-desc">Seu pedido foi cancelado pelo estabelecimento.</p>
+                )}
+                <button
+                  ref={successBtnRef}
+                  className="c-submit c-success-action"
+                  onClick={closeSuccess}
+                >
+                  {isDelivered || isCancelled ? 'Fazer novo pedido' : 'Fazer outro pedido'}
+                </button>
               </div>
-              <h3 className="c-success-title">Pedido enviado</h3>
-              <p className="c-success-desc">
-                {mesa
-                  ? `Seu pedido da mesa ${mesa} foi recebido. Aguarde o preparo.`
-                  : 'Seu pedido foi recebido. Entraremos em contato.'}
-              </p>
-              <button
-                ref={successBtnRef}
-                className="c-submit c-success-action"
-                onClick={closeSuccess}
-              >
-                Fazer outro pedido
-              </button>
             </div>
-          </div>
-        )}
+          )
+        })()}
       </div>
     </>
   )
