@@ -5,8 +5,13 @@ import { embed } from '@/lib/embed'
 // Endpoint usado pelo agente VPS para busca semântica
 // Autenticado via x-api-key (mesma chave do VPS)
 export async function POST(req: NextRequest) {
+  const expectedKey = process.env.VPS_API_KEY
+  if (!expectedKey) {
+    console.error('[knowledge/search] VPS_API_KEY not configured')
+    return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
+  }
   const apiKey = req.headers.get('x-api-key')
-  if (apiKey !== process.env.VPS_API_KEY) {
+  if (apiKey !== expectedKey) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

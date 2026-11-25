@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -10,11 +11,15 @@ export async function POST(req: NextRequest) {
   try {
     // Verifica chave secreta do webhook (InfinitePay envia no header ou podemos exigir no body)
     const webhookSecret = process.env.INFINITEPAY_WEBHOOK_SECRET
-    if (webhookSecret) {
-      const signature = req.headers.get('x-infinitepay-signature') || req.headers.get('authorization')
-      if (!signature || !signature.includes(webhookSecret)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
+    if (!webhookSecret) {
+      console.error('[webhook] INFINITEPAY_WEBHOOK_SECRET not configured')
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+    const signature = req.headers.get('x-infinitepay-signature') || req.headers.get('authorization') || ''
+    const sigMatch = signature.length === webhookSecret.length &&
+      crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(webhookSecret))
+    if (!sigMatch) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await req.json()

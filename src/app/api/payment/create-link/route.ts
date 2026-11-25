@@ -63,12 +63,14 @@ export async function POST(req: NextRequest) {
   const data = await res.json()
 
   if (!res.ok) {
-    return NextResponse.json({ error: 'Erro ao criar link de pagamento', detail: data }, { status: 502 })
+    console.error('[create-link] InfinitePay error:', JSON.stringify(data))
+    return NextResponse.json({ error: 'Erro ao criar link de pagamento' }, { status: 502 })
   }
 
   const url = data.url || data.link || data.checkout_url || data.payment_url
   if (!url) {
-    return NextResponse.json({ error: 'Link não retornado', detail: data }, { status: 502 })
+    console.error('[create-link] No URL in response:', JSON.stringify(data))
+    return NextResponse.json({ error: 'Link não retornado' }, { status: 502 })
   }
 
   return NextResponse.json({ url })

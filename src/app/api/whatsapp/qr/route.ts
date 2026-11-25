@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 
 const VPS_BASE_URL = process.env.VPS_BASE_URL ?? 'http://129.121.39.54:8080'
-const VPS_API_KEY = process.env.VPS_API_KEY ?? 'attendeai-internal-vps-key'
+const VPS_API_KEY = process.env.VPS_API_KEY!
+if (!process.env.VPS_API_KEY) throw new Error('VPS_API_KEY environment variable is required')
 
 export async function GET() {
   const supabase = await createClient()

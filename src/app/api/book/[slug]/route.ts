@@ -37,8 +37,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   const { slug } = await params
   const { nome, email, servico, preco, data, horario, barbeiro } = await req.json()
 
-  if (!nome || !email || !servico || !data || !horario)
-    return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 })
+  // Input validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const dataRegex = /^\d{4}-\d{2}-\d{2}$/
+  const horarioRegex = /^\d{2}:\d{2}$/
+
+  if (!nome || typeof nome !== 'string' || nome.length > 100)
+    return NextResponse.json({ error: 'Nome invalido' }, { status: 400 })
+  if (!email || !emailRegex.test(email))
+    return NextResponse.json({ error: 'Email invalido' }, { status: 400 })
+  if (!servico || typeof servico !== 'string' || servico.length > 100)
+    return NextResponse.json({ error: 'Servico invalido' }, { status: 400 })
+  if (!data || !dataRegex.test(data))
+    return NextResponse.json({ error: 'Data invalida' }, { status: 400 })
+  if (!horario || !horarioRegex.test(horario))
+    return NextResponse.json({ error: 'Horario invalido' }, { status: 400 })
 
   const { data: shop } = await supabase
     .from('barbershops')
@@ -76,7 +89,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[book] DB error:', error.message); return NextResponse.json({ error: 'Erro ao salvar agendamento' }, { status: 500 }) }
 
   // Optional: send confirmation email via Resend
   const resendKey = process.env.RESEND_API_KEY

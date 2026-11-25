@@ -16,6 +16,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'doc_name e content são obrigatórios' }, { status: 400 })
   }
 
+  // Limit content size to 500KB to prevent abuse
+  if (content.length > 500_000) {
+    return NextResponse.json({ error: 'Conteúdo excede o limite de 500KB' }, { status: 413 })
+  }
+  if (doc_name.length > 200) {
+    return NextResponse.json({ error: 'Nome do documento excede 200 caracteres' }, { status: 400 })
+  }
+
   const chunks = chunkText(content)
   if (chunks.length === 0) {
     return NextResponse.json({ error: 'Conteúdo muito curto ou vazio' }, { status: 400 })
