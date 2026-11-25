@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isRateLimited, getClientIp } from '@/lib/rate-limit'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,6 +8,12 @@ const supabaseAdmin = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 5 signups per minute per IP
+  const ip = getClientIp(req)
+  if (isRateLimited(`cadastro:${ip}`, 5, 60_000)) {
+    return NextResponse.json({ error: 'Muitas tentativas. Aguarde um momento.' }, { status: 429 })
+  }
+
   const { nome, email, password, barbearia, telefone } = await req.json()
 
   // 1. Criar usuário no Auth

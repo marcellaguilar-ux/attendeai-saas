@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { isRateLimited, getClientIp } from '@/lib/rate-limit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,6 +35,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ slu
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  // Rate limit: 10 bookings per minute per IP
+  const ip = getClientIp(req)
+  if (isRateLimited(`book:${ip}`, 10, 60_000)) {
+    return NextResponse.json({ error: 'Muitas tentativas. Aguarde um momento.' }, { status: 429 })
+  }
+
   const { slug } = await params
   const { nome, email, servico, preco, data, horario, barbeiro } = await req.json()
 

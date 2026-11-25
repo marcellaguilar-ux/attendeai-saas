@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isRateLimited, getClientIp } from '@/lib/rate-limit'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,6 +9,12 @@ const supabaseAdmin = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 30 webhook calls per minute per IP
+  const ip = getClientIp(req)
+  if (isRateLimited(`webhook:${ip}`, 30, 60_000)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   try {
     // Verifica chave secreta do webhook (InfinitePay envia no header ou podemos exigir no body)
     const webhookSecret = process.env.INFINITEPAY_WEBHOOK_SECRET
